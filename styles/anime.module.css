@@ -1,0 +1,176 @@
+.container {
+    background-color: rgb(252, 251, 219);
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+  }
+
+.Wrapper {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+.poster {
+    margin: 10px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+  }
+
+.centerPoster {
+    display: flex;
+    justify-content: center;
+}
+
+.header {
+    border-left: 20px rgb(65, 184, 248) solid;
+    background-color: rgb(201, 227, 250);
+    padding: 10px;
+    margin: 0;
+    box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179,179,179,0);
+  }
+
+.headerTitle:hover {
+    cursor: pointer;
+}
+
+.headerTitle {
+    margin: 0%;
+    font-family: 'Malgun Gothic';
+    font-weight: 700;
+    font-size: 50px;
+    padding-left: 30px;
+  }
+
+.animeTitle {
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  font-size: 20px;
+  font-family: 'Verdana Pro';
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.borderTop {
+  border-top: rgb(65, 184, 248) solid;
+  padding-top: 15px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+.animeType {
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  color: rgb(62, 62, 62);
+  font-size: 16px;
+  font-family: 'Verdana Pro';
+  font-weight: 500;
+}
+
+.animeDescription {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+  font-family: 'Verdana Pro';
+  font-weight: 700;
+}
+
+.animeWrapper {
+  margin: 30px;
+  border: rgb(65, 184, 248) solid;
+  border-radius: 10px;
+  width: 380px;
+  background-color: aliceblue;
+  padding-left: 50px;
+  padding-right: 50px;
+  height: auto;
+}
+
+.animeSynopsis {
+  display: flex;
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.animePadding {
+  padding-top: 5px;
+  padding-left: 10px;
+  padding-bottom: 5px;
+  display: flex;
+  align-items: baseline;
+}
+
+.animeFlex {
+  display: inline-flex;
+}
+
+.synopsTitle {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 20px;
+  font-family: 'Verdana Pro';
+  font-weight: 700;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  border-top:rgb(65, 184, 248) solid;
+}
+
+.synops {
+  padding-top: 20px;
+  margin: 30px;
+  border: rgb(65, 184, 248) solid;
+  border-radius: 10px;
+  width: 100%;
+  height: 700px;
+  background-color: aliceblue;
+  padding-left: 50px;
+  padding-right: 50px;
+  height: auto;
+  padding-bottom: 20px;
+}
+
+.trailerTitle{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 20px;
+  font-family: 'Verdana Pro';
+  font-weight: 700;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.animeTrailer {
+  width: 800px;
+  height: 400px;
+  border-radius: 20px;
+  background-repeat: no-repeat;
+  border: none;
+  margin-right: 30px;
+  margin-bottom: 20px;
+}
+
+.trailerWrapper {
+  display: flex;
+  justify-items: baseline;
+  flex-wrap: wrap;
+  font-size: 16px;
+  font-family: 'Verdana Pro';
+  font-weight: 700;
+}
+
+.animeProducers {
+  border-left: rgb(65, 184, 248) solid;
+  padding-left: 20px;
+  color: rgb(62, 62, 62);
+  font-size: 16px;
+  font-family: 'Verdana Pro';
+  font-weight: 500;
+  display: flex;
+}

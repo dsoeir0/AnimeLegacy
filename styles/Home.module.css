@@ -1,129 +1,107 @@
-.container {
-  padding: 0 2rem;
+.imageWrapper {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  height: 325px;
 }
 
-.main {
-  min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.footer {
-  display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
-  justify-content: center;
-  align-items: center;
-}
-
-.footer a {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-}
-
-.title a {
-  color: #0070f3;
-  text-decoration: none;
-}
-
-.title a:hover,
-.title a:focus,
-.title a:active {
-  text-decoration: underline;
-}
-
-.title {
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-}
-
-.title,
-.description {
-  text-align: center;
-}
-
-.description {
-  margin: 4rem 0;
-  line-height: 1.5;
-  font-size: 1.5rem;
-}
-
-.code {
-  background: #fafafa;
-  border-radius: 5px;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-    Bitstream Vera Sans Mono, Courier New, monospace;
-}
-
-.grid {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 800px;
+.poster {
+  position: absolute;
+  object-fit: cover;
+  object-position: center;
+  top: 0;
 }
 
 .card {
-  margin: 1rem;
-  padding: 1.5rem;
-  text-align: left;
-  color: inherit;
-  text-decoration: none;
-  border: 1px solid #eaeaea;
+  width: 225px;
+  border: #c4c255;
+  border-style: inset;
   border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  max-width: 300px;
+  background-color: aliceblue;
+  font-weight: 700;
 }
 
-.card:hover,
-.card:focus,
-.card:active {
-  color: #0070f3;
-  border-color: #0070f3;
+.card:hover {
+  opacity: 0.8;
+  background-color: #d2d18f;
+  cursor: pointer;
 }
 
-.card h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
+.carrosel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  padding: 10px;
 }
 
-.card p {
-  margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.5;
+.animeTitle {
+  display: flex;
+  padding-left: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
-.logo {
-  height: 1em;
-  margin-left: 0.5rem;
+.header {
+  border-left: 20px rgb(65, 184, 248) solid;
+  background-color: rgb(201, 227, 250);
+  padding: 10px;
+  margin: 0; 
+  box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179,179,179,0);
 }
 
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
-  }
+.header:hover{
+  cursor:default;
 }
 
-@media (prefers-color-scheme: dark) {
-  .card,
-  .footer {
-    border-color: #222;
-  }
-  .code {
-    background: #111;
-  }
-  .logo img {
-    filter: invert(1);
-  }
+.headerTitle {
+  margin: 0%;
+  font-family: 'Malgun Gothic';
+  font-size: 50px;
+  padding-left: 30px;
 }
+
+.container {
+  background-color: rgb(252, 251, 219);
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+
+.seasonTitle {
+  margin-bottom: 10px;
+  padding-left: 50px;
+  font-size: 35px;
+  font-family: 'Verdana Pro';
+  border-top: 1px black solid;
+}
+
+.titleWinter {
+  margin-bottom: 10px;
+  padding-left: 50px;
+  font-size: 35px;
+  font-family: 'Verdana';
+}
+
+.showButton {
+  border: none;
+  background: none;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  font-size: 17px;
+}
+
+.showButton:hover {
+  color: blue;
+  cursor: pointer;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 150px;
+}
+
