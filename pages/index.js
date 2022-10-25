@@ -17,7 +17,7 @@ export default function Home({ winterResposta, springResposta, summerResposta, f
       </div>
       <div className={styles.carrosel}>
         {winterResposta.data.map(element => (
-          <Link href={`/anime/${element.mal_id}`}>
+          <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
             <div className={styles.card}>
               <div className={styles.imageWrapper}>
                 <img className={styles.poster}
@@ -35,7 +35,7 @@ export default function Home({ winterResposta, springResposta, summerResposta, f
       </div>
       <div className={styles.carrosel}>
         {springResposta.data.map(element => (
-          <Link href={`/anime/${element.mal_id}`}>
+          <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
             <div className={styles.card}>
              <div className={styles.imageWrapper}>
                 <img className={styles.poster}
@@ -53,7 +53,7 @@ export default function Home({ winterResposta, springResposta, summerResposta, f
       </div>
       <div className={styles.carrosel}>
         {summerResposta.data.map(element => (
-          <Link href={`/anime/${element.mal_id}`}>
+          <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
             <div className={styles.card}>
              <div className={styles.imageWrapper}>
                 <img className={styles.poster}
@@ -71,7 +71,7 @@ export default function Home({ winterResposta, springResposta, summerResposta, f
       </div>
       <div className={styles.carrosel}>
         {fallResposta.data.map(element => (
-          <Link href={`/anime/${element.mal_id}`}>
+          <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
             <div className={styles.card}>
               <div className={styles.imageWrapper}>
                 <img className={styles.poster}

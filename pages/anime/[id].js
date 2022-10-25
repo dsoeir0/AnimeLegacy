@@ -40,9 +40,9 @@ export default function anime({ animeResposta }) {
               <span  className={styles.animeDescription}>
                 {animeResposta.data.genres.map((element, index) => {
                     if(animeResposta.data.genres.length -1 === index) {
-                      return(<span>{element.name}</span>)
+                      return(<span key={index}>{element.name}</span>)
                     } else {
-                      return(<span>{element.name}, </span>)
+                      return(<span key={index}>{element.name}, </span>)
                     }
                   })
                 }
@@ -65,9 +65,9 @@ export default function anime({ animeResposta }) {
               <span>
                 {animeResposta.data.producers.map((element, index) => {
                     if(animeResposta.data.producers.length -1 === index) {
-                      return(<span>{element.name}</span>)
+                      return(<span key={index}>{element.name}</span>)
                     } else {
-                      return(<span>{element.name}<p></p> </span>)
+                      return(<span key={index}>{element.name}<p></p> </span>)
                     }
                   })
                 }
