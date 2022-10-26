@@ -1,46 +1,44 @@
 .container {
-    background-color: rgb(252, 251, 219);
-    width: 100%;
-    height: 100%;
-    overflow: scroll;
+  background-color: rgb(252, 251, 219);
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
   }
 
 .Wrapper {
-    display: flex;
-    justify-content: flex-start;
+  display: flex;
+  justify-content: flex-start;
   }
 
 .poster {
-    margin: 10px;
-    border-radius: 15px;
-    display: flex;
-    justify-content: center;
-    padding-bottom: 10px;
+  margin: 10px;
+  border-radius: 15px;
+  margin-bottom: 10px;
   }
 
 .centerPoster {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .header {
-    border-left: 20px rgb(65, 184, 248) solid;
-    background-color: rgb(201, 227, 250);
-    padding: 10px;
-    margin: 0;
-    box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179,179,179,0);
+  border-left: 20px rgb(65, 184, 248) solid;
+  background-color: rgb(201, 227, 250);
+  padding: 10px;
+  margin: 0;
+  box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179,179,179,0);
   }
 
 .headerTitle:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .headerTitle {
-    margin: 0%;
-    font-family: 'Malgun Gothic';
-    font-weight: 700;
-    font-size: 50px;
-    padding-left: 30px;
+  margin: 0%;
+  font-family: 'Malgun Gothic';
+  font-weight: 700;
+  font-size: 50px;
+  padding-left: 30px;
   }
 
 .animeTitle {
@@ -138,7 +136,7 @@
 
 .trailerTitle{
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
   font-size: 20px;
   font-family: 'Verdana Pro';
   font-weight: 700;
@@ -165,12 +163,108 @@
   font-weight: 700;
 }
 
+.trailerRight{
+  border-right: rgb(65, 184, 248) solid;
+}
+
 .animeProducers {
-  border-left: rgb(65, 184, 248) solid;
   padding-left: 20px;
   color: rgb(62, 62, 62);
   font-size: 16px;
   font-family: 'Verdana Pro';
   font-weight: 500;
   display: flex;
+  height: 100%;
+}
+
+.producersName {
+  color: black;
+  font-size: 16px;
+  font-family: 'Verdana Pro';
+  font-weight: 700;
+}
+
+@media screen and (max-width: 600px) {
+
+}
+
+@media screen and (max-width: 1400px) {
+  .Wrapper{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  }
+
+  .animeWrapper {
+  width: 100%;
+  }
+
+  .animeProducers{
+  border-top: rgb(65, 184, 248) solid;
+  border-left: none;
+  padding-top: 10px;
+  width: 100%;
+  padding-bottom: 10px;
+  }
+
+}
+
+@media screen and (max-width: 1080px) {
+  .Wrapper{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  }
+
+  .synops{
+  width: 50%;
+  }
+
+  .animeTrailer {
+  width: 100%;
+  height: 300px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  }
+
+  .animeProducers{
+  border-top: rgb(65, 184, 248) solid;
+  border-left: none;
+  padding-top: 10px;
+  width: 100%;
+  padding-bottom: 10px;
+  width: 100%;
+  }
+
+  .trailerTitle {
+  border-bottom:  rgb(65, 184, 248) solid;
+  }
+
+  .animeWrapper {
+    width: 100%;
+  }
+
+  .synops {
+    width: 100%;
+  }
+
+  .trailerRight{
+    border:none;
+  }
+}
+
+
+@media screen and (max-width: 1805px) {
+  .animeProducers{
+  width: 100%;
+  border-top: rgb(65, 184, 248) solid;
+  border-left: none;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  }
+
+  .trailerRight{
+    border:none;
+  }
+  
 }

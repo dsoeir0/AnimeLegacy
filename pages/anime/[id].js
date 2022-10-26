@@ -15,7 +15,7 @@ export default function anime({ animeResposta }) {
       <div className={styles.Wrapper}> 
         <div className={styles.animeWrapper}>
           <div className={styles.animeTitle}>{animeResposta.data.title}</div>
-          <div clasName={styles.centerPoster}>
+          <div className={styles.centerPoster}>
             <img className={styles.poster}
               src={animeResposta.data.images.webp.image_url}
             />
@@ -57,17 +57,18 @@ export default function anime({ animeResposta }) {
         <div className={styles.synops}>
           <div className={styles.trailerTitle}>Trailer</div>
           <div className={styles.trailerWrapper}>
-            <iframe className={styles.animeTrailer} allow="accelerometer; fullscreen;clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              src={animeResposta.data.trailer.embed_url}>
-            </iframe>
-            <div className={styles.animeProducers}>Producers:</div>
-            <div>
+            <div className={styles.trailerRight}>
+              <iframe className={styles.animeTrailer} allow="accelerometer; fullscreen;clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                src={animeResposta.data.trailer.embed_url}>
+              </iframe>
+            </div>
+            <div className={styles.animeProducers}>Producers:
               <span>
                 {animeResposta.data.producers.map((element, index) => {
                     if(animeResposta.data.producers.length -1 === index) {
-                      return(<span key={index}>{element.name}</span>)
+                      return(<span className={styles.producersName} key={index}>{element.name}</span>)
                     } else {
-                      return(<span key={index}>{element.name}<p></p> </span>)
+                      return(<span className={styles.producersName} key={index}>{element.name},<p></p></span>)
                     }
                   })
                 }
