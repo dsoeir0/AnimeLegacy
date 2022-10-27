@@ -102,6 +102,14 @@
 .buttonContainer {
   display: flex;
   justify-content: flex-end;
-  padding-right: 150px;
+  padding-right: 100px;
 }
 
+@media screen and (max-width: 600px) {
+  
+}
+@media screen and (max-width: 1080px) {
+  .buttonContainer {
+   padding-right: 30px;
+  }
+}
