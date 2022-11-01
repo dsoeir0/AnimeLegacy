@@ -1,0 +1,22 @@
+.sidebar {
+    width: 40%;
+    min-height: 100%;
+    background-color: rgb(219, 217, 145);
+    position: static;
+}
+
+.yearStyle {
+    font-family: 'Malgun Gothic';
+    border: rgb(65, 184, 248) solid;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 5px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    background-color: aliceblue;
+}
+
+.yearStyle:hover {
+    cursor: pointer;
+}

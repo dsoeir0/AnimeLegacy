@@ -16,7 +16,7 @@
 
 .card {
   width: 225px;
-  border: #c4c255;
+  border: rgb(65, 184, 248) solid;
   border-style: inset;
   border-radius: 10px;
   background-color: aliceblue;
@@ -25,7 +25,7 @@
 
 .card:hover {
   opacity: 0.8;
-  background-color: #d2d18f;
+  background-color: #8fbed2;
   cursor: pointer;
 }
 
@@ -49,12 +49,12 @@
   border-left: 20px rgb(65, 184, 248) solid;
   background-color: rgb(201, 227, 250);
   padding: 10px;
-  margin: 0; 
-  box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179,179,179,0);
+  margin: 0;
+  box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179, 179, 179, 0);
 }
 
-.header:hover{
-  cursor:default;
+.header:hover {
+  cursor: default;
 }
 
 .headerTitle {
@@ -75,15 +75,7 @@
   margin-bottom: 10px;
   padding-left: 50px;
   font-size: 35px;
-  font-family: 'Verdana Pro';
-  border-top: 1px black solid;
-}
-
-.titleWinter {
-  margin-bottom: 10px;
-  padding-left: 50px;
-  font-size: 35px;
-  font-family: 'Verdana';
+  font-family: 'Malgun Gothic';
 }
 
 .showButton {
@@ -105,11 +97,23 @@
   padding-right: 100px;
 }
 
-@media screen and (max-width: 600px) {
-  
+.wrapper {
+  border: rgb(65, 184, 248) solid;
+  border-radius: 10px;
+  background-color: aliceblue;
+  margin: 30px;
+  margin-bottom: 30px;
+  padding: 10px;
 }
-@media screen and (max-width: 1080px) {
+
+.sidebarWrapper {
+  display: flex;
+}
+
+@media screen and (max-width: 600px) {}
+
+@media screen and (max-width: 1050px) {
   .buttonContainer {
-   padding-right: 30px;
+    padding-right: 30px;
   }
 }

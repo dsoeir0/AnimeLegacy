@@ -8,11 +8,11 @@ export default function anime({ animeResposta }) {
     <div className={styles.container}>
       <title>{animeResposta.data.title}</title>
       <div className={styles.header}>
-        <Link href ='/'>
+        <Link href='/'>
           <span className={styles.headerTitle}>AnimeLegacy</span>
         </Link>
       </div>
-      <div className={styles.Wrapper}> 
+      <div className={styles.Wrapper}>
         <div className={styles.animeWrapper}>
           <div className={styles.animeTitle}>{animeResposta.data.title}</div>
           <div className={styles.centerPoster}>
@@ -22,36 +22,36 @@ export default function anime({ animeResposta }) {
           </div>
           <div className={styles.borderTop}>
             <span className={styles.animeType}>Type:</span>
-            <span  className={styles.animeDescription}>{animeResposta.data.type}</span>
+            <span className={styles.animeDescription}>{animeResposta.data.type}</span>
           </div>
           <div className={styles.animePadding}>
             <span className={styles.animeType}>Episodes:</span>
-            <span  className={styles.animeDescription}>
-              {!animeResposta.data.episodes ? "???":animeResposta.data.episodes} 
+            <span className={styles.animeDescription}>
+              {!animeResposta.data.episodes ? "???" : animeResposta.data.episodes}
             </span>
           </div>
           <div className={styles.animePadding}>
             <span className={styles.animeType}>Status:</span>
-            <span  className={styles.animeDescription}>{animeResposta.data.status}</span>
+            <span className={styles.animeDescription}>{animeResposta.data.status}</span>
           </div>
           <div className={styles.animePadding}>
             <span className={styles.animeType}>Genres:</span>
             <div className={styles.animeFlex}>
-              <span  className={styles.animeDescription}>
+              <span className={styles.animeDescription}>
                 {animeResposta.data.genres.map((element, index) => {
-                    if(animeResposta.data.genres.length -1 === index) {
-                      return(<span key={index}>{element.name}</span>)
-                    } else {
-                      return(<span key={index}>{element.name}, </span>)
-                    }
-                  })
+                  if (animeResposta.data.genres.length - 1 === index) {
+                    return (<span key={index}>{element.name}</span>)
+                  } else {
+                    return (<span key={index}>{element.name}, </span>)
+                  }
+                })
                 }
               </span>
             </div>
           </div>
           <div className={styles.animePadding}>
             <span className={styles.animeType}>Score:</span>
-            <span  className={styles.animeDescription}>{animeResposta.data.score}</span>
+            <span className={styles.animeDescription}>{animeResposta.data.score}</span>
           </div>
         </div>
         <div className={styles.synops}>
@@ -65,12 +65,12 @@ export default function anime({ animeResposta }) {
             <div className={styles.animeProducers}>Producers:
               <span>
                 {animeResposta.data.producers.map((element, index) => {
-                    if(animeResposta.data.producers.length -1 === index) {
-                      return(<span className={styles.producersName} key={index}>{element.name}</span>)
-                    } else {
-                      return(<span className={styles.producersName} key={index}>{element.name},<p></p></span>)
-                    }
-                  })
+                  if (animeResposta.data.producers.length - 1 === index) {
+                    return (<span className={styles.producersName} key={index}>{element.name}</span>)
+                  } else {
+                    return (<span className={styles.producersName} key={index}>{element.name},<p></p></span>)
+                  }
+                })
                 }
               </span>
             </div>
@@ -82,13 +82,14 @@ export default function anime({ animeResposta }) {
     </div>
   )
 }
+
 export async function getServerSideProps(context) {
-  
+
   const baseurl = "https://api.jikan.moe/v4";
 
   const { id } = context.query
   const anime = await fetch(`${baseurl}/anime/${id}`)
   const animeResposta = await anime.json()
   console.log(animeResposta)
-  return { props: { animeResposta} }
+  return { props: { animeResposta } }
 }

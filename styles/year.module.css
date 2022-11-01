@@ -1,0 +1,97 @@
+.container {
+    background-color: rgb(252, 251, 219);
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+}
+
+.headerTitle {
+    margin: 0%;
+    font-family: 'Malgun Gothic';
+    font-weight: 700;
+    font-size: 50px;
+    padding-left: 30px;
+}
+
+.headerTitle:hover {
+    cursor: pointer;
+}
+
+.header {
+    border-left: 20px rgb(65, 184, 248) solid;
+    background-color: rgb(201, 227, 250);
+    padding: 10px;
+    margin: 0;
+    box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179, 179, 179, 0);
+}
+
+.header:hover {
+    cursor: default;
+}
+
+.sidebarWrapper {
+    display: flex;
+    min-height: 100%;
+}
+
+.wrapper {
+    border: rgb(65, 184, 248) solid;
+    border-radius: 10px;
+    background-color: aliceblue;
+    margin: 20px;
+    padding: 20px;
+}
+
+.seasonTitle {
+    margin-bottom: 10px;
+    padding-left: 50px;
+    font-size: 35px;
+    font-family: 'Malgun Gothic';
+  }
+
+  .carrosel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    padding: 10px;
+  }
+
+  .card {
+    width: 225px;
+    border: rgb(65, 184, 248) solid;
+    border-style: inset;
+    border-radius: 10px;
+    background-color: aliceblue;
+    font-weight: 700;
+  }
+
+  .card:hover {
+    opacity: 0.8;
+    background-color: #8fbed2;
+    cursor: pointer;
+  }
+
+  .imageWrapper {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    height: 325px;
+  }
+
+  .poster {
+    position: absolute;
+    object-fit: cover;
+    object-position: center;
+    top: 0;
+  }
+
+  .animeTitle {
+    display: flex;
+    padding-left: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
