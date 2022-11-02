@@ -4,7 +4,7 @@ import styles from '../styles/sidebar.module.css'
 const Sidebar = () => {
     return (
         <div className={styles.sidebar}>
-            <Link href={`/seasons/2022/winter`}>
+            <Link href={`/`}>
                 <div className={styles.yearStyle}>2022</div>
             </Link>
             <Link href={`/seasons/2021/winter`}>
