@@ -3,17 +3,12 @@ import Image from 'next/image'
 import css from 'styled-jsx/css'
 import styles from '../styles/Home.module.css'
 import Link from 'next/link'
-import Sidebar from '../components/Sidebar'
+import Layout from '../components/Layout'
 
 export default function Home({ winterResposta, springResposta, summerResposta, fallResposta }) {
+  
   return (
-    <div className={styles.container}>
-      <title>AnimeLegacy</title>
-      <div className={styles.header}>
-        <h1 className={styles.headerTitle}>AnimeLegacy</h1>
-      </div>
-      <div className={styles.sidebarWrapper}>
-        <Sidebar />
+    <Layout>
         <div>
           <div className={styles.wrapper}>
             <h2 className={styles.seasonTitle}>Winter</h2>
@@ -95,9 +90,8 @@ export default function Home({ winterResposta, springResposta, summerResposta, f
               ))}
             </div>
           </div>
-        </div>
       </div>
-    </div>
+    </Layout>
   )
 }
 

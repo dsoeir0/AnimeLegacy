@@ -1,17 +1,12 @@
 import React from 'react'
 import styles from '../../styles/anime.module.css'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
+import Header from '../../components/Header'
 
 export default function anime({ animeResposta }) {
   return (
     <div className={styles.container}>
       <title>{animeResposta.data.title}</title>
-      <div className={styles.header}>
-        <Link href='/'>
-          <span className={styles.headerTitle}>AnimeLegacy</span>
-        </Link>
-      </div>
+        <Header />
       <div className={styles.Wrapper}>
         <div className={styles.animeWrapper}>
           <div className={styles.animeTitle}>{animeResposta.data.title}</div>
