@@ -6,90 +6,90 @@ import Link from 'next/link'
 import Layout from '../components/Layout'
 
 export default function Home({ winterResposta, springResposta, summerResposta, fallResposta }) {
-  
+
   return (
     <Layout>
-        <div>
-          <div className={styles.wrapper}>
-            <h2 className={styles.seasonTitle}>Winter</h2>
-            <div className={styles.buttonContainer}>
-              <button className={styles.showButton}>Show all</button>
-            </div>
-            <div className={styles.carrosel}>
-              {winterResposta.data.map(element => (
-                <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
-                  <div className={styles.card}>
-                    <div className={styles.imageWrapper}>
-                      <img className={styles.poster}
-                        src={element.images.webp.image_url}
-                      />
-                    </div>
-                    <div className={styles.animeTitle}>{element.title}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+      <div>
+        <div className={styles.wrapper}>
+          <h2 className={styles.seasonTitle}>Winter</h2>
+          <div className={styles.buttonContainer}>
+            <button className={styles.showButton}>Show all</button>
           </div>
-          <div className={styles.wrapper}>
-            <h2 className={styles.seasonTitle}>Spring</h2>
-            <div className={styles.buttonContainer}>
-              <button className={styles.showButton}>Show all</button>
-            </div>
-            <div className={styles.carrosel}>
-              {springResposta.data.map(element => (
-                <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
-                  <div className={styles.card}>
-                    <div className={styles.imageWrapper}>
-                      <img className={styles.poster}
-                        src={element.images.webp.image_url}
-                      />
-                    </div>
-                    <div className={styles.animeTitle}>{element.title}</div>
+          <div className={styles.carrosel}>
+            {winterResposta.data.map(element => (
+              <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
+                <div className={styles.card}>
+                  <div className={styles.imageWrapper}>
+                    <img className={styles.poster}
+                      src={element.images.webp.image_url}
+                    />
                   </div>
-                </Link>
-              ))}
-            </div>
+                  <div className={styles.animeTitle}>{element.title}</div>
+                </div>
+              </Link>
+            ))}
           </div>
-          <div className={styles.wrapper}>
-            <h2 className={styles.seasonTitle}>Summer</h2>
-            <div className={styles.buttonContainer}>
-              <button className={styles.showButton}>Show all</button>
-            </div>
-            <div className={styles.carrosel}>
-              {summerResposta.data.map(element => (
-                <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
-                  <div className={styles.card}>
-                    <div className={styles.imageWrapper}>
-                      <img className={styles.poster}
-                        src={element.images.webp.image_url}
-                      />
-                    </div>
-                    <div className={styles.animeTitle}>{element.title}</div>
+        </div>
+        <div className={styles.wrapper}>
+          <h2 className={styles.seasonTitle}>Spring</h2>
+          <div className={styles.buttonContainer}>
+            <button className={styles.showButton}>Show all</button>
+          </div>
+          <div className={styles.carrosel}>
+            {springResposta.data.map(element => (
+              <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
+                <div className={styles.card}>
+                  <div className={styles.imageWrapper}>
+                    <img className={styles.poster}
+                      src={element.images.webp.image_url}
+                    />
                   </div>
-                </Link>
-              ))}
-            </div>
+                  <div className={styles.animeTitle}>{element.title}</div>
+                </div>
+              </Link>
+            ))}
           </div>
-          <div className={styles.wrapper}>
-            <h2 className={styles.seasonTitle}>Fall</h2>
-            <div className={styles.buttonContainer}>
-              <button className={styles.showButton}>Show all</button>
-            </div>
-            <div className={styles.carrosel}>
-              {fallResposta.data.map(element => (
-                <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
-                  <div className={styles.card}>
-                    <div className={styles.imageWrapper}>
-                      <img className={styles.poster}
-                        src={element.images.webp.image_url}
-                      />
-                    </div>
-                    <div className={styles.animeTitle}>{element.title}</div>
+        </div>
+        <div className={styles.wrapper}>
+          <h2 className={styles.seasonTitle}>Summer</h2>
+          <div className={styles.buttonContainer}>
+            <button className={styles.showButton}>Show all</button>
+          </div>
+          <div className={styles.carrosel}>
+            {summerResposta.data.map(element => (
+              <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
+                <div className={styles.card}>
+                  <div className={styles.imageWrapper}>
+                    <img className={styles.poster}
+                      src={element.images.webp.image_url}
+                    />
                   </div>
-                </Link>
-              ))}
-            </div>
+                  <div className={styles.animeTitle}>{element.title}</div>
+                </div>
+              </Link>
+            ))}
           </div>
+        </div>
+        <div className={styles.wrapper}>
+          <h2 className={styles.seasonTitle}>Fall</h2>
+          <div className={styles.buttonContainer}>
+            <button className={styles.showButton}>Show all</button>
+          </div>
+          <div className={styles.carrosel}>
+            {fallResposta.data.map(element => (
+              <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
+                <div className={styles.card}>
+                  <div className={styles.imageWrapper}>
+                    <img className={styles.poster}
+                      src={element.images.webp.image_url}
+                    />
+                  </div>
+                  <div className={styles.animeTitle}>{element.title}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </Layout>
   )

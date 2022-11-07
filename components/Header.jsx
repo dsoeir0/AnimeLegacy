@@ -1,7 +1,5 @@
 import styles from '../styles/header.module.css'
 import Link from 'next/link';
-import { useState } from 'react';
-import Sidebar from './Sidebar'
 
 const Header = ({handleOnClick}) => {
 

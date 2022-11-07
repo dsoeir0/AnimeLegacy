@@ -1,12 +1,12 @@
 import React from 'react'
 import styles from '../../styles/anime.module.css'
 import Header from '../../components/Header'
+import Layout from '../../components/Layout'
 
 export default function anime({ animeResposta }) {
   return (
-    <div className={styles.container}>
+    <Layout>
       <title>{animeResposta.data.title}</title>
-        <Header />
       <div className={styles.Wrapper}>
         <div className={styles.animeWrapper}>
           <div className={styles.animeTitle}>{animeResposta.data.title}</div>
@@ -74,7 +74,7 @@ export default function anime({ animeResposta }) {
           <div className={styles.animeSynopsis}>{animeResposta.data.synopsis}</div>
         </div>
       </div>
-    </div>
+    </Layout>
   )
 }
 

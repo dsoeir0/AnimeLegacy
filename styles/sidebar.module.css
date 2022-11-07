@@ -1,7 +1,8 @@
 .sidebar {
     width: 40%;
-    height: 100%;
+    /* height: 100%; */
     background-color: rgb(219, 217, 145);
+
 }
 
 .yearStyle {
@@ -20,10 +21,11 @@
     cursor: pointer;
 }
 
-/* @media screen and (max-width: 600px) {}
-
-@media screen and (max-width: 1050px) {
-    .sidebar{
-        display: none;
+@media screen and (max-width: 600px) {
+    .sidebar {
+        position: absolute;
+        z-index: 1;
     }
-} */
+}
+
+@media screen and (max-width: 1050px) {}

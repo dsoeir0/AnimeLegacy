@@ -5,6 +5,7 @@
     height: 100%;
     overflow: scroll;
     background-color: rgb(252, 251, 219);
+    position: relative;
 }
 
 .contentWrapper {

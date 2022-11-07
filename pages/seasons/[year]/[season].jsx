@@ -5,7 +5,7 @@ import Layout from '../../../components/Layout'
 
 export default function seasons({ seasonResposta }) {
   return (
-   <Layout>
+    <Layout>
       <div className={styles.sidebarWrapper}>
         <div className={styles.wrapper}>
           <h2 className={styles.seasonTitle}>Winter</h2>
@@ -25,8 +25,8 @@ export default function seasons({ seasonResposta }) {
           </div>
         </div>
       </div>
-   </Layout>
-      
+    </Layout>
+
   )
 }
 
