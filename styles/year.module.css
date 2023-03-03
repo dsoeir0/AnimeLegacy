@@ -7,7 +7,6 @@
 
 .sidebarWrapper {
   display: flex;
-  min-height: 100%;
 }
 
 .wrapper {
@@ -16,6 +15,7 @@
   background-color: aliceblue;
   margin: 20px;
   padding: 20px;
+  height: 100%;
 }
 
 .seasonTitle {

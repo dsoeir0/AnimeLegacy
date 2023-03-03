@@ -1,34 +1,34 @@
 .header {
-    border-left: 20px rgb(65, 184, 248) solid;
-    background-color: rgb(201, 227, 250);
-    padding: 10px;
-    margin: 0;
-    box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179, 179, 179, 0);
-    display: flex;
-    align-items: center;
+  border-left: 20px rgb(65, 184, 248) solid;
+  background-color: rgb(201, 227, 250);
+  padding: 10px;
+  margin: 0;
+  box-shadow: 0px 10px 13px -7px #d4d387, 5px 5px 15px 5px rgba(179, 179, 179, 0);
+  display: flex;
+  align-items: center;
 }
 
 .header:hover {
-    cursor: default;
+  cursor: default;
 }
 
 .headerTitle {
-    margin: 0%;
-    font-family: 'Malgun Gothic';
-    font-size: 50px;
-    padding-left: 30px;
-    font-weight: 700;
+  margin: 0%;
+  font-family: 'Malgun Gothic';
+  font-size: 50px;
+  padding-left: 30px;
+  font-weight: 700;
 }
 
 .headerTitle:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* .burger {
   display: none;
 } */
 
-.burger:hover{
+.burger:hover {
   cursor: pointer;
 }
 
