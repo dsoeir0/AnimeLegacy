@@ -4,13 +4,19 @@ import Link from 'next/link'
 import Layout from '../../components/Layout'
 
 export default function seasons({ winterResposta, springResposta, summerResposta, fallResposta }) {
+  const safeData = (resp) => (Array.isArray(resp?.data) ? resp.data : [])
+  const winterData = safeData(winterResposta)
+  const springData = safeData(springResposta)
+  const summerData = safeData(summerResposta)
+  const fallData = safeData(fallResposta)
+
   return (
     <Layout>
       <div className={styles.sidebarWrapper}>
         <div className={styles.wrapper}>
           <h2 className={styles.seasonTitle}>Winter</h2>
           <div className={styles.carrosel}>
-            {winterResposta.data.map((element) => (
+            {winterData.map((element) => (
               <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
                 <div className={styles.card}>
                   <div className={styles.imageWrapper}>
@@ -29,7 +35,7 @@ export default function seasons({ winterResposta, springResposta, summerResposta
         <div className={styles.wrapper}>
           <h2 className={styles.seasonTitle}>Spring</h2>
           <div className={styles.carrosel}>
-            {springResposta.data.map((element) => (
+            {springData.map((element) => (
               <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
                 <div className={styles.card}>
                   <div className={styles.imageWrapper}>
@@ -48,7 +54,7 @@ export default function seasons({ winterResposta, springResposta, summerResposta
         <div className={styles.wrapper}>
           <h2 className={styles.seasonTitle}>Summer</h2>
           <div className={styles.carrosel}>
-            {summerResposta.data.map((element) => (
+            {summerData.map((element) => (
               <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
                 <div className={styles.card}>
                   <div className={styles.imageWrapper}>
@@ -67,7 +73,7 @@ export default function seasons({ winterResposta, springResposta, summerResposta
         <div className={styles.wrapper}>
           <h2 className={styles.seasonTitle}>Fall</h2>
           <div className={styles.carrosel}>
-            {fallResposta.data.map((element) => (
+            {fallData.map((element) => (
               <Link key={element.mal_id} href={`/anime/${element.mal_id}`}>
                 <div className={styles.card}>
                   <div className={styles.imageWrapper}>
