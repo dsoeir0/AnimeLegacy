@@ -2,6 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'myanimelist.net' },
+      { protocol: 'https', hostname: 'cdn.myanimelist.net' },
+      { protocol: 'https', hostname: 's4.anilist.co' },
+      { protocol: 'https', hostname: 's3.anilist.co' },
+      { protocol: 'https', hostname: 's2.anilist.co' },
+      { protocol: 'https', hostname: 's1.anilist.co' },
+    ],
+  },
   webpack: (config) => {
     config.watchOptions ??= {}
     const existing = config.watchOptions.ignored ?? []
