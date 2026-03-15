@@ -321,6 +321,7 @@
   color: inherit;
   border: 1px solid rgba(255, 255, 255, 0.06);
   animation: riseIn 800ms ease both;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
 }
 
 .movieLink {
@@ -340,6 +341,7 @@
 .moviePosterImage {
   object-fit: cover;
   border-radius: 14px;
+  transition: transform 300ms ease;
 }
 
 .movieInfo {
@@ -376,6 +378,16 @@
   gap: 12px;
   font-size: 12px;
   color: #8a90a5;
+}
+
+.movieCard:hover {
+  transform: translateY(-4px);
+  background: rgba(22, 26, 38, 0.9);
+  box-shadow: 0 20px 45px rgba(10, 12, 18, 0.45);
+}
+
+.movieCard:hover .moviePosterImage {
+  transform: scale(1.03);
 }
 
 @keyframes riseIn {

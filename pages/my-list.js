@@ -1,14 +1,20 @@
-import Layout from '../components/Layout'
-import styles from '../styles/my-list.module.css'
-import useMyList from '../components/useMyList'
 import Link from 'next/link'
 import Image from 'next/image'
+import Layout from '../components/layout/Layout'
+import styles from '../styles/my-list.module.css'
+import useMyList from '../hooks/useMyList'
 
 export default function MyList() {
   const { list, removeItem, hasLoaded } = useMyList()
 
   return (
-    <Layout showSidebar={false} headerVariant="dark" layoutVariant="dark">
+    <Layout
+      showSidebar={false}
+      headerVariant="dark"
+      layoutVariant="dark"
+      title="AnimeLegacy - My List"
+      description="Your personal anime watchlist and favorites in one place."
+    >
       <main className={styles.main}>
         <section className={styles.header}>
           <div>
@@ -45,7 +51,7 @@ export default function MyList() {
                       <div className={styles.cardTitle}>{item.title}</div>
                       <div className={styles.meta}>
                         <span>{item.type || 'Series'}</span>
-                        <span>{item.year || '—'}</span>
+                        <span>{item.year || '-'}</span>
                         <span>{item.score ? `${item.score}` : 'NR'}</span>
                       </div>
                     </div>

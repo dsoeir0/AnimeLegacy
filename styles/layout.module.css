@@ -12,9 +12,12 @@
 }
 
 .layoutDark {
-  background: radial-gradient(circle at top left, rgba(59, 71, 130, 0.25), transparent 55%),
-    radial-gradient(circle at 30% 30%, rgba(90, 160, 255, 0.15), transparent 60%),
-    #0b0c10;
+  background-color: #0c1326;
+  background-image:
+    radial-gradient(circle at 20% 15%, rgba(99, 102, 241, 0.06), transparent 55%),
+    radial-gradient(circle at 80% 30%, rgba(59, 130, 246, 0.05), transparent 60%),
+    radial-gradient(circle at 50% 80%, rgba(56, 189, 248, 0.04), transparent 65%);
+  background-attachment: fixed;
   color: #f1f3fb;
 }
 

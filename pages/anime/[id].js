@@ -1,28 +1,23 @@
-import React from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
+import Layout from '../../components/layout/Layout'
 import styles from '../../styles/anime.module.css'
-import Layout from '../../components/Layout'
+import { getAnimeById, getAnimeCharacters } from '../../lib/api/jikan'
+import { formatSeasonLabel } from '../../lib/utils/season'
+import { getAnimeBannerUrl, getAnimeImageUrl, getCharacterAvatarUrl } from '../../lib/utils/media'
 
-export default function anime({ animeResposta, charactersResposta }) {
+export default function AnimeDetail({ animeResposta, charactersResposta }) {
   const data = animeResposta?.data ?? {}
   const genres = Array.isArray(data.genres) ? data.genres : []
   const producers = Array.isArray(data.producers) ? data.producers : []
-  const posterUrl = data?.images?.webp?.large_image_url
-    || data?.images?.jpg?.large_image_url
-    || data?.images?.webp?.image_url
-    || data?.images?.jpg?.image_url
-    || ''
-  const backdropUrl = data?.images?.webp?.large_image_url
-    || data?.images?.jpg?.large_image_url
-    || posterUrl
+  const posterUrl = getAnimeImageUrl(data)
+  const backdropUrl = getAnimeBannerUrl(data)
   const trailerUrl = data?.trailer?.embed_url || ''
-  const seasonLabel = data?.season
-    ? `${data.season[0].toUpperCase()}${data.season.slice(1)} ${data?.year || ''}`.trim()
-    : (data?.year ? `${data.year}` : 'Unknown')
+  const seasonLabel = formatSeasonLabel(data?.season, data?.year)
   const studioName = Array.isArray(data.studios) && data.studios.length > 0 ? data.studios[0].name : 'Unknown'
   const ratingLabel = data?.rating || 'Not Rated'
   const scoreLabel = typeof data?.score === 'number' ? data.score.toFixed(2) : 'N/A'
-  const isAiring = Boolean(data?.airing)
+  const statusLabel = data?.airing ? 'Airing' : (data.status || 'Unknown')
   const characters = Array.isArray(charactersResposta?.data) ? charactersResposta.data : []
   const rankLabel = data?.rank ? `#${data.rank}` : 'N/A'
   const popularityLabel = data?.popularity ? `#${data.popularity}` : 'N/A'
@@ -30,11 +25,17 @@ export default function anime({ animeResposta, charactersResposta }) {
   const synopsisText = data.synopsis || 'Synopsis not available.'
   const [shortSynopsis, ...restSynopsis] = synopsisText.split('. ')
   const secondarySynopsis = restSynopsis.join('. ').trim()
-  const backgroundText = data?.background || 'Background information not available.'
+  const backgroundText = data?.background || ''
+  const [showAllCharacters, setShowAllCharacters] = useState(false)
 
   return (
-    <Layout showSidebar={false} headerVariant="dark" layoutVariant="dark">
-      <title>{data.title || 'Anime'}</title>
+    <Layout
+      showSidebar={false}
+      headerVariant="dark"
+      layoutVariant="dark"
+      title={`${data.title || 'Anime'} - AnimeLegacy`}
+      description={data.synopsis || 'Anime details, characters, and highlights.'}
+    >
       <div className={styles.page}>
         <section className={styles.hero}>
           {backdropUrl ? (
@@ -54,7 +55,7 @@ export default function anime({ animeResposta, charactersResposta }) {
               <span className={styles.scorePill}>{scoreLabel}</span>
               <span className={styles.metaText}>Score</span>
               <span className={styles.metaDivider} />
-              <span className={styles.metaText}>{isAiring ? 'Finished Airing' : (data.status || 'Unknown')}</span>
+              <span className={styles.metaText}>{statusLabel}</span>
               <span className={styles.metaDivider} />
               <span className={styles.metaText}>{episodeLabel}</span>
             </div>
@@ -67,7 +68,7 @@ export default function anime({ animeResposta, charactersResposta }) {
             <div className={styles.posterFrame}>
               <Image
                 className={styles.poster}
-                src={posterUrl || '/vercel.svg'}
+                src={posterUrl || '/logo_no_text.png'}
                 alt={data.title || 'Anime poster'}
                 width={280}
                 height={380}
@@ -93,6 +94,7 @@ export default function anime({ animeResposta, charactersResposta }) {
                   <div className={styles.videoBadge}>Trailer</div>
                   <iframe
                     className={styles.animeTrailer}
+                    title="Official trailer"
                     allow="accelerometer; fullscreen;clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     src={trailerUrl}
                   />
@@ -101,39 +103,79 @@ export default function anime({ animeResposta, charactersResposta }) {
                 <p className={styles.sectionBody}>Trailer not available.</p>
               )}
             </div>
-            <div className={styles.section}>
-              <div className={styles.sectionEyebrow}>Background</div>
-              <h2 className={styles.sectionTitle}>Background</h2>
-              <p className={styles.sectionBody}>{backgroundText}</p>
-            </div>
+            {backgroundText ? (
+              <div className={styles.section}>
+                <div className={styles.sectionEyebrow}>Background</div>
+                <h2 className={styles.sectionTitle}>Background</h2>
+                <p className={styles.sectionBody}>{backgroundText}</p>
+              </div>
+            ) : null}
             <div className={styles.section}>
               <div className={styles.sectionEyebrow}>Key Characters</div>
               <div className={styles.sectionHeader}>
                 <h2 className={styles.sectionTitle}>Key Characters</h2>
-                <button className={styles.linkButton} type="button">View All Characters</button>
+                <button
+                  className={styles.linkButton}
+                  type="button"
+                  onClick={() => setShowAllCharacters((prev) => !prev)}
+                >
+                  {showAllCharacters ? 'Show Less' : 'View All Characters'}
+                </button>
               </div>
               <div className={styles.keyCharacters}>
                 {characters.length === 0 ? (
                   <p className={styles.sectionBody}>Characters unavailable.</p>
                 ) : (
-                  characters.slice(0, 4).map((character, index) => (
-                    <div className={styles.characterCard} key={`${character?.character?.name || 'Character'}-${index}`}>
-                      <div className={styles.characterAvatar}>
-                        <Image
-                          src={character?.character?.images?.webp?.image_url
-                            || character?.character?.images?.jpg?.image_url
-                            || '/logo_no_text.png'}
-                          alt={character?.character?.name || 'Character'}
-                          width={60}
-                          height={60}
-                        />
-                      </div>
-                      <div>
-                        <div className={styles.characterName}>{character?.character?.name || 'Unknown'}</div>
-                        <div className={styles.characterRole}>{character?.role || 'Role'}</div>
-                      </div>
-                    </div>
-                  ))
+                  (() => {
+                    const mains = characters.filter((entry) => entry?.role === 'Main')
+                    const supporting = characters.filter((entry) => entry?.role !== 'Main')
+                    const ordered = [...mains, ...supporting]
+                    const limit = showAllCharacters ? ordered.length : 4
+                    const items = ordered.slice(0, limit).map((entry) => {
+                      const actor = Array.isArray(entry?.voice_actors)
+                        ? entry.voice_actors.find((item) => item?.language === 'Japanese') || entry.voice_actors[0]
+                        : null
+                      return { entry, actor }
+                    })
+                    return (
+                      <>
+                        <div className={styles.keyHeader}>Characters</div>
+                        <div className={styles.keyHeader}>Voice Actors</div>
+                        {items.map(({ entry, actor }, index) => (
+                          <div className={styles.keyRow} key={`${entry?.character?.name || 'Character'}-${index}`}>
+                            <div className={styles.characterCard}>
+                              <div className={styles.characterAvatar}>
+                                <Image
+                                  src={getCharacterAvatarUrl(entry) || '/logo_no_text.png'}
+                                  alt={entry?.character?.name || 'Character'}
+                                  width={60}
+                                  height={60}
+                                />
+                              </div>
+                              <div>
+                                <div className={styles.characterName}>{entry?.character?.name || 'Unknown'}</div>
+                                <div className={styles.characterRole}>{entry?.role || 'Role'}</div>
+                              </div>
+                            </div>
+                            <div className={styles.actorCard}>
+                              <div className={styles.actorAvatar}>
+                                <Image
+                                  src={actor?.person?.images?.jpg?.image_url || actor?.person?.images?.webp?.image_url || '/logo_no_text.png'}
+                                  alt={actor?.person?.name || 'Voice actor'}
+                                  width={48}
+                                  height={48}
+                                />
+                              </div>
+                              <div>
+                                <div className={styles.actorName}>{actor?.person?.name || 'Unknown'}</div>
+                                <div className={styles.actorLanguage}>{actor?.language || 'N/A'}</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )
+                  })()
                 )}
               </div>
             </div>
@@ -182,6 +224,14 @@ export default function anime({ animeResposta, charactersResposta }) {
                 <span>Anime DB</span>
                 <strong>{data?.url ? 'MAL' : 'N/A'}</strong>
               </div>
+              <div className={styles.factRow}>
+                <span>Studios</span>
+                <strong>{studioName}</strong>
+              </div>
+              <div className={styles.factRow}>
+                <span>Producers</span>
+                <strong>{producers.slice(0, 2).map((producer) => producer.name).join(', ') || 'Unknown'}</strong>
+              </div>
             </div>
           </aside>
         </section>
@@ -191,22 +241,15 @@ export default function anime({ animeResposta, charactersResposta }) {
 }
 
 export async function getServerSideProps(context) {
-
-  const baseurl = "https://api.jikan.moe/v4";
-
   const { id } = context.query
-  const [anime, characters] = await Promise.all([
-    fetch(`${baseurl}/anime/${id}`),
-    fetch(`${baseurl}/anime/${id}/characters`)
-  ])
   const [animeResposta, charactersResposta] = await Promise.all([
-    anime.json(),
-    characters.json()
+    getAnimeById(id),
+    getAnimeCharacters(id),
   ])
   return {
     props: {
       animeResposta,
       charactersResposta,
-    }
+    },
   }
 }

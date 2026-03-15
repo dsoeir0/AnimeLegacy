@@ -1,17 +1,25 @@
 import Link from 'next/link'
-import Layout from '../components/Layout'
-import styles from '../styles/movies.module.css'
 import Image from 'next/image'
-import useMyList from '../components/useMyList'
-import { normalizeAnime } from '../lib/anime'
-import { fetchAniListMediaByMalIds } from '../lib/anilist'
+import Layout from '../components/layout/Layout'
+import styles from '../styles/movies.module.css'
+import useMyList from '../hooks/useMyList'
+import { normalizeAnime } from '../lib/utils/anime'
+import { fetchAniListMediaByMalIds } from '../lib/api/anilist'
+import { getTopAnimeMovies } from '../lib/api/jikan'
+import { getAnimeImageUrl } from '../lib/utils/media'
 
 export default function Movies({ moviesResposta, aniListMap }) {
   const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : []
   const { addItem, removeItem, isInList } = useMyList()
 
   return (
-    <Layout showSidebar={false} headerVariant="dark" layoutVariant="dark">
+    <Layout
+      showSidebar={false}
+      headerVariant="dark"
+      layoutVariant="dark"
+      title="AnimeLegacy - Movies"
+      description="Cinematic anime films curated for your next watch night."
+    >
       <main className={styles.main}>
         <section className={styles.header}>
           <div>
@@ -25,13 +33,7 @@ export default function Movies({ moviesResposta, aniListMap }) {
         <section className={styles.grid}>
           {movieData.map((movie, index) => {
             const media = aniListMap?.[movie.mal_id]
-            const imageUrl =
-              media?.coverImage?.extraLarge ||
-              media?.coverImage?.large ||
-              movie?.images?.webp?.large_image_url ||
-              movie?.images?.jpg?.large_image_url ||
-              movie?.images?.jpg?.image_url ||
-              ''
+            const imageUrl = getAnimeImageUrl(movie, media)
             const normalized = normalizeAnime(movie)
             return (
               <div key={movie.mal_id} className={styles.card} style={{ animationDelay: `${index * 60}ms` }}>
@@ -40,7 +42,7 @@ export default function Movies({ moviesResposta, aniListMap }) {
                     <div className={styles.poster}>
                       <Image
                         className={styles.posterImage}
-                        src={imageUrl || '/vercel.svg'}
+                        src={imageUrl || '/logo_no_text.png'}
                         alt={movie.title}
                         fill
                         sizes="220px"
@@ -50,7 +52,7 @@ export default function Movies({ moviesResposta, aniListMap }) {
                     <div className={styles.info}>
                       <div className={styles.cardTitle}>{movie.title}</div>
                       <div className={styles.meta}>
-                        <span>{movie.year || movie.aired?.prop?.from?.year || '—'}</span>
+                        <span>{movie.year || movie.aired?.prop?.from?.year || '-'}</span>
                         <span>{movie.duration || 'Movie'}</span>
                       </div>
                     </div>
@@ -80,10 +82,7 @@ export default function Movies({ moviesResposta, aniListMap }) {
 }
 
 export async function getServerSideProps() {
-  const baseurl = "https://api.jikan.moe/v4/";
-  const movies = await fetch(`${baseurl}top/anime?type=movie`)
-  const moviesResposta = await movies.json()
-
+  const moviesResposta = await getTopAnimeMovies()
   const ids = moviesResposta?.data?.map((item) => item.mal_id) || []
   const aniListMap = await fetchAniListMediaByMalIds(ids)
 
