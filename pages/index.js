@@ -1,55 +1,56 @@
-import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-import Layout from '../components/layout/Layout'
-import useMyList from '../hooks/useMyList'
-import { normalizeAnime } from '../lib/utils/anime'
-import { fetchAniListMediaByMalIds } from '../lib/api/anilist'
-import { getCurrentSeason, getTopAnimeMovies, slimAnimeResponse } from '../lib/api/jikan'
-import { getSeasonFromDate } from '../lib/utils/season'
-import { getAnimeBannerUrl, getAnimeImageUrl } from '../lib/utils/media'
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import styles from '../styles/Home.module.css';
+import Layout from '../components/layout/Layout';
+import useMyList from '../hooks/useMyList';
+import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
+import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
+import { getCurrentSeason, getTopAnimeMovies, slimAnimeResponse } from '../lib/services/jikan';
+import { getSeasonFromDate } from '../lib/utils/season';
+import { getAnimeBannerUrl, getAnimeImageUrl } from '../lib/utils/media';
 
 export default function Home({ currentResposta, moviesResposta, aniListMap, topMovies }) {
-  const currentData = Array.isArray(currentResposta?.data) ? currentResposta.data : []
-  const currentSeason = getSeasonFromDate()
-  const currentYear = new Date().getFullYear()
-  const heroData = currentData.slice(0, 5)
+  const currentData = Array.isArray(currentResposta?.data) ? currentResposta.data : [];
+  const currentSeason = getSeasonFromDate();
+  const currentYear = new Date().getFullYear();
+  const heroData = currentData.slice(0, 5);
   const trendingData = Array.isArray(currentResposta?.data)
     ? currentResposta.data.filter((item) => {
-        if (item?.type !== 'TV') return false
-        const matchesSeason = item?.season ? item.season === currentSeason : true
-        const matchesYear = item?.year ? item.year === currentYear : true
-        return matchesSeason && matchesYear
+        if (item?.type !== 'TV') return false;
+        const matchesSeason = item?.season ? item.season === currentSeason : true;
+        const matchesYear = item?.year ? item.year === currentYear : true;
+        return matchesSeason && matchesYear;
       })
-    : []
-  const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : []
-  const [featuredIndex, setFeaturedIndex] = useState(0)
-  const featured = heroData[featuredIndex] || heroData[0] || trendingData[0] || movieData[0] || null
-  const featuredMedia = featured ? aniListMap?.[featured.mal_id] : null
-  const featuredImage = featured ? getAnimeBannerUrl(featured, featuredMedia) : ''
-  const featuredNormalized = featured ? normalizeAnime(featured) : null
-  const trendingRef = useRef(null)
-  const { addItem, removeItem, isInList } = useMyList()
-  const slideDuration = 6
+    : [];
+  const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : [];
+  const [featuredIndex, setFeaturedIndex] = useState(0);
+  const featured =
+    heroData[featuredIndex] || heroData[0] || trendingData[0] || movieData[0] || null;
+  const featuredMedia = featured ? aniListMap?.[featured.mal_id] : null;
+  const featuredImage = featured ? getAnimeBannerUrl(featured, featuredMedia) : '';
+  const featuredNormalized = featured ? normalizeAnime(featured) : null;
+  const trendingRef = useRef(null);
+  const { addItem, removeItem, isInList, canEdit } = useMyList();
+  const slideDuration = 6;
 
   useEffect(() => {
-    if (heroData.length <= 1) return
+    if (heroData.length <= 1) return;
     const interval = setInterval(() => {
-      setFeaturedIndex((prev) => (prev + 1) % heroData.length)
-    }, slideDuration * 1000)
-    return () => clearInterval(interval)
-  }, [heroData.length])
+      setFeaturedIndex((prev) => (prev + 1) % heroData.length);
+    }, slideDuration * 1000);
+    return () => clearInterval(interval);
+  }, [heroData.length]);
 
   const handleScroll = (direction) => {
-    if (!trendingRef.current) return
-    const container = trendingRef.current
-    const step = direction === 'left' ? -1 : 1
-    const cardWidth = 220
-    const gap = 24
-    const delta = (cardWidth + gap) * 3 * step
-    container.scrollBy({ left: delta, behavior: 'smooth' })
-  }
+    if (!trendingRef.current) return;
+    const container = trendingRef.current;
+    const step = direction === 'left' ? -1 : 1;
+    const cardWidth = 220;
+    const gap = 24;
+    const delta = (cardWidth + gap) * 3 * step;
+    container.scrollBy({ left: delta, behavior: 'smooth' });
+  };
 
   return (
     <Layout
@@ -75,7 +76,10 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
             ) : null}
           </div>
           <div className={styles.heroOverlay} />
-          <div key={`hero-content-${featured?.mal_id || featuredIndex}`} className={styles.heroContent}>
+          <div
+            key={`hero-content-${featured?.mal_id || featuredIndex}`}
+            className={styles.heroContent}
+          >
             <div className={styles.heroBadge}>Featured This Season</div>
             <h1 className={styles.heroTitle}>{featured?.title || 'Discover New Worlds'}</h1>
             <p className={styles.heroDescription}>
@@ -93,15 +97,21 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
                   className={`${styles.button} ${styles.ghostButton}`}
                   type="button"
                   onClick={() => {
-                    if (!featuredNormalized) return
+                    if (!featuredNormalized) return;
+                    if (!canEdit) return;
                     if (isInList(featuredNormalized.id)) {
-                      removeItem(featuredNormalized.id)
+                      removeItem(featuredNormalized.id);
                     } else {
-                      addItem(featuredNormalized)
+                      addItem(featuredNormalized);
                     }
                   }}
+                  disabled={!canEdit}
                 >
-                  {featuredNormalized && isInList(featuredNormalized.id) ? 'Remove from List' : 'Add to List'}
+                  {!canEdit
+                    ? 'Login to Add'
+                    : featuredNormalized && isInList(featuredNormalized.id)
+                      ? 'Remove from List'
+                      : 'Add to List'}
                 </button>
               ) : null}
             </div>
@@ -131,9 +141,9 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
             <div className={styles.cardRow} ref={trendingRef} style={{ '--card-width': '220px' }}>
               <div className={styles.carouselSpacer} aria-hidden="true" />
               {trendingData.map((element, index) => {
-                const media = aniListMap?.[element.mal_id]
-                const imageUrl = getAnimeImageUrl(element, media)
-                const normalized = normalizeAnime(element)
+                const media = aniListMap?.[element.mal_id];
+                const imageUrl = getAnimeImageUrl(element, media);
+                const normalized = normalizeAnime(element);
                 return (
                   <div
                     key={element.mal_id}
@@ -156,7 +166,8 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
                         <div className={styles.trendingMeta}>
                           <div className={styles.trendingTitle}>{element.title}</div>
                           <div className={styles.trendingTags}>
-                            {element.type || 'Series'} - {element.episodes ? `${element.episodes} eps` : 'Ongoing'}
+                            {element.type || 'Series'} -{' '}
+                            {element.episodes ? `${element.episodes} eps` : 'Ongoing'}
                           </div>
                         </div>
                       </a>
@@ -165,18 +176,24 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
                       className={styles.listButton}
                       type="button"
                       onClick={() => {
-                        if (!normalized) return
+                        if (!normalized) return;
+                        if (!canEdit) return;
                         if (isInList(normalized.id)) {
-                          removeItem(normalized.id)
+                          removeItem(normalized.id);
                         } else {
-                          addItem(normalized)
+                          addItem(normalized);
                         }
                       }}
+                      disabled={!canEdit}
                     >
-                      {normalized && isInList(normalized.id) ? 'In My List' : 'Add to List'}
+                      {!canEdit
+                        ? 'Login to Add'
+                        : normalized && isInList(normalized.id)
+                          ? 'In My List'
+                          : 'Add to List'}
                     </button>
                   </div>
-                )
+                );
               })}
               <div className={styles.carouselSpacer} aria-hidden="true" />
             </div>
@@ -203,11 +220,15 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
           </div>
           <div className={styles.movieGrid}>
             {topMovies.map((element, index) => {
-              const media = aniListMap?.[element.mal_id]
-              const imageUrl = getAnimeImageUrl(element, media)
-              const normalized = normalizeAnime(element)
+              const media = aniListMap?.[element.mal_id];
+              const imageUrl = getAnimeImageUrl(element, media);
+              const normalized = normalizeAnime(element);
               return (
-                <div key={element.mal_id} className={styles.movieCard} style={{ animationDelay: `${index * 120}ms` }}>
+                <div
+                  key={element.mal_id}
+                  className={styles.movieCard}
+                  style={{ animationDelay: `${index * 120}ms` }}
+                >
                   <Link href={`/anime/${element.mal_id}`} legacyBehavior>
                     <a className={styles.movieLink}>
                       <div className={styles.moviePoster}>
@@ -237,54 +258,66 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
                     className={styles.listButton}
                     type="button"
                     onClick={() => {
-                      if (!normalized) return
+                      if (!normalized) return;
+                      if (!canEdit) return;
                       if (isInList(normalized.id)) {
-                        removeItem(normalized.id)
+                        removeItem(normalized.id);
                       } else {
-                        addItem(normalized)
+                        addItem(normalized);
                       }
                     }}
+                    disabled={!canEdit}
                   >
-                    {normalized && isInList(normalized.id) ? 'In My List' : 'Add to List'}
+                    {!canEdit
+                      ? 'Login to Add'
+                      : normalized && isInList(normalized.id)
+                        ? 'In My List'
+                        : 'Add to List'}
                   </button>
                 </div>
-              )
+              );
             })}
           </div>
         </section>
       </main>
     </Layout>
-  )
+  );
 }
 
 export async function getServerSideProps() {
   const [currentRespostaRaw, moviesRespostaRaw] = await Promise.all([
     getCurrentSeason(),
     getTopAnimeMovies(),
-  ])
+  ]);
 
-  const currentResposta = slimAnimeResponse(currentRespostaRaw)
-  const moviesResposta = slimAnimeResponse(moviesRespostaRaw)
+  const currentFiltered = Array.isArray(currentRespostaRaw?.data)
+    ? filterOutHentai(currentRespostaRaw.data)
+    : [];
+  const currentResposta = slimAnimeResponse({ data: currentFiltered });
+  const moviesFiltered = Array.isArray(moviesRespostaRaw?.data)
+    ? filterOutHentai(moviesRespostaRaw.data)
+    : [];
+  const moviesResposta = slimAnimeResponse({ data: moviesFiltered });
 
   const pickRandom = (items, count) => {
-    const pool = [...items]
+    const pool = [...items];
     for (let i = pool.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[pool[i], pool[j]] = [pool[j], pool[i]]
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
     }
-    return pool.slice(0, count)
-  }
+    return pool.slice(0, count);
+  };
 
   const topMovies = pickRandom(
     moviesResposta.data.filter((item) => typeof item?.score === 'number' && item.score >= 7.5),
-    3
-  )
+    3,
+  );
 
   const ids = [
     ...currentResposta.data.slice(0, 40).map((item) => item.mal_id),
     ...moviesResposta.data.slice(0, 10).map((item) => item.mal_id),
-  ].filter(Boolean)
-  const aniListMap = await fetchAniListMediaByMalIds(ids)
+  ].filter(Boolean);
+  const aniListMap = await fetchAniListMediaByMalIds(ids);
 
-  return { props: { currentResposta, moviesResposta, aniListMap, topMovies } }
+  return { props: { currentResposta, moviesResposta, aniListMap, topMovies } };
 }

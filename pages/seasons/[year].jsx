@@ -1,123 +1,126 @@
-import { useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import Layout from '../../components/layout/Layout'
-import styles from '../../styles/year.module.css'
-import useMyList from '../../hooks/useMyList'
-import { normalizeAnime } from '../../lib/utils/anime'
-import { fetchAniListMediaByMalIds } from '../../lib/api/anilist'
-import { getSeasonByYear } from '../../lib/api/jikan'
-import { getAnimeImageUrl } from '../../lib/utils/media'
+import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import Layout from '../../components/layout/Layout';
+import styles from '../../styles/year.module.css';
+import useMyList from '../../hooks/useMyList';
+import { filterOutHentai, normalizeAnime } from '../../lib/utils/anime';
+import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
+import { getSeasonByYear } from '../../lib/services/jikan';
+import { getAnimeImageUrl } from '../../lib/utils/media';
 
-export default function Seasons({ winterResposta, springResposta, summerResposta, fallResposta, aniListMap, year }) {
-  const router = useRouter()
-  const safeData = (resp) => (Array.isArray(resp?.data) ? resp.data : [])
+export default function Seasons({
+  winterResposta,
+  springResposta,
+  summerResposta,
+  fallResposta,
+  aniListMap,
+  year,
+}) {
+  const router = useRouter();
+  const safeData = (resp) => (Array.isArray(resp?.data) ? resp.data : []);
   const seasonSets = [
     { key: 'winter', label: 'Winter', data: safeData(winterResposta) },
     { key: 'spring', label: 'Spring', data: safeData(springResposta) },
     { key: 'summer', label: 'Summer', data: safeData(summerResposta) },
     { key: 'fall', label: 'Fall', data: safeData(fallResposta) },
-  ]
-  const { addItem, removeItem, isInList } = useMyList()
-  const featuredSeason = seasonSets[0]?.label || 'Winter'
+  ];
+  const { addItem, removeItem, isInList, canEdit } = useMyList();
   const [filters, setFilters] = useState({
     genre: 'All Genres',
     format: 'All Formats',
     season: 'All Seasons',
     sort: 'Popularity',
-  })
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 20
-  const [openDropdown, setOpenDropdown] = useState(null)
-  const currentYear = new Date().getFullYear()
-  const hasActiveFilters =
-    filters.genre !== 'All Genres' ||
-    filters.format !== 'All Formats' ||
-    filters.season !== 'All Seasons'
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 21;
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const currentYear = new Date().getFullYear();
 
-  const displaySeason = filters.season !== 'All Seasons' ? filters.season : featuredSeason
+  const displaySeason = filters.season !== 'All Seasons' ? filters.season : 'All Seasons';
 
   const filterOptions = useMemo(() => {
-    const allItems = seasonSets.flatMap((season) => season.data)
-    const genres = new Set()
-    const formats = new Set()
-    const statuses = new Set()
+    const allItems = seasonSets.flatMap((season) => season.data);
+    const genres = new Set();
+    const formats = new Set();
+    const statuses = new Set();
     allItems.forEach((item) => {
       item?.genres?.forEach((genre) => {
-        if (genre?.name) genres.add(genre.name)
-      })
-      if (item?.type) formats.add(item.type)
-      if (item?.status) statuses.add(item.status)
-    })
+        if (genre?.name) genres.add(genre.name);
+      });
+      if (item?.type) formats.add(item.type);
+      if (item?.status) statuses.add(item.status);
+    });
     return {
       genres: ['All Genres', ...Array.from(genres).sort()],
       formats: ['All Formats', ...Array.from(formats).sort()],
-    }
-  }, [seasonSets])
+    };
+  }, [seasonSets]);
 
   const sortedSeasonSets = useMemo(() => {
     const matchesFilters = (item, seasonKey) => {
-      if (filters.season !== 'All Seasons' && seasonKey !== filters.season.toLowerCase()) return false
+      if (filters.season !== 'All Seasons' && seasonKey !== filters.season.toLowerCase())
+        return false;
       if (filters.genre !== 'All Genres') {
-        const genreMatch = item?.genres?.some((genre) => genre?.name === filters.genre)
-        if (!genreMatch) return false
+        const genreMatch = item?.genres?.some((genre) => genre?.name === filters.genre);
+        if (!genreMatch) return false;
       }
-      if (filters.format !== 'All Formats' && item?.type !== filters.format) return false
-      return true
-    }
+      if (filters.format !== 'All Formats' && item?.type !== filters.format) return false;
+      return true;
+    };
 
     const sortItems = (items) => {
-      const sorted = [...items]
+      const sorted = [...items];
       if (filters.sort === 'Rating') {
-        sorted.sort((a, b) => (b?.score || 0) - (a?.score || 0))
+        sorted.sort((a, b) => (b?.score || 0) - (a?.score || 0));
       } else if (filters.sort === 'Recently Added') {
         sorted.sort((a, b) => {
-          const aDate = new Date(a?.aired?.from || 0).getTime()
-          const bDate = new Date(b?.aired?.from || 0).getTime()
-          return bDate - aDate
-        })
+          const aDate = new Date(a?.aired?.from || 0).getTime();
+          const bDate = new Date(b?.aired?.from || 0).getTime();
+          return bDate - aDate;
+        });
       } else {
-        sorted.sort((a, b) => (a?.popularity || 999999) - (b?.popularity || 999999))
+        sorted.sort((a, b) => (a?.popularity || 999999) - (b?.popularity || 999999));
       }
-      return sorted
-    }
+      return sorted;
+    };
 
     return seasonSets
       .map((season) => ({
         ...season,
         data: sortItems(season.data.filter((item) => matchesFilters(item, season.key))),
       }))
-      .filter((season) => season.data.length > 0)
-  }, [filters, seasonSets])
+      .filter((season) => season.data.length > 0);
+  }, [filters, seasonSets]);
 
   const displayedItems = useMemo(() => {
     const allItems =
       filters.season === 'All Seasons'
         ? sortedSeasonSets.flatMap((season) => season.data)
-        : sortedSeasonSets[0]?.data || []
-    const unique = []
-    const seen = new Set()
+        : sortedSeasonSets[0]?.data || [];
+    const unique = [];
+    const seen = new Set();
     allItems.forEach((item) => {
-      if (!item?.mal_id) return
-      if (seen.has(item.mal_id)) return
-      seen.add(item.mal_id)
-      unique.push(item)
-    })
-    return unique
-  }, [filters.season, sortedSeasonSets])
+      if (!item?.mal_id) return;
+      if (seen.has(item.mal_id)) return;
+      seen.add(item.mal_id);
+      unique.push(item);
+    });
+    return unique;
+  }, [filters.season, sortedSeasonSets]);
 
-  const totalPages = Math.max(1, Math.ceil(displayedItems.length / pageSize))
+  const totalPages = Math.max(1, Math.ceil(displayedItems.length / pageSize));
   const pagedItems = useMemo(() => {
-    const start = (currentPage - 1) * pageSize
-    return displayedItems.slice(start, start + pageSize)
-  }, [currentPage, displayedItems])
+    const start = (currentPage - 1) * pageSize;
+    return displayedItems.slice(start, start + pageSize);
+  }, [currentPage, displayedItems]);
 
   const getBadge = (item, index) => {
-    if (index < 2) return 'Popular'
-    if ((item?.score || 0) >= 8.5) return 'Hot'
-    return null
-  }
+    if (index < 2) return 'Popular';
+    if ((item?.score || 0) >= 8.5) return 'Hot';
+    return null;
+  };
 
   const handleReset = () => {
     setFilters({
@@ -125,48 +128,48 @@ export default function Seasons({ winterResposta, springResposta, summerResposta
       format: 'All Formats',
       season: 'All Seasons',
       sort: 'Popularity',
-    })
-    setCurrentPage(1)
+    });
+    setCurrentPage(1);
     if (String(year) !== String(currentYear)) {
-      router.push(`/seasons/${currentYear}`)
+      router.push(`/seasons/${currentYear}`);
     }
-  }
+  };
 
   const yearOptions = useMemo(() => {
-    const current = Number(year)
-    if (!Number.isFinite(current)) return [year]
-    const maxYear = new Date().getFullYear()
-    const oldestYear = 1963
-    const startYear = maxYear
-    const years = []
+    const current = Number(year);
+    if (!Number.isFinite(current)) return [year];
+    const maxYear = new Date().getFullYear();
+    const oldestYear = 1963;
+    const startYear = maxYear;
+    const years = [];
     for (let y = startYear; y >= oldestYear; y -= 1) {
-      years.push(y)
+      years.push(y);
     }
-    return years.length ? years : [current]
-  }, [year])
+    return years.length ? years : [current];
+  }, [year]);
 
   const handleYearSelect = (nextYear) => {
     if (nextYear && nextYear !== String(year)) {
-      router.push(`/seasons/${nextYear}`)
+      router.push(`/seasons/${nextYear}`);
     }
-    setOpenDropdown(null)
-  }
+    setOpenDropdown(null);
+  };
 
   useEffect(() => {
     const handleOutside = (event) => {
       if (!event.target.closest('[data-dropdown-root="true"]')) {
-        setOpenDropdown(null)
+        setOpenDropdown(null);
       }
-    }
-    document.addEventListener('mousedown', handleOutside)
-    return () => document.removeEventListener('mousedown', handleOutside)
-  }, [])
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
 
   const setFilterValue = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-    setCurrentPage(1)
-    setOpenDropdown(null)
-  }
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+    setOpenDropdown(null);
+  };
 
   return (
     <Layout
@@ -180,21 +183,16 @@ export default function Seasons({ winterResposta, springResposta, summerResposta
         <section className={styles.heroPanel}>
           <div className={styles.hero}>
             <div>
-              <div className={styles.eyebrow}>Current Season</div>
               <h1 className={styles.title}>
-                Seasonal Anime <span>{displaySeason} {year}</span>
+                Seasonal Anime{' '}
+                <span>
+                  {displaySeason} {year}
+                </span>
               </h1>
               <p className={styles.subtitle}>
-                Explore the latest releases, trending sequels, and hidden gems from the broadcast season.
+                Explore the latest releases, trending sequels, and hidden gems from the broadcast
+                season.
               </p>
-            </div>
-            <div className={styles.viewToggle} aria-label="View options">
-              <button className={`${styles.viewButton} ${styles.viewButtonActive}`} type="button" aria-label="Grid view">
-                <span className={styles.viewGrid} aria-hidden="true" />
-              </button>
-              <button className={styles.viewButton} type="button" aria-label="List view">
-                <span className={styles.viewList} aria-hidden="true" />
-              </button>
             </div>
           </div>
 
@@ -351,11 +349,7 @@ export default function Seasons({ winterResposta, springResposta, summerResposta
                 ) : null}
               </div>
             </div>
-            <button
-              className={styles.applyButton}
-              type="button"
-              onClick={handleReset}
-            >
+            <button className={styles.applyButton} type="button" onClick={handleReset}>
               Clear Filters
             </button>
           </div>
@@ -364,12 +358,16 @@ export default function Seasons({ winterResposta, springResposta, summerResposta
         <section className={styles.section}>
           <div className={styles.grid}>
             {pagedItems.map((element, index) => {
-              const media = aniListMap?.[element.mal_id]
-              const imageUrl = getAnimeImageUrl(element, media)
-              const normalized = normalizeAnime(element)
-              const badge = getBadge(element, index)
+              const media = aniListMap?.[element.mal_id];
+              const imageUrl = getAnimeImageUrl(element, media);
+              const normalized = normalizeAnime(element);
+              const badge = getBadge(element, index);
               return (
-                <div key={element.mal_id} className={styles.card} style={{ animationDelay: `${index * 30}ms` }}>
+                <div
+                  key={element.mal_id}
+                  className={styles.card}
+                  style={{ animationDelay: `${index * 30}ms` }}
+                >
                   <Link href={`/anime/${element.mal_id}`} legacyBehavior>
                     <a className={styles.cardLink}>
                       <div className={styles.poster}>
@@ -394,18 +392,24 @@ export default function Seasons({ winterResposta, springResposta, summerResposta
                     className={styles.listButton}
                     type="button"
                     onClick={() => {
-                      if (!normalized) return
+                      if (!normalized) return;
+                      if (!canEdit) return;
                       if (isInList(normalized.id)) {
-                        removeItem(normalized.id)
+                        removeItem(normalized.id);
                       } else {
-                        addItem(normalized)
+                        addItem(normalized);
                       }
                     }}
+                    disabled={!canEdit}
                   >
-                    {normalized && isInList(normalized.id) ? 'In My List' : 'Add to List'}
+                    {!canEdit
+                      ? 'Login to Add'
+                      : normalized && isInList(normalized.id)
+                        ? 'In My List'
+                        : 'Add to List'}
                   </button>
                 </div>
-              )
+              );
             })}
           </div>
         </section>
@@ -420,16 +424,18 @@ export default function Seasons({ winterResposta, springResposta, summerResposta
           >
             &lsaquo;
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 5).map((page) => (
-            <button
-              key={page}
-              className={`${styles.pageButton} ${currentPage === page ? styles.pageButtonActive : ''}`}
-              type="button"
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .slice(0, 5)
+            .map((page) => (
+              <button
+                key={page}
+                className={`${styles.pageButton} ${currentPage === page ? styles.pageButtonActive : ''}`}
+                type="button"
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
           {totalPages > 5 ? <span className={styles.pageEllipsis}>…</span> : null}
           {totalPages > 5 ? (
             <button
@@ -452,28 +458,38 @@ export default function Seasons({ winterResposta, springResposta, summerResposta
         </section>
       </main>
     </Layout>
-  )
+  );
 }
 
 export async function getServerSideProps(context) {
-  const { year } = context.query
+  const { year } = context.query;
 
   const [winterResposta, springResposta, summerResposta] = await Promise.all([
     getSeasonByYear(year, 'winter'),
     getSeasonByYear(year, 'spring'),
     getSeasonByYear(year, 'summer'),
-  ])
+  ]);
 
-  await new Promise((res) => setTimeout(res, 1000))
-  const fallResposta = await getSeasonByYear(year, 'fall')
+  await new Promise((res) => setTimeout(res, 1000));
+  const fallResposta = await getSeasonByYear(year, 'fall');
+
+  if (Array.isArray(winterResposta?.data))
+    winterResposta.data = filterOutHentai(winterResposta.data);
+  if (Array.isArray(springResposta?.data))
+    springResposta.data = filterOutHentai(springResposta.data);
+  if (Array.isArray(summerResposta?.data))
+    summerResposta.data = filterOutHentai(summerResposta.data);
+  if (Array.isArray(fallResposta?.data)) fallResposta.data = filterOutHentai(fallResposta.data);
 
   const ids = [
     ...(winterResposta?.data || []).map((item) => item.mal_id),
     ...(springResposta?.data || []).map((item) => item.mal_id),
     ...(summerResposta?.data || []).map((item) => item.mal_id),
     ...(fallResposta?.data || []).map((item) => item.mal_id),
-  ].filter(Boolean)
-  const aniListMap = await fetchAniListMediaByMalIds(ids)
+  ].filter(Boolean);
+  const aniListMap = await fetchAniListMediaByMalIds(ids);
 
-  return { props: { winterResposta, springResposta, summerResposta, fallResposta, aniListMap, year } }
+  return {
+    props: { winterResposta, springResposta, summerResposta, fallResposta, aniListMap, year },
+  };
 }

@@ -1,47 +1,107 @@
-import { useEffect, useState } from 'react'
-
-const STORAGE_KEY = 'animeLegacy.myList'
-
-const readStoredList = () => {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
-  } catch (error) {
-    return []
-  }
-}
+import { useEffect, useState } from 'react';
+import useAuth from './useAuth';
+import { getFirebaseClient } from '../lib/firebase/client';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { ensureAnimeCatalog } from '../lib/services/animeCatalog';
+import { addUserActivity, upsertUserAnime, updateUserAnime } from '../lib/services/userAnime';
 
 export default function useMyList() {
-  const [list, setList] = useState([])
-  const [hasLoaded, setHasLoaded] = useState(false)
+  const { user } = useAuth();
+  const [list, setList] = useState([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const canEdit = Boolean(user?.uid);
 
   useEffect(() => {
-    setList(readStoredList())
-    setHasLoaded(true)
-  }, [])
+    let unsubscribe = null;
 
-  useEffect(() => {
-    if (!hasLoaded || typeof window === 'undefined') return
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
-  }, [list, hasLoaded])
+    const loadRemote = async () => {
+      const { db } = getFirebaseClient();
+      if (!db || !user?.uid) {
+        setList([]);
+        setHasLoaded(true);
+        return;
+      }
+      const listRef = collection(db, 'users', user.uid, 'list');
+      const listQuery = query(listRef, orderBy('addedAt', 'desc'));
+      unsubscribe = onSnapshot(listQuery, (snapshot) => {
+        const items = snapshot.docs.map((docItem) => docItem.data());
+        setList(items);
+        setHasLoaded(true);
+      });
+    };
 
-  const addItem = (item) => {
-    if (!item?.id) return
-    setList((prev) => {
-      if (prev.some((entry) => entry.id === item.id)) return prev
-      return [item, ...prev]
-    })
-  }
+    loadRemote();
 
-  const removeItem = (id) => {
-    setList((prev) => prev.filter((entry) => entry.id !== id))
-  }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user?.uid]);
 
-  const isInList = (id) => list.some((entry) => entry.id === id)
+  const addItem = async (item) => {
+    if (!item?.id || !user?.uid) return false;
+    const safeId = String(item.id);
+    const { db } = getFirebaseClient();
+    if (db) {
+      const payload = { ...item, id: safeId, addedAt: serverTimestamp() };
+      await setDoc(doc(db, 'users', user.uid, 'list', safeId), payload, { merge: true });
+      await ensureAnimeCatalog(item);
+      await upsertUserAnime({
+        uid: user.uid,
+        anime: item,
+        overrides: {
+          status: 'plan',
+          addedAt: serverTimestamp(),
+        },
+      });
+      await addUserActivity({
+        uid: user.uid,
+        activity: {
+          animeId: safeId,
+          title: item.title || 'Untitled',
+          posterUrl: item.image || '',
+          type: 'added_to_list',
+          label: 'Added to Plan to Watch',
+        },
+      });
+      return true;
+    }
+    return false;
+  };
 
-  return { list, addItem, removeItem, isInList, hasLoaded }
+  const removeItem = async (id) => {
+    if (!user?.uid) return false;
+    const safeId = String(id);
+    const { db } = getFirebaseClient();
+    if (db) {
+      await deleteDoc(doc(db, 'users', user.uid, 'list', safeId));
+      await updateUserAnime({
+        uid: user.uid,
+        animeId: safeId,
+        patch: { status: 'removed', removedAt: serverTimestamp() },
+      });
+      await addUserActivity({
+        uid: user.uid,
+        activity: {
+          animeId: safeId,
+          type: 'removed_from_list',
+          label: 'Removed from list',
+        },
+      });
+      return true;
+    }
+    return false;
+  };
+
+  const isInList = (id) => list.some((entry) => String(entry.id) === String(id));
+
+  return { list, addItem, removeItem, isInList, hasLoaded, canEdit };
 }
-

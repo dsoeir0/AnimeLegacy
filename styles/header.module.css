@@ -135,7 +135,10 @@
   color: inherit;
   background: rgba(15, 23, 42, 0.55);
   border: 1px solid transparent;
-  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
 }
 
 .searchItem:hover {
@@ -188,6 +191,96 @@
   text-align: center;
 }
 
+.profile {
+  position: relative;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 999px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.headerLight .profileButton {
+  border: none;
+  background: transparent;
+}
+
+.profileAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.profileInitials {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.profileMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(240px, 80vw);
+  background: rgba(12, 16, 26, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(2, 6, 18, 0.55);
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  z-index: 20;
+}
+
+.profileMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  font-size: 12px;
+  color: rgba(226, 232, 250, 0.8);
+}
+
+.profileMeta strong {
+  font-size: 13px;
+  color: #f3f4ff;
+}
+
+.profileItem {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.6);
+  color: inherit;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.profileItem:hover {
+  background: rgba(30, 41, 59, 0.75);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
 @media screen and (max-width: 900px) {
   .nav {
     display: none;
@@ -205,5 +298,9 @@
 
   .searchInput {
     min-width: 120px;
+  }
+
+  .profileLabel {
+    display: none;
   }
 }

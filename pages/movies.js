@@ -1,16 +1,16 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import Layout from '../components/layout/Layout'
-import styles from '../styles/movies.module.css'
-import useMyList from '../hooks/useMyList'
-import { normalizeAnime } from '../lib/utils/anime'
-import { fetchAniListMediaByMalIds } from '../lib/api/anilist'
-import { getTopAnimeMovies } from '../lib/api/jikan'
-import { getAnimeImageUrl } from '../lib/utils/media'
+import Link from 'next/link';
+import Image from 'next/image';
+import Layout from '../components/layout/Layout';
+import styles from '../styles/movies.module.css';
+import useMyList from '../hooks/useMyList';
+import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
+import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
+import { getTopAnimeMovies } from '../lib/services/jikan';
+import { getAnimeImageUrl } from '../lib/utils/media';
 
 export default function Movies({ moviesResposta, aniListMap }) {
-  const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : []
-  const { addItem, removeItem, isInList } = useMyList()
+  const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : [];
+  const { addItem, removeItem, isInList, canEdit } = useMyList();
 
   return (
     <Layout
@@ -32,11 +32,15 @@ export default function Movies({ moviesResposta, aniListMap }) {
         </section>
         <section className={styles.grid}>
           {movieData.map((movie, index) => {
-            const media = aniListMap?.[movie.mal_id]
-            const imageUrl = getAnimeImageUrl(movie, media)
-            const normalized = normalizeAnime(movie)
+            const media = aniListMap?.[movie.mal_id];
+            const imageUrl = getAnimeImageUrl(movie, media);
+            const normalized = normalizeAnime(movie);
             return (
-              <div key={movie.mal_id} className={styles.card} style={{ animationDelay: `${index * 60}ms` }}>
+              <div
+                key={movie.mal_id}
+                className={styles.card}
+                style={{ animationDelay: `${index * 60}ms` }}
+              >
                 <Link href={`/anime/${movie.mal_id}`} legacyBehavior>
                   <a className={styles.cardLink}>
                     <div className={styles.poster}>
@@ -62,29 +66,37 @@ export default function Movies({ moviesResposta, aniListMap }) {
                   className={styles.listButton}
                   type="button"
                   onClick={() => {
-                    if (!normalized) return
+                    if (!normalized) return;
+                    if (!canEdit) return;
                     if (isInList(normalized.id)) {
-                      removeItem(normalized.id)
+                      removeItem(normalized.id);
                     } else {
-                      addItem(normalized)
+                      addItem(normalized);
                     }
                   }}
+                  disabled={!canEdit}
                 >
-                  {normalized && isInList(normalized.id) ? 'In My List' : 'Add to List'}
+                  {!canEdit
+                    ? 'Login to Add'
+                    : normalized && isInList(normalized.id)
+                      ? 'In My List'
+                      : 'Add to List'}
                 </button>
               </div>
-            )
+            );
           })}
         </section>
       </main>
     </Layout>
-  )
+  );
 }
 
 export async function getServerSideProps() {
-  const moviesResposta = await getTopAnimeMovies()
-  const ids = moviesResposta?.data?.map((item) => item.mal_id) || []
-  const aniListMap = await fetchAniListMediaByMalIds(ids)
+  const moviesResposta = await getTopAnimeMovies();
+  const filtered = Array.isArray(moviesResposta?.data) ? filterOutHentai(moviesResposta.data) : [];
+  moviesResposta.data = filtered;
+  const ids = filtered.map((item) => item.mal_id);
+  const aniListMap = await fetchAniListMediaByMalIds(ids);
 
-  return { props: { moviesResposta, aniListMap } }
+  return { props: { moviesResposta, aniListMap } };
 }

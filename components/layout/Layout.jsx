@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import Head from 'next/head'
-import Header from './Header'
-import Sidebar from './Sidebar'
-import styles from '../../styles/layout.module.css'
+import { useState } from 'react';
+import Head from 'next/head';
+import Header from './Header';
+import Sidebar from './Sidebar';
+import styles from '../../styles/layout.module.css';
 
 export default function Layout({
   children,
@@ -12,12 +12,12 @@ export default function Layout({
   title = 'AnimeLegacy',
   description = 'Curated anime seasons, movies, and personal watchlists.',
 }) {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(showSidebar)
+  const [isSidebarVisible, setIsSidebarVisible] = useState(showSidebar);
   const handleOnClick = () => {
-    setIsSidebarVisible((oldValue) => !oldValue)
-  }
+    setIsSidebarVisible((oldValue) => !oldValue);
+  };
 
-  const layoutClass = layoutVariant === 'dark' ? styles.layoutDark : styles.layoutDefault
+  const layoutClass = layoutVariant === 'dark' ? styles.layoutDark : styles.layoutDefault;
 
   return (
     <div className={`${styles.layout} ${layoutClass}`}>
@@ -38,5 +38,5 @@ export default function Layout({
         <div className={styles.content}>{children}</div>
       </div>
     </div>
-  )
+  );
 }

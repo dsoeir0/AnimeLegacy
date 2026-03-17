@@ -1,31 +1,31 @@
 .sidebar {
-    width: 40%;
-    /* height: 100%; */
-    background-color: rgb(219, 217, 145);
-
+  width: 40%;
+  /* height: 100%; */
+  background-color: rgb(219, 217, 145);
 }
 
 .yearStyle {
-    font-family: 'Malgun Gothic';
-    border: rgb(65, 184, 248) solid;
-    border-radius: 10px;
-    margin: 10px;
-    padding: 5px;
-    margin-top: 15px;
-    display: flex;
-    justify-content: center;
-    background-color: aliceblue;
+  font-family: 'Malgun Gothic';
+  border: rgb(65, 184, 248) solid;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 5px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  background-color: aliceblue;
 }
 
 .yearStyle:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 600px) {
-    .sidebar {
-        position: absolute;
-        z-index: 1;
-    }
+  .sidebar {
+    position: absolute;
+    z-index: 1;
+  }
 }
 
-@media screen and (max-width: 1050px) {}
+@media screen and (max-width: 1050px) {
+}

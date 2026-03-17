@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": true,
+  "singleQuote": true,
+  "quoteProps": "as-needed",
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "tabWidth": 2,
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": ["**/*.d.ts"],
+      "options": {
+        "semi": true,
+        "singleQuote": true,
+        "quoteProps": "as-needed",
+        "trailingComma": "all",
+        "bracketSpacing": true,
+        "bracketSameLine": false,
+        "arrowParens": "always",
+        "tabWidth": 2,
+        "printWidth": 100
+      }
+    }
+  ]
+}

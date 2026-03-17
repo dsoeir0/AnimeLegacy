@@ -122,6 +122,13 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
+.listButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
 @keyframes riseIn {
   from {
     opacity: 0;
