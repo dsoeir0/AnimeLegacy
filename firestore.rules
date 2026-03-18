@@ -6,6 +6,14 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    match /characterStats/{characterId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.resource.data.keys().hasOnly(['favoritesCount'])
+        && request.resource.data.favoritesCount is int
+        && request.resource.data.favoritesCount >= 0;
+    }
+
     match /usernames/{username} {
       allow read: if true;
       allow create: if request.auth != null
@@ -31,6 +39,10 @@ service cloud.firestore {
       }
 
       match /collections/{collectionId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /favoriteCharacters/{characterId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }

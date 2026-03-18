@@ -587,6 +587,18 @@
   border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
+.characterLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.characterLink:hover .characterCard {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 12px 22px rgba(5, 8, 18, 0.45);
+  transform: translateY(-1px);
+}
+
 .characterAvatar {
   width: 60px;
   height: 60px;

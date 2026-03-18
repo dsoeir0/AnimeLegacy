@@ -16,7 +16,8 @@ import styles from '../styles/profile.module.css';
 export default function ProfilePage() {
   const { user, loading: authLoading, signOutUser } = useAuth();
   const router = useRouter();
-  const { stats, genres, favorites, activity, activityAll, profile, animeItems } = useProfileData(user?.uid);
+  const { stats, genres, favorites, favoriteCharacters, activity, activityAll, profile, animeItems } =
+    useProfileData(user?.uid);
   const displayName = profile?.username || user?.displayName || 'Zenith_Runner';
   const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL;
   const initials = useMemo(() => displayName.slice(0, 1).toUpperCase(), [displayName]);
@@ -133,6 +134,7 @@ export default function ProfilePage() {
   }, [isEditing, profile?.bio, profile?.username, user?.displayName]);
 
   const orderedFavorites = favorites;
+  const orderedFavoriteCharacters = favoriteCharacters;
 
 
   const handleSaveProfile = async (event) => {
@@ -525,6 +527,62 @@ export default function ProfilePage() {
                                 <div className={styles.favoriteMeta}>
                                   {favorite.year || '-'} - {favorite.type || 'Series'}
                                 </div>
+                              </div>
+                            </Link>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+
+                {activeTab === 'Overview' || activeTab === 'Favorites' ? (
+                  <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                      <h2>Favorite Characters</h2>
+                      <span className={styles.cardHint} aria-hidden="true" />
+                    </div>
+                    <div className={styles.favoritesGrid}>
+                      {orderedFavoriteCharacters.length === 0 ? (
+                        <div className={styles.favoriteEmpty}>
+                          <Image
+                            src="/logo_no_text.png"
+                            alt="No favorite characters"
+                            width={120}
+                            height={160}
+                          />
+                          <div>
+                            <div className={styles.favoriteEmptyTitle}>No favorite characters</div>
+                            <div className={styles.favoriteEmptyText}>
+                              Mark a character as favorite to feature it here.
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        orderedFavoriteCharacters.map((favorite) => {
+                          const favoriteId = favorite.id;
+                          const poster = favorite.imageUrl || '/logo_no_text.png';
+                          return (
+                            <Link
+                              key={favoriteId}
+                              href={`/characters/${favoriteId}`}
+                              className={styles.favoriteCard}
+                            >
+                              <div className={styles.favoritePoster}>
+                                <Image
+                                  src={poster}
+                                  alt={favorite.name || 'Character'}
+                                  width={200}
+                                  height={280}
+                                />
+                              </div>
+                              <div className={styles.favoriteOverlay}>
+                                <div className={styles.favoriteTitle}>
+                                  {favorite.name || 'Unknown Character'}
+                                </div>
+                                {favorite.nameKanji ? (
+                                  <div className={styles.favoriteMeta}>{favorite.nameKanji}</div>
+                                ) : null}
                               </div>
                             </Link>
                           );

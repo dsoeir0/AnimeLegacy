@@ -62,10 +62,12 @@ export default function useProfileData(uid) {
   const [listItems, setListItems] = useState([]);
   const [activity, setActivity] = useState([]);
   const [catalogGenres, setCatalogGenres] = useState({});
+  const [favoriteCharacters, setFavoriteCharacters] = useState([]);
   const [loadedAnime, setLoadedAnime] = useState(false);
   const [loadedList, setLoadedList] = useState(false);
   const [loadedActivity, setLoadedActivity] = useState(false);
   const [loadedProfile, setLoadedProfile] = useState(false);
+  const [loadedFavoriteCharacters, setLoadedFavoriteCharacters] = useState(false);
 
   useEffect(() => {
     if (!uid) {
@@ -73,10 +75,12 @@ export default function useProfileData(uid) {
       setAnimeItems([]);
       setListItems([]);
       setActivity([]);
+      setFavoriteCharacters([]);
       setLoadedAnime(true);
       setLoadedList(true);
       setLoadedActivity(true);
       setLoadedProfile(true);
+      setLoadedFavoriteCharacters(true);
       return undefined;
     }
     const { db } = getFirebaseClient();
@@ -85,6 +89,7 @@ export default function useProfileData(uid) {
       setLoadedAnime(true);
       setLoadedList(true);
       setLoadedActivity(true);
+      setLoadedFavoriteCharacters(true);
       return undefined;
     }
 
@@ -115,11 +120,19 @@ export default function useProfileData(uid) {
       setLoadedActivity(true);
     });
 
+    const favoriteCharactersRef = collection(db, 'users', uid, 'favoriteCharacters');
+    const favoriteCharactersQuery = query(favoriteCharactersRef, orderBy('updatedAt', 'desc'));
+    const unsubscribeFavoriteCharacters = onSnapshot(favoriteCharactersQuery, (snapshot) => {
+      setFavoriteCharacters(snapshot.docs.map((docItem) => docItem.data()));
+      setLoadedFavoriteCharacters(true);
+    });
+
     return () => {
       unsubscribeProfile();
       unsubscribeAnime();
       unsubscribeList();
       unsubscribeActivity();
+      unsubscribeFavoriteCharacters();
     };
   }, [uid]);
 
@@ -316,10 +329,11 @@ export default function useProfileData(uid) {
     stats,
     genres: watchedGenres,
     favorites,
+    favoriteCharacters,
     activity: filteredActivity,
     activityAll: filteredActivityAll,
     profile,
-    loading: !(loadedAnime && loadedList && loadedActivity && loadedProfile),
+    loading: !(loadedAnime && loadedList && loadedActivity && loadedProfile && loadedFavoriteCharacters),
     animeItems,
   };
 }

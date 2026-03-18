@@ -314,22 +314,31 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                             className={styles.keyRow}
                             key={`${entry?.character?.name || 'Character'}-${index}`}
                           >
-                            <div className={styles.characterCard}>
-                              <div className={styles.characterAvatar}>
-                                <Image
-                                  src={getCharacterAvatarUrl(entry) || '/logo_no_text.png'}
-                                  alt={entry?.character?.name || 'Character'}
-                                  width={60}
-                                  height={60}
-                                />
-                              </div>
-                              <div>
-                                <div className={styles.characterName}>
-                                  {entry?.character?.name || 'Unknown'}
+                            <Link
+                              href={`/characters/${entry?.character?.mal_id || ''}`}
+                              legacyBehavior
+                            >
+                              <a className={styles.characterLink}>
+                                <div className={styles.characterCard}>
+                                  <div className={styles.characterAvatar}>
+                                    <Image
+                                      src={getCharacterAvatarUrl(entry) || '/logo_no_text.png'}
+                                      alt={entry?.character?.name || 'Character'}
+                                      width={60}
+                                      height={60}
+                                    />
+                                  </div>
+                                  <div>
+                                    <div className={styles.characterName}>
+                                      {entry?.character?.name || 'Unknown'}
+                                    </div>
+                                    <div className={styles.characterRole}>
+                                      {entry?.role || 'Role'}
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className={styles.characterRole}>{entry?.role || 'Role'}</div>
-                              </div>
-                            </div>
+                              </a>
+                            </Link>
                             <div className={styles.actorCard}>
                               <div className={styles.actorAvatar}>
                                 <Image
