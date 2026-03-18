@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout/Layout';
 import useAuth from '../hooks/useAuth';
 import useProfileData from '../hooks/useProfileData';
 import { formatRelativeTime } from '../lib/utils/time';
+import { formatSeasonLabel, getSeasonFromDate } from '../lib/utils/season';
 import { claimUsername, getUserProfile, upsertUserProfile } from '../lib/services/userProfile';
 import { getFirebaseClient } from '../lib/firebase/client';
 import { updateProfile } from 'firebase/auth';
+import { isAiringAnime } from '../lib/utils/anime';
 import styles from '../styles/profile.module.css';
 
 export default function ProfilePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOutUser } = useAuth();
   const router = useRouter();
-  const { stats, genres, favorites, activity, profile } = useProfileData(user?.uid);
+  const { stats, genres, favorites, activity, activityAll, profile, animeItems } = useProfileData(user?.uid);
   const displayName = profile?.username || user?.displayName || 'Zenith_Runner';
   const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL;
   const initials = useMemo(() => displayName.slice(0, 1).toUpperCase(), [displayName]);
@@ -28,6 +31,47 @@ export default function ProfilePage() {
   const [removeAvatar, setRemoveAvatar] = useState(false);
   const [editError, setEditError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleteText, setDeleteText] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  const currentSeason = getSeasonFromDate();
+  const currentYear = new Date().getFullYear();
+  const seasonLabel = formatSeasonLabel(currentSeason, currentYear);
+
+  const seasonalItems = useMemo(() => {
+    return (animeItems || []).filter(
+      (item) => item?.season === currentSeason && item?.year === currentYear,
+    );
+  }, [animeItems, currentSeason, currentYear]);
+
+  const normalizeSeasonStatus = (item) =>
+    isAiringAnime(item) && item?.status === 'completed' ? 'watching' : item?.status;
+
+  const seasonalPlanned = useMemo(
+    () =>
+      seasonalItems.filter(
+        (item) => {
+          const status = normalizeSeasonStatus(item);
+          return status !== 'dropped' && status !== 'removed';
+        },
+      ),
+    [seasonalItems],
+  );
+  const seasonalCompleted = useMemo(
+    () => seasonalItems.filter((item) => normalizeSeasonStatus(item) === 'completed'),
+    [seasonalItems],
+  );
+  const seasonalProgress = seasonalPlanned.length
+    ? Math.round((seasonalCompleted.length / seasonalPlanned.length) * 100)
+    : 0;
+  const reviews = useMemo(() => {
+    return (animeItems || []).filter((item) => {
+      const hasRating = typeof item?.rating === 'number';
+      const hasReview = Boolean(item?.review && String(item.review).trim().length > 0);
+      return hasRating || hasReview;
+    });
+  }, [animeItems]);
   const withTimeout = (promise, ms, label) =>
     Promise.race([
       promise,
@@ -54,16 +98,26 @@ export default function ProfilePage() {
       sublabel: 'Time spent',
     },
     {
-      label: 'Mean Score',
-      value: stats.meanScore ? stats.meanScore.toFixed(1) : '-',
-      sublabel: 'Personal avg',
+      label: 'Reviews',
+      value: stats.reviewCount ?? 0,
+      sublabel: 'Written',
+    },
+    {
+      label: 'Avg MAL Score',
+      value: stats.malAvgScore ? stats.malAvgScore.toFixed(1) : '-',
+      sublabel: 'MyAnimeList',
+    },
+    {
+      label: 'My Avg Score',
+      value: stats.myAvgScore ? stats.myAvgScore.toFixed(1) : '-',
+      sublabel: 'Your ratings',
     },
   ];
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      router.replace('/login');
+      router.replace('/sign-in');
     }
   }, [authLoading, router, user]);
 
@@ -74,7 +128,12 @@ export default function ProfilePage() {
     setEditAvatarFile(null);
     setRemoveAvatar(false);
     setEditError('');
+    setDeleteText('');
+    setDeleteError('');
   }, [isEditing, profile?.bio, profile?.username, user?.displayName]);
+
+  const orderedFavorites = favorites;
+
 
   const handleSaveProfile = async (event) => {
     event.preventDefault();
@@ -145,6 +204,46 @@ export default function ProfilePage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user?.uid) return;
+    if (deleteText.trim().toUpperCase() !== 'DELETE') {
+      setDeleteError('Type DELETE to confirm.');
+      return;
+    }
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      const { auth } = getFirebaseClient();
+      if (!auth?.currentUser) {
+        setDeleteError('Please sign in again, then retry deleting your account.');
+        return;
+      }
+      const idToken = await auth.currentUser.getIdToken(true);
+      const response = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ uid: user.uid }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        const message = data?.error || data?.message || 'Unable to delete account.';
+        setDeleteError(message);
+        return;
+      }
+
+      await signOutUser();
+      router.replace('/');
+    } catch (err) {
+      setDeleteError(err?.message || 'Unable to delete account.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <Layout
       showSidebar={false}
@@ -174,7 +273,6 @@ export default function ProfilePage() {
                 <div className={styles.heroMeta}>
                   <div className={styles.heroTitleRow}>
                     <h1 className={styles.heroTitle}>{displayName}</h1>
-                    <span className={styles.heroBadge}>PRO</span>
                   </div>
                   <p className={styles.heroSubtitle}>{bio}</p>
                 </div>
@@ -205,16 +303,16 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div className={styles.card}>
-                  <div className={styles.cardTitle}>Genres</div>
+                  <div className={styles.cardTitle}>Most Watched Genres</div>
                   <div className={styles.genreTags}>
-                    {genres.length === 0 ? (
-                      <span className={styles.genreTag}>No genres yet</span>
-                    ) : (
+                    {genres.length > 0 ? (
                       genres.map((genre) => (
                         <span key={genre} className={styles.genreTag}>
                           {genre}
                         </span>
                       ))
+                    ) : (
+                      <span className={styles.genreEmpty}>No genre data yet.</span>
                     )}
                   </div>
                 </div>
@@ -222,7 +320,7 @@ export default function ProfilePage() {
 
               <section className={styles.content}>
                 <div className={styles.tabs}>
-                  {['Overview', 'Favorites'].map((tab) => (
+                  {['Overview', 'Favorites', 'Reviews', 'Activity'].map((tab) => (
                     <button
                       key={tab}
                       type="button"
@@ -238,9 +336,7 @@ export default function ProfilePage() {
                   <div className={styles.card}>
                     <div className={styles.cardHeader}>
                       <h2>Recent Activity</h2>
-                      <button className={styles.textButton} type="button">
-                        View All
-                      </button>
+                      <span className={styles.cardHint} aria-hidden="true" />
                     </div>
                     <div className={styles.activityList}>
                       {activity.length === 0 ? (
@@ -282,32 +378,157 @@ export default function ProfilePage() {
                   </div>
                 ) : null}
 
+                {activeTab === 'Activity' ? (
+                  <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                      <h2>All Activity</h2>
+                      <span className={styles.cardHint}>
+                        {activityAll.length} updates
+                      </span>
+                    </div>
+                    <div className={styles.activityList}>
+                      {activityAll.length === 0 ? (
+                        <div className={styles.activityItem}>
+                          <div className={styles.activityMeta}>
+                            <div className={styles.activityTitle}>No activity yet</div>
+                            <div className={styles.activitySubtitle}>
+                              Add anime to your list to start tracking updates.
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        activityAll.map((entry, index) => (
+                          <div
+                            key={`${entry.animeId || 'activity'}-full-${index}`}
+                            className={styles.activityItem}
+                          >
+                            <div className={styles.activityThumb}>
+                              <Image
+                                src={entry.posterUrl || '/logo_no_text.png'}
+                                alt={entry.title || 'Activity'}
+                                width={48}
+                                height={64}
+                              />
+                            </div>
+                            <div className={styles.activityMeta}>
+                              <div className={styles.activityTitle}>{entry.title || 'Activity'}</div>
+                              <div className={styles.activitySubtitle}>
+                                {entry.label || entry.type || 'Updated'}
+                              </div>
+                            </div>
+                            <div className={styles.activityTime}>
+                              {formatRelativeTime(entry.createdAt) || 'Just now'}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+
+                {activeTab === 'Reviews' ? (
+                  <div className={styles.card}>
+                    <div className={styles.cardHeader}>
+                      <h2>Your Reviews</h2>
+                      <span className={styles.cardHint}>{reviews.length} published</span>
+                    </div>
+                    {reviews.length === 0 ? (
+                      <>
+                        <p className={styles.progressText}>
+                          Share your thoughts on finished shows to build your review shelf.
+                        </p>
+                        <button className={styles.secondaryButton} type="button">
+                          Write your first review
+                        </button>
+                      </>
+                    ) : (
+                      <div className={styles.reviewList}>
+                        {reviews.map((entry) => {
+                          const poster =
+                            entry.posterUrl ||
+                            entry.image ||
+                            entry.coverImage ||
+                            '/logo_no_text.png';
+                          return (
+                            <div key={entry.animeId || entry.id} className={styles.reviewCard}>
+                              <div className={styles.reviewPoster}>
+                                <Image
+                                  src={poster}
+                                  alt={entry.title || 'Anime'}
+                                  width={72}
+                                  height={96}
+                                />
+                              </div>
+                              <div className={styles.reviewMeta}>
+                                <div className={styles.reviewTitle}>{entry.title || 'Untitled'}</div>
+                                <div className={styles.reviewScore}>
+                                  {typeof entry.rating === 'number' ? `${entry.rating}/5` : 'Not rated'}
+                                </div>
+                                {entry.review ? (
+                                  <p className={styles.reviewText}>{entry.review}</p>
+                                ) : null}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+
                 {activeTab === 'Overview' || activeTab === 'Favorites' ? (
                   <div className={styles.card}>
                     <div className={styles.cardHeader}>
                       <h2>All-Time Favorites</h2>
+                      <span className={styles.cardHint} aria-hidden="true" />
                     </div>
                     <div className={styles.favoritesGrid}>
                       {favorites.length === 0 ? (
-                        <div className={styles.favoriteCard}>
+                        <div className={styles.favoriteEmpty}>
                           <Image
                             src="/logo_no_text.png"
                             alt="No favorites yet"
-                            width={140}
-                            height={190}
+                            width={120}
+                            height={160}
                           />
+                          <div>
+                            <div className={styles.favoriteEmptyTitle}>No favorites yet</div>
+                            <div className={styles.favoriteEmptyText}>
+                              Mark a completed anime as favorite to feature it here.
+                            </div>
+                          </div>
                         </div>
                       ) : (
-                        favorites.map((favorite) => (
-                          <div key={favorite.animeId || favorite.id} className={styles.favoriteCard}>
-                            <Image
-                              src={favorite.posterUrl || favorite.image || '/logo_no_text.png'}
-                              alt={favorite.title || 'Favorite'}
-                              width={140}
-                              height={190}
-                            />
-                          </div>
-                        ))
+                        orderedFavorites.map((favorite) => {
+                          const favoriteId = favorite.animeId || favorite.id;
+                          const poster = favorite.posterUrl || favorite.image || '/logo_no_text.png';
+                          const favoriteKey = String(favoriteId);
+                          return (
+                            <Link
+                              key={favoriteId}
+                              href={`/anime/${favoriteId}`}
+                              className={styles.favoriteCard}
+                              data-favorite-id={favoriteKey}
+                            >
+                              <div className={styles.favoritePoster}>
+                                <Image
+                                  src={poster}
+                                  alt={favorite.title || 'Favorite'}
+                                  width={200}
+                                  height={280}
+                                />
+                              </div>
+                              <div className={styles.favoriteOverlay}>
+                                <div className={styles.favoriteTitle}>
+                                  {favorite.title || 'Untitled'}
+                                </div>
+                                <div className={styles.favoriteMeta}>
+                                  {favorite.year || '-'} - {favorite.type || 'Series'}
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })
                       )}
                     </div>
                   </div>
@@ -316,12 +537,12 @@ export default function ProfilePage() {
                 {activeTab === 'Overview' ? (
                   <div className={styles.card}>
                     <div className={styles.cardHeader}>
-                      <h2>Winter 2026 Progress</h2>
-                      <div className={styles.progressBadge}>50%</div>
+                      <h2>{seasonLabel} Progress</h2>
+                      <div className={styles.progressBadge}>{seasonalProgress}%</div>
                     </div>
                     <p className={styles.progressText}>
-                      You have completed 4 of your 8 planned shows this season. Keep going, the finale
-                      of Echoes of Valhalla is just around the corner.
+                      You have completed {seasonalCompleted.length} of your {seasonalPlanned.length} planned shows
+                      this season.
                     </p>
                     <button className={styles.secondaryButton} type="button">
                       Go to Seasonal List
@@ -337,7 +558,17 @@ export default function ProfilePage() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard} role="dialog" aria-modal="true" aria-label="Edit profile">
             <div className={styles.modalHeader}>
-              <h2>Edit profile</h2>
+              <div className={styles.modalHeaderRow}>
+                <h2>Edit profile</h2>
+                <button
+                  className={styles.modalClose}
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  aria-label="Close"
+                >
+                  <i className="bi bi-x-lg" aria-hidden="true" />
+                </button>
+              </div>
               <p>Update your username, bio, and avatar.</p>
             </div>
             <form className={styles.modalForm} onSubmit={handleSaveProfile}>
@@ -404,6 +635,28 @@ export default function ProfilePage() {
                 </button>
                 <button className={styles.modalPrimary} type="submit" disabled={saving}>
                   {saving ? 'Saving...' : 'Save changes'}
+                </button>
+              </div>
+              <div className={styles.dangerZone}>
+                <div className={styles.dangerTitle}>Delete account</div>
+                <p className={styles.dangerText}>
+                  This will permanently remove your profile data. Type DELETE to confirm.
+                </p>
+                <input
+                  className={styles.dangerInput}
+                  type="text"
+                  value={deleteText}
+                  onChange={(event) => setDeleteText(event.target.value)}
+                  placeholder="DELETE"
+                />
+                {deleteError ? <div className={styles.dangerError}>{deleteError}</div> : null}
+                <button
+                  className={styles.dangerButton}
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                >
+                  {deleting ? 'Deleting...' : 'Delete account'}
                 </button>
               </div>
             </form>

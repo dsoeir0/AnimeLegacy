@@ -1,13 +1,10 @@
-import AuthPage from '../components/auth/AuthPage';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-export default function LoginPage() {
-  return (
-    <AuthPage
-      title="Login"
-      subtitle="Pick up right where you left off and keep your personal watchlist synced."
-      altHref="/sign-in"
-      altLabel="Go to Sign in"
-      mode="login"
-    />
-  );
+export default function LoginRedirect() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/sign-in');
+  }, [router]);
+  return null;
 }

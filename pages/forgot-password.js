@@ -51,7 +51,7 @@ const ForgotPasswordPage = () => {
   useEffect(() => {
     if (!message) return;
     const timer = setTimeout(() => {
-      router.push('/login');
+      router.push('/sign-in');
     }, 3000);
     return () => clearTimeout(timer);
   }, [message, router]);
@@ -106,8 +106,8 @@ const ForgotPasswordPage = () => {
               {message ? <div className={styles.success}>{message}</div> : null}
               <div className={styles.altLink}>
                 <span>Remembered your password?</span>
-                <Link href="/login" legacyBehavior>
-                  <a>Back to Login</a>
+                <Link href="/sign-in" legacyBehavior>
+                  <a>Back to Sign in</a>
                 </Link>
               </div>
             </>

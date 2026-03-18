@@ -166,6 +166,33 @@
   padding: 8px 12px;
   font-size: 12px;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.listActions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.listLink {
+  background: rgba(125, 107, 255, 0.18);
+  border-color: rgba(125, 107, 255, 0.4);
+  color: #f8f7ff;
+}
+
+.editButton {
+  padding: 8px 10px;
+  min-width: 56px;
+}
+
+.editIcon {
+  font-size: 12px;
 }
 
 .listButton:hover {

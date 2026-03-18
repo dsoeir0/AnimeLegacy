@@ -4,10 +4,10 @@ export default function SignInPage() {
   return (
     <AuthPage
       title="Sign in"
-      subtitle="Create your AnimeLegacy profile and start building your list."
-      altHref="/login"
-      altLabel="Go to Login"
-      mode="signup"
+      subtitle="Pick up right where you left off and keep your personal watchlist synced."
+      altHref="/sign-up"
+      altLabel="Go to Sign up"
+      mode="login"
     />
   );
 }

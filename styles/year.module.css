@@ -198,7 +198,7 @@
 .grid {
   --card-width: 210px;
   display: grid;
-  grid-template-columns: repeat(7, var(--card-width));
+  grid-template-columns: repeat(8, var(--card-width));
   column-gap: 60px;
   row-gap: 30px;
   justify-content: center;
@@ -309,6 +309,33 @@
   padding: 8px 12px;
   font-size: 12px;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.listActions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.listLink {
+  background: rgba(125, 107, 255, 0.18);
+  border-color: rgba(125, 107, 255, 0.4);
+  color: #f8f7ff;
+}
+
+.editButton {
+  padding: 8px 10px;
+  min-width: 56px;
+}
+
+.editIcon {
+  font-size: 12px;
 }
 
 .listButton:hover {
@@ -385,10 +412,9 @@
   .applyButton {
     grid-column: span 3;
   }
-
   .grid {
     --card-width: 200px;
-    grid-template-columns: repeat(5, var(--card-width));
+    grid-template-columns: repeat(6, var(--card-width));
   }
 }
 
@@ -411,7 +437,7 @@
 
   .grid {
     --card-width: 180px;
-    grid-template-columns: repeat(3, var(--card-width));
+    grid-template-columns: repeat(4, var(--card-width));
   }
 }
 
@@ -426,10 +452,16 @@
 
   .grid {
     --card-width: 160px;
-    grid-template-columns: repeat(2, var(--card-width));
+    grid-template-columns: repeat(3, var(--card-width));
   }
 
   .poster {
     height: 230px;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .grid {
+    grid-template-columns: repeat(2, var(--card-width));
   }
 }

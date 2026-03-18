@@ -5,7 +5,7 @@ import Layout from '../layout/Layout';
 import useAuth from '../../hooks/useAuth';
 import { getFirebaseClient } from '../../lib/firebase/client';
 import { claimUsername, getUserProfile, upsertUserProfile } from '../../lib/services/userProfile';
-import { updateProfile } from 'firebase/auth';
+import { deleteUser, updateProfile } from 'firebase/auth';
 import styles from '../../styles/auth.module.css';
 
 const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
@@ -24,12 +24,14 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarError, setAvatarError] = useState('');
   const [activeTab, setActiveTab] = useState('account');
   const [touched, setTouched] = useState({});
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [modalUsername, setModalUsername] = useState('');
   const [modalBio, setModalBio] = useState('');
   const [modalAvatarFile, setModalAvatarFile] = useState(null);
+  const [modalAvatarError, setModalAvatarError] = useState('');
   const router = useRouter();
   const MAX_AVATAR_SIZE = 512 * 1024;
 
@@ -46,6 +48,10 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
       if (!file) resolve('');
       if (file.size > MAX_AVATAR_SIZE) {
         reject(new Error('Avatar must be under 512KB.'));
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        reject(new Error('Avatar must be an image file.'));
         return;
       }
       const reader = new FileReader();
@@ -82,6 +88,9 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
     const code = err?.code || '';
     if (code === 'auth/user-not-found') return 'No account found for this email.';
     if (code === 'auth/wrong-password') return 'Incorrect password.';
+    if (code === 'auth/invalid-credential') {
+      return 'Incorrect email or password, or this account was deleted.';
+    }
     if (code === 'auth/invalid-email') return 'Email address is invalid.';
     if (code === 'auth/email-already-in-use') return 'An account already exists with this email.';
     if (code === 'auth/weak-password') return 'Password is too weak.';
@@ -145,7 +154,11 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
           });
           if (!claim.ok) {
             setError('Username is already taken.');
-            await signOutUser();
+            try {
+              await deleteUser(auth.currentUser);
+            } catch {
+              await signOutUser();
+            }
             return;
           }
           const avatarData = avatarFile ? await fileToDataUrl(avatarFile) : '';
@@ -358,7 +371,7 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
                       {signupAvatarPreview ? (
                         <img src={signupAvatarPreview} alt="Profile preview" />
                       ) : (
-                        <span>+</span>
+                        <i className={`bi bi-plus-lg ${styles.avatarIcon}`} aria-hidden="true" />
                       )}
                     </div>
                   </div>
@@ -371,7 +384,21 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
                         className={styles.fileInput}
                         type="file"
                         accept="image/*"
-                        onChange={(event) => setAvatarFile(event.target.files?.[0] || null)}
+                        onChange={(event) => {
+                          const file = event.target.files?.[0] || null;
+                          setAvatarError('');
+                          if (file && file.size > MAX_AVATAR_SIZE) {
+                            setAvatarError('Avatar must be under 512KB.');
+                            setAvatarFile(null);
+                            return;
+                          }
+                          if (file && !file.type.startsWith('image/')) {
+                            setAvatarError('Avatar must be an image file.');
+                            setAvatarFile(null);
+                            return;
+                          }
+                          setAvatarFile(file);
+                        }}
                       />
                       <button
                         className={styles.removeInline}
@@ -395,6 +422,9 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
                       rows={3}
                     />
                   </label>
+                ) : null}
+                {mode === 'signup' && activeTab === 'profile' && avatarError ? (
+                  <div className={styles.error}>{avatarError}</div>
                 ) : null}
                 <div className={styles.formActions}>
                   {mode === 'signup' && activeTab === 'profile' ? (
@@ -463,7 +493,7 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
                     {modalAvatarPreview ? (
                       <img src={modalAvatarPreview} alt="Profile preview" />
                     ) : (
-                      <span>+</span>
+                      <i className={`bi bi-plus-lg ${styles.avatarIcon}`} aria-hidden="true" />
                     )}
                   </div>
                 </div>
@@ -474,7 +504,21 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
                       className={styles.fileInput}
                       type="file"
                       accept="image/*"
-                      onChange={(event) => setModalAvatarFile(event.target.files?.[0] || null)}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] || null;
+                        setModalAvatarError('');
+                        if (file && file.size > MAX_AVATAR_SIZE) {
+                          setModalAvatarError('Avatar must be under 512KB.');
+                          setModalAvatarFile(null);
+                          return;
+                        }
+                        if (file && !file.type.startsWith('image/')) {
+                          setModalAvatarError('Avatar must be an image file.');
+                          setModalAvatarFile(null);
+                          return;
+                        }
+                        setModalAvatarFile(file);
+                      }}
                     />
                     <button
                       className={styles.removeInline}
@@ -496,6 +540,7 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
                     rows={3}
                   />
                 </label>
+                {modalAvatarError ? <div className={styles.error}>{modalAvatarError}</div> : null}
                 {error ? <div className={styles.error}>{error}</div> : null}
                 <div className={styles.formActions}>
                   <button

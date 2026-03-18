@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from '../styles/Home.module.css';
+import styles from '../styles/home.module.css';
 import Layout from '../components/layout/Layout';
+import AddToListModal from '../components/modals/AddToListModal';
 import useMyList from '../hooks/useMyList';
 import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
@@ -24,6 +25,10 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
       })
     : [];
   const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : [];
+  const moviePool = useMemo(() => {
+    const scored = movieData.filter((item) => typeof item?.score === 'number' && item.score >= 7.5);
+    return scored.length >= 3 ? scored : movieData;
+  }, [movieData]);
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const featured =
     heroData[featuredIndex] || heroData[0] || trendingData[0] || movieData[0] || null;
@@ -31,8 +36,12 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
   const featuredImage = featured ? getAnimeBannerUrl(featured, featuredMedia) : '';
   const featuredNormalized = featured ? normalizeAnime(featured) : null;
   const trendingRef = useRef(null);
-  const { addItem, removeItem, isInList, canEdit } = useMyList();
+  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
   const slideDuration = 6;
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [pendingAnime, setPendingAnime] = useState(null);
+  const [pendingEntry, setPendingEntry] = useState(null);
+  const [moviePicks, setMoviePicks] = useState(topMovies);
 
   useEffect(() => {
     if (heroData.length <= 1) return;
@@ -50,6 +59,41 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
     const gap = 24;
     const delta = (cardWidth + gap) * 3 * step;
     container.scrollBy({ left: delta, behavior: 'smooth' });
+  };
+
+  const openAddModal = (anime, entry = null) => {
+    if (!anime) return;
+    setPendingAnime(anime);
+    setPendingEntry(entry);
+    setAddModalOpen(true);
+  };
+
+  const closeAddModal = () => {
+    setAddModalOpen(false);
+    setPendingAnime(null);
+    setPendingEntry(null);
+  };
+
+  const handleConfirmAdd = async (details) => {
+    if (!pendingAnime) return;
+    await addItem(pendingAnime, details);
+    closeAddModal();
+  };
+
+  const pickRandom = (items, count, excludeIds = new Set()) => {
+    const pool = items.filter((item) => !excludeIds.has(item?.mal_id));
+    const source = pool.length >= count ? pool : items;
+    const shuffled = [...source];
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, count);
+  };
+
+  const refreshMovies = () => {
+    const currentIds = new Set(moviePicks.map((item) => item?.mal_id));
+    setMoviePicks(pickRandom(moviePool, 3, currentIds));
   };
 
   return (
@@ -93,26 +137,33 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
                 </Link>
               ) : null}
               {featured ? (
-                <button
-                  className={`${styles.button} ${styles.ghostButton}`}
-                  type="button"
-                  onClick={() => {
-                    if (!featuredNormalized) return;
-                    if (!canEdit) return;
-                    if (isInList(featuredNormalized.id)) {
-                      removeItem(featuredNormalized.id);
-                    } else {
-                      addItem(featuredNormalized);
-                    }
-                  }}
-                  disabled={!canEdit}
-                >
-                  {!canEdit
-                    ? 'Login to Add'
-                    : featuredNormalized && isInList(featuredNormalized.id)
-                      ? 'Remove from List'
-                      : 'Add to List'}
-                </button>
+                !canEdit ? (
+                  <button className={`${styles.button} ${styles.ghostButton}`} type="button" disabled>
+                    Login to Add
+                  </button>
+                ) : featuredNormalized && isInList(featuredNormalized.id) ? (
+                  <div className={styles.heroListActions}>
+                    <Link href="/my-list" legacyBehavior>
+                      <a className={`${styles.button} ${styles.ghostButton}`}>In My List</a>
+                    </Link>
+                    <button
+                      className={`${styles.button} ${styles.ghostButton} ${styles.editButton}`}
+                      type="button"
+                      onClick={() => openAddModal(featuredNormalized, getEntry(featuredNormalized.id))}
+                    >
+                      <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
+                      Edit
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className={`${styles.button} ${styles.ghostButton}`}
+                    type="button"
+                    onClick={() => openAddModal(featuredNormalized)}
+                  >
+                    Add to List
+                  </button>
+                )
               ) : null}
             </div>
           </div>
@@ -136,7 +187,7 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
               onClick={() => handleScroll('left')}
               aria-label="Scroll left"
             >
-              <span aria-hidden="true">&lt;</span>
+              <i className="bi bi-chevron-left" aria-hidden="true" />
             </button>
             <div className={styles.cardRow} ref={trendingRef} style={{ '--card-width': '220px' }}>
               <div className={styles.carouselSpacer} aria-hidden="true" />
@@ -172,26 +223,33 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
                         </div>
                       </a>
                     </Link>
-                    <button
-                      className={styles.listButton}
-                      type="button"
-                      onClick={() => {
-                        if (!normalized) return;
-                        if (!canEdit) return;
-                        if (isInList(normalized.id)) {
-                          removeItem(normalized.id);
-                        } else {
-                          addItem(normalized);
-                        }
-                      }}
-                      disabled={!canEdit}
-                    >
-                      {!canEdit
-                        ? 'Login to Add'
-                        : normalized && isInList(normalized.id)
-                          ? 'In My List'
-                          : 'Add to List'}
-                    </button>
+                    {!canEdit ? (
+                      <button className={styles.listButton} type="button" disabled>
+                        Login to Add
+                      </button>
+                    ) : normalized && isInList(normalized.id) ? (
+                      <div className={styles.listActions}>
+                        <Link href="/my-list" legacyBehavior>
+                          <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
+                        </Link>
+                        <button
+                          className={`${styles.listButton} ${styles.editButton}`}
+                          type="button"
+                          onClick={() => openAddModal(normalized, getEntry(normalized.id))}
+                        >
+                          <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
+                          Edit
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        className={styles.listButton}
+                        type="button"
+                        onClick={() => openAddModal(normalized)}
+                      >
+                        Add to List
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -203,7 +261,7 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
               onClick={() => handleScroll('right')}
               aria-label="Scroll right"
             >
-              <span aria-hidden="true">&gt;</span>
+              <i className="bi bi-chevron-right" aria-hidden="true" />
             </button>
           </div>
         </section>
@@ -214,12 +272,13 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
               <div className={styles.sectionEyebrow}>Recommended</div>
               <h2 className={styles.sectionTitle}>Recommended movies to watch tonight</h2>
             </div>
-            <Link href="/movies" legacyBehavior>
-              <a className={styles.sectionLink}>See all</a>
-            </Link>
+            <button className={styles.sectionLink} type="button" onClick={refreshMovies}>
+              <i className={`bi bi-arrow-repeat ${styles.sectionLinkIcon}`} aria-hidden="true" />
+              Shuffle picks
+            </button>
           </div>
           <div className={styles.movieGrid}>
-            {topMovies.map((element, index) => {
+            {moviePicks.map((element, index) => {
               const media = aniListMap?.[element.mal_id];
               const imageUrl = getAnimeImageUrl(element, media);
               const normalized = normalizeAnime(element);
@@ -254,32 +313,52 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
                       </div>
                     </a>
                   </Link>
-                  <button
-                    className={styles.listButton}
-                    type="button"
-                    onClick={() => {
-                      if (!normalized) return;
-                      if (!canEdit) return;
-                      if (isInList(normalized.id)) {
-                        removeItem(normalized.id);
-                      } else {
-                        addItem(normalized);
-                      }
-                    }}
-                    disabled={!canEdit}
-                  >
-                    {!canEdit
-                      ? 'Login to Add'
-                      : normalized && isInList(normalized.id)
-                        ? 'In My List'
-                        : 'Add to List'}
-                  </button>
+                  {!canEdit ? (
+                    <button className={styles.listButton} type="button" disabled>
+                      Login to Add
+                    </button>
+                  ) : normalized && isInList(normalized.id) ? (
+                    <div className={styles.listActions}>
+                      <Link href="/my-list" legacyBehavior>
+                        <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
+                      </Link>
+                      <button
+                        className={`${styles.listButton} ${styles.editButton}`}
+                        type="button"
+                        onClick={() => openAddModal(normalized, getEntry(normalized.id))}
+                      >
+                        <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
+                        Edit
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className={styles.listButton}
+                      type="button"
+                      onClick={() => openAddModal(normalized)}
+                    >
+                      Add to List
+                    </button>
+                  )}
                 </div>
               );
             })}
           </div>
         </section>
       </main>
+      <AddToListModal
+        open={addModalOpen}
+        anime={pendingAnime}
+        onClose={closeAddModal}
+        onConfirm={handleConfirmAdd}
+        initialStatus={pendingEntry?.status}
+        initialProgress={pendingEntry?.progress}
+        initialFavorite={pendingEntry?.isFavorite}
+        initialRating={pendingEntry?.rating}
+        initialReview={pendingEntry?.review}
+        favoriteCount={favoritesCount}
+        isEditing={Boolean(pendingEntry)}
+      />
     </Layout>
   );
 }

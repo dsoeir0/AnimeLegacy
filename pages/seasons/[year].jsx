@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout/Layout';
+import AddToListModal from '../../components/modals/AddToListModal';
 import styles from '../../styles/year.module.css';
 import useMyList from '../../hooks/useMyList';
 import { filterOutHentai, normalizeAnime } from '../../lib/utils/anime';
@@ -26,7 +27,7 @@ export default function Seasons({
     { key: 'summer', label: 'Summer', data: safeData(summerResposta) },
     { key: 'fall', label: 'Fall', data: safeData(fallResposta) },
   ];
-  const { addItem, removeItem, isInList, canEdit } = useMyList();
+  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
   const [filters, setFilters] = useState({
     genre: 'All Genres',
     format: 'All Formats',
@@ -34,9 +35,12 @@ export default function Seasons({
     sort: 'Popularity',
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 21;
+  const pageSize = 24;
   const [openDropdown, setOpenDropdown] = useState(null);
   const currentYear = new Date().getFullYear();
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [pendingAnime, setPendingAnime] = useState(null);
+  const [pendingEntry, setPendingEntry] = useState(null);
 
   const displaySeason = filters.season !== 'All Seasons' ? filters.season : 'All Seasons';
 
@@ -169,6 +173,25 @@ export default function Seasons({
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
     setOpenDropdown(null);
+  };
+
+  const openAddModal = (anime, entry = null) => {
+    if (!anime) return;
+    setPendingAnime(anime);
+    setPendingEntry(entry);
+    setAddModalOpen(true);
+  };
+
+  const closeAddModal = () => {
+    setAddModalOpen(false);
+    setPendingAnime(null);
+    setPendingEntry(null);
+  };
+
+  const handleConfirmAdd = async (details) => {
+    if (!pendingAnime) return;
+    await addItem(pendingAnime, details);
+    closeAddModal();
   };
 
   return (
@@ -388,26 +411,33 @@ export default function Seasons({
                       </div>
                     </a>
                   </Link>
-                  <button
-                    className={styles.listButton}
-                    type="button"
-                    onClick={() => {
-                      if (!normalized) return;
-                      if (!canEdit) return;
-                      if (isInList(normalized.id)) {
-                        removeItem(normalized.id);
-                      } else {
-                        addItem(normalized);
-                      }
-                    }}
-                    disabled={!canEdit}
-                  >
-                    {!canEdit
-                      ? 'Login to Add'
-                      : normalized && isInList(normalized.id)
-                        ? 'In My List'
-                        : 'Add to List'}
-                  </button>
+                  {!canEdit ? (
+                    <button className={styles.listButton} type="button" disabled>
+                      Login to Add
+                    </button>
+                  ) : normalized && isInList(normalized.id) ? (
+                    <div className={styles.listActions}>
+                      <Link href="/my-list" legacyBehavior>
+                        <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
+                      </Link>
+                      <button
+                        className={`${styles.listButton} ${styles.editButton}`}
+                        type="button"
+                        onClick={() => openAddModal(normalized, getEntry(normalized.id))}
+                      >
+                        <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
+                        Edit
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className={styles.listButton}
+                      type="button"
+                      onClick={() => openAddModal(normalized)}
+                    >
+                      Add to List
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -422,7 +452,7 @@ export default function Seasons({
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
           >
-            &lsaquo;
+            <i className="bi bi-chevron-left" aria-hidden="true" />
           </button>
           {Array.from({ length: totalPages }, (_, i) => i + 1)
             .slice(0, 5)
@@ -453,10 +483,23 @@ export default function Seasons({
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
           >
-            &rsaquo;
+            <i className="bi bi-chevron-right" aria-hidden="true" />
           </button>
         </section>
       </main>
+      <AddToListModal
+        open={addModalOpen}
+        anime={pendingAnime}
+        onClose={closeAddModal}
+        onConfirm={handleConfirmAdd}
+        initialStatus={pendingEntry?.status}
+        initialProgress={pendingEntry?.progress}
+        initialFavorite={pendingEntry?.isFavorite}
+        initialRating={pendingEntry?.rating}
+        initialReview={pendingEntry?.review}
+        favoriteCount={favoritesCount}
+        isEditing={Boolean(pendingEntry)}
+      />
     </Layout>
   );
 }

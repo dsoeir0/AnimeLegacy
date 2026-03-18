@@ -106,10 +106,7 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
             }}
             aria-label="Toggle sidebar"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22">
-              <path fill="none" d="M0 0h24v24H0z" />
-              <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" />
-            </svg>
+            <i className={`bi bi-list ${styles.burgerIcon}`} aria-hidden="true" />
           </button>
         ) : null}
         <Link href="/" legacyBehavior>
@@ -131,9 +128,6 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
           <Link href={`/seasons/${currentYear}`} legacyBehavior>
             <a className={styles.navLink}>Seasonal</a>
           </Link>
-          <Link href="/movies" legacyBehavior>
-            <a className={styles.navLink}>Movies</a>
-          </Link>
           <Link href="/my-list" legacyBehavior>
             <a className={styles.navLink}>My List</a>
           </Link>
@@ -141,16 +135,7 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
       </div>
       <div className={styles.right}>
         <div className={styles.search} ref={searchRef}>
-          <svg
-            className={styles.searchIcon}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="18"
-            height="18"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z" />
-          </svg>
+          <i className={`bi bi-search ${styles.searchIcon}`} aria-hidden="true" />
           <input
             className={styles.searchInput}
             type="search"
@@ -283,15 +268,6 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
                 </>
               ) : (
                 <>
-                  <Link href="/login" legacyBehavior>
-                    <a
-                      className={styles.profileItem}
-                      role="menuitem"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Login
-                    </a>
-                  </Link>
                   <Link href="/sign-in" legacyBehavior>
                     <a
                       className={styles.profileItem}
@@ -299,6 +275,15 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
                       onClick={() => setIsProfileOpen(false)}
                     >
                       Sign in
+                    </a>
+                  </Link>
+                  <Link href="/sign-up" legacyBehavior>
+                    <a
+                      className={styles.profileItem}
+                      role="menuitem"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      Sign up
                     </a>
                   </Link>
                 </>

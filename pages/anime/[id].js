@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Layout from '../../components/layout/Layout';
+import AddToListModal from '../../components/modals/AddToListModal';
+import RatingReviewModal from '../../components/modals/RatingReviewModal';
 import styles from '../../styles/anime.module.css';
 import { getAnimeById, getAnimeCharacters } from '../../lib/services/jikan';
 import { isHentaiAnime } from '../../lib/utils/anime';
-import { normalizeAnime } from '../../lib/utils/anime';
+import { isAiringAnime, normalizeAnime } from '../../lib/utils/anime';
 import { formatSeasonLabel } from '../../lib/utils/season';
 import { getAnimeBannerUrl, getAnimeImageUrl, getCharacterAvatarUrl } from '../../lib/utils/media';
 import useMyList from '../../hooks/useMyList';
-import useAuth from '../../hooks/useAuth';
-import { ensureAnimeCatalog } from '../../lib/services/animeCatalog';
-import { addUserActivity, upsertUserAnime } from '../../lib/services/userAnime';
 
 export default function AnimeDetail({ animeResposta, charactersResposta }) {
   const data = animeResposta?.data ?? {};
@@ -37,8 +37,73 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
   const backgroundText = data?.background || '';
   const [showAllCharacters, setShowAllCharacters] = useState(false);
   const normalized = useMemo(() => normalizeAnime(data), [data]);
-  const { addItem, removeItem, isInList, canEdit } = useMyList();
-  const { user } = useAuth();
+  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [pendingAnime, setPendingAnime] = useState(null);
+  const [pendingEntry, setPendingEntry] = useState(null);
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [ratingEntry, setRatingEntry] = useState(null);
+  const currentEntry = normalized ? getEntry(normalized.id) : null;
+  const displayProgress = typeof currentEntry?.progress === 'number' ? currentEntry.progress : 0;
+  const displayStatus =
+    isAiringAnime(data) && currentEntry?.status === 'completed'
+      ? 'watching'
+      : currentEntry?.status || 'watching';
+  const displayPercent = data?.episodes
+    ? Math.min(100, Math.round((displayProgress / data.episodes) * 100))
+    : 0;
+  const buildStarState = (ratingValue, starIndex) => {
+    const fullValue = starIndex;
+    const halfValue = starIndex - 0.5;
+    if (typeof ratingValue !== 'number') return 'empty';
+    if (ratingValue >= fullValue) return 'full';
+    if (ratingValue >= halfValue) return 'half';
+    return 'empty';
+  };
+
+  const openAddModal = (anime, entry = null) => {
+    if (!anime) return;
+    setPendingAnime(anime);
+    setPendingEntry(entry);
+    setAddModalOpen(true);
+  };
+
+  const closeAddModal = () => {
+    setAddModalOpen(false);
+    setPendingAnime(null);
+    setPendingEntry(null);
+  };
+
+  const handleConfirmAdd = async (details) => {
+    if (!pendingAnime) return;
+    await addItem(pendingAnime, details);
+    closeAddModal();
+  };
+
+  const openRatingModal = () => {
+    if (!normalized) return;
+    setRatingEntry(getEntry(normalized.id) || {});
+    setRatingModalOpen(true);
+  };
+
+  const closeRatingModal = () => {
+    setRatingModalOpen(false);
+    setRatingEntry(null);
+  };
+
+  const handleSaveRating = async ({ rating, review }) => {
+    if (!normalized) return;
+    const detail = ratingEntry || {};
+    await addItem(normalized, {
+      status: detail.status || 'completed',
+      progress: typeof detail.progress === 'number' ? detail.progress : 0,
+      isFavorite: Boolean(detail.isFavorite),
+      rating,
+      review,
+      keepAddedAt: true,
+    });
+    closeRatingModal();
+  };
 
   return (
     <Layout
@@ -72,52 +137,34 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
               <span className={styles.metaText}>{episodeLabel}</span>
             </div>
             <div className={styles.heroActions}>
-              <button
-                className={styles.primaryButton}
-                type="button"
-                disabled={!canEdit || !normalized}
-                onClick={() => {
-                  if (!normalized) return;
-                  if (!canEdit) return;
-                  if (isInList(normalized.id)) {
-                    removeItem(normalized.id);
-                  } else {
-                    addItem(normalized);
-                  }
-                }}
-              >
-                {!canEdit
-                  ? 'Login to Add'
-                  : normalized && isInList(normalized.id)
-                    ? 'Remove from List'
-                    : 'Add to List'}
-              </button>
-              <button
-                className={styles.secondaryButton}
-                type="button"
-                disabled={!user}
-                onClick={async () => {
-                  if (!user) return;
-                  await ensureAnimeCatalog(data);
-                  await upsertUserAnime({
-                    uid: user.uid,
-                    anime: data,
-                    overrides: { status: 'watching' },
-                  });
-                  await addUserActivity({
-                    uid: user.uid,
-                    activity: {
-                      animeId: String(data.mal_id || data.id || ''),
-                      title: data.title || 'Untitled',
-                      posterUrl: getAnimeImageUrl(data) || '',
-                      type: 'watching',
-                      label: 'Started watching',
-                    },
-                  });
-                }}
-              >
-                Track Progress
-              </button>
+              {!canEdit || !normalized ? (
+                <button className={styles.primaryButton} type="button" disabled>
+                  Login to Add
+                </button>
+              ) : normalized && isInList(normalized.id) ? (
+                <div className={styles.listActions}>
+                  <Link href="/my-list" legacyBehavior>
+                    <a className={`${styles.primaryButton} ${styles.listLink}`}>In My List</a>
+                  </Link>
+                  <button
+                    className={`${styles.primaryButton} ${styles.editButton}`}
+                    type="button"
+                    onClick={() => openAddModal(normalized, getEntry(normalized.id))}
+                  >
+                    <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
+                    Edit
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className={styles.primaryButton}
+                  type="button"
+                  onClick={() => openAddModal(normalized)}
+                >
+                  Add to List
+                </button>
+              )}
+              {normalized && isInList(normalized.id) ? null : null}
             </div>
           </div>
           <div className={styles.heroPoster}>
@@ -135,6 +182,72 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
 
         <section className={styles.mainGrid}>
           <div className={styles.mainColumn}>
+            {normalized && isInList(normalized.id) ? (
+              <div className={styles.progressCard}>
+                <div className={styles.progressHeader}>
+                  <h2>Tracking Progress</h2>
+                  <div className={styles.progressActions}>
+                    {displayStatus === 'completed' ? (
+                      <button
+                        className={styles.progressRate}
+                        type="button"
+                        onClick={openRatingModal}
+                      >
+                        Rate
+                      </button>
+                    ) : null}
+                    <button
+                      className={styles.progressEdit}
+                      type="button"
+                      onClick={() => openAddModal(normalized, getEntry(normalized.id))}
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.progressMetaRow}>
+                  <span className={styles.progressLabel}>
+                    EP {displayProgress} / {data?.episodes || 'TBA'}
+                  </span>
+                  <span className={styles.progressStatus}>
+                    {(displayStatus || 'watching').toUpperCase()} {data?.episodes ? `${displayPercent}%` : ''}
+                  </span>
+                </div>
+                {typeof currentEntry?.rating === 'number' ? (
+                  <div className={styles.ratingRow}>
+                    <span className={styles.ratingLabel}>Your Rating</span>
+                    <div className={styles.ratingStars}>
+                      {Array.from({ length: 5 }, (_, index) => {
+                        const starIndex = index + 1;
+                        const starState = buildStarState(currentEntry.rating, starIndex);
+                        return (
+                          <i
+                            key={starIndex}
+                            className={`bi ${
+                              starState === 'full'
+                                ? 'bi-star-fill'
+                                : starState === 'half'
+                                ? 'bi-star-half'
+                                : 'bi-star'
+                            } ${styles.ratingStar}`}
+                            aria-hidden="true"
+                          />
+                        );
+                      })}
+                    </div>
+                    <span className={styles.ratingValue}>{currentEntry.rating}/5</span>
+                  </div>
+                ) : null}
+                <div className={styles.progressBar}>
+                  <span
+                    className={styles.progressFill}
+                    style={{
+                      width: data?.episodes ? `${displayPercent}%` : '0%',
+                    }}
+                  />
+                </div>
+              </div>
+            ) : null}
             <div className={styles.section}>
               <div className={styles.sectionEyebrow}>Synopsis</div>
               <h2 className={styles.sectionTitle}>{shortSynopsis || synopsisText}</h2>
@@ -316,6 +429,27 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
           </aside>
         </section>
       </div>
+      <RatingReviewModal
+        open={ratingModalOpen}
+        anime={normalized}
+        initialRating={ratingEntry?.rating}
+        initialReview={ratingEntry?.review}
+        onClose={closeRatingModal}
+        onSave={handleSaveRating}
+      />
+      <AddToListModal
+        open={addModalOpen}
+        anime={pendingAnime}
+        onClose={closeAddModal}
+        onConfirm={handleConfirmAdd}
+        initialStatus={pendingEntry?.status}
+        initialProgress={pendingEntry?.progress}
+        initialFavorite={pendingEntry?.isFavorite}
+        initialRating={pendingEntry?.rating}
+        initialReview={pendingEntry?.review}
+        favoriteCount={favoritesCount}
+        isEditing={Boolean(pendingEntry)}
+      />
     </Layout>
   );
 }

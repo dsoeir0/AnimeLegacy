@@ -66,7 +66,7 @@ const ResetPasswordPage = () => {
     try {
       await confirmResetPassword(oobCode, password);
       setStatus('success');
-      setTimeout(() => router.push('/login'), 3000);
+      setTimeout(() => router.push('/sign-in'), 3000);
     } catch (err) {
       const msg =
         err?.code === 'auth/weak-password'
@@ -111,11 +111,11 @@ const ResetPasswordPage = () => {
             <p className={styles.subtitle}>Verifying your reset link...</p>
           ) : status === 'success' ? (
             <>
-              <div className={styles.success}>Password updated. Redirecting to login...</div>
+              <div className={styles.success}>Password updated. Redirecting to sign in...</div>
               <div className={styles.altLink}>
                 <span>Not redirected?</span>
-                <Link href="/login" legacyBehavior>
-                  <a>Go to Login</a>
+                <Link href="/sign-in" legacyBehavior>
+                  <a>Go to Sign in</a>
                 </Link>
               </div>
             </>
@@ -173,8 +173,8 @@ const ResetPasswordPage = () => {
               ) : null}
               <div className={styles.altLink}>
                 <span>Remembered your password?</span>
-                <Link href="/login" legacyBehavior>
-                  <a>Back to Login</a>
+                <Link href="/sign-in" legacyBehavior>
+                  <a>Back to Sign in</a>
                 </Link>
               </div>
             </>

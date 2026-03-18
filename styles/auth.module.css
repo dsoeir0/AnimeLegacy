@@ -330,10 +330,9 @@
   object-fit: cover;
 }
 
-.avatarCircle span {
+.avatarIcon {
   color: rgba(226, 232, 250, 0.7);
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 22px;
 }
 
 .avatarActions {

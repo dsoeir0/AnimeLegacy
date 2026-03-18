@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Layout from '../components/layout/Layout';
+import AddToListModal from '../components/modals/AddToListModal';
 import styles from '../styles/movies.module.css';
 import useMyList from '../hooks/useMyList';
 import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
@@ -10,7 +12,29 @@ import { getAnimeImageUrl } from '../lib/utils/media';
 
 export default function Movies({ moviesResposta, aniListMap }) {
   const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : [];
-  const { addItem, removeItem, isInList, canEdit } = useMyList();
+  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [pendingAnime, setPendingAnime] = useState(null);
+  const [pendingEntry, setPendingEntry] = useState(null);
+
+  const openAddModal = (anime, entry = null) => {
+    if (!anime) return;
+    setPendingAnime(anime);
+    setPendingEntry(entry);
+    setAddModalOpen(true);
+  };
+
+  const closeAddModal = () => {
+    setAddModalOpen(false);
+    setPendingAnime(null);
+    setPendingEntry(null);
+  };
+
+  const handleConfirmAdd = async (details) => {
+    if (!pendingAnime) return;
+    await addItem(pendingAnime, details);
+    closeAddModal();
+  };
 
   return (
     <Layout
@@ -62,31 +86,51 @@ export default function Movies({ moviesResposta, aniListMap }) {
                     </div>
                   </a>
                 </Link>
-                <button
-                  className={styles.listButton}
-                  type="button"
-                  onClick={() => {
-                    if (!normalized) return;
-                    if (!canEdit) return;
-                    if (isInList(normalized.id)) {
-                      removeItem(normalized.id);
-                    } else {
-                      addItem(normalized);
-                    }
-                  }}
-                  disabled={!canEdit}
-                >
-                  {!canEdit
-                    ? 'Login to Add'
-                    : normalized && isInList(normalized.id)
-                      ? 'In My List'
-                      : 'Add to List'}
-                </button>
+                {!canEdit ? (
+                  <button className={styles.listButton} type="button" disabled>
+                    Login to Add
+                  </button>
+                ) : normalized && isInList(normalized.id) ? (
+                  <div className={styles.listActions}>
+                    <Link href="/my-list" legacyBehavior>
+                      <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
+                    </Link>
+                    <button
+                      className={`${styles.listButton} ${styles.editButton}`}
+                      type="button"
+                      onClick={() => openAddModal(normalized, getEntry(normalized.id))}
+                    >
+                      <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
+                      Edit
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className={styles.listButton}
+                    type="button"
+                    onClick={() => openAddModal(normalized)}
+                  >
+                    Add to List
+                  </button>
+                )}
               </div>
             );
           })}
         </section>
       </main>
+      <AddToListModal
+        open={addModalOpen}
+        anime={pendingAnime}
+        onClose={closeAddModal}
+        onConfirm={handleConfirmAdd}
+        initialStatus={pendingEntry?.status}
+        initialProgress={pendingEntry?.progress}
+        initialFavorite={pendingEntry?.isFavorite}
+        initialRating={pendingEntry?.rating}
+        initialReview={pendingEntry?.review}
+        favoriteCount={favoritesCount}
+        isEditing={Boolean(pendingEntry)}
+      />
     </Layout>
   );
 }

@@ -167,6 +167,31 @@
   color: #9fb8ff;
   text-decoration: none;
   font-weight: 600;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.01em;
+  transition: color 200ms ease, transform 200ms ease;
+  font: inherit;
+}
+
+.sectionLink:hover {
+  color: #c7d6ff;
+  transform: translateY(-1px);
+}
+
+.sectionLink:focus-visible {
+  outline: 2px solid rgba(159, 184, 255, 0.6);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.sectionLinkIcon {
+  font-size: 14px;
 }
 
 .carouselWrapper {
@@ -187,6 +212,9 @@
   cursor: pointer;
 }
 
+.carouselButton i {
+  font-size: 18px;
+}
 .carouselButton:disabled {
   opacity: 0.35;
   cursor: default;
@@ -309,6 +337,47 @@
   font-size: 12px;
   cursor: pointer;
   margin-top: auto;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.listActions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+}
+
+.listLink {
+  background: rgba(125, 107, 255, 0.18);
+  border-color: rgba(125, 107, 255, 0.4);
+  color: #f8f7ff;
+}
+
+.button.editButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+}
+
+.listButton.editButton {
+  padding: 8px 10px;
+  min-width: 56px;
+}
+
+.editIcon {
+  font-size: 12px;
+}
+
+.heroListActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .listButton:hover {
