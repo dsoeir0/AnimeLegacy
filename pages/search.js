@@ -220,17 +220,28 @@ export async function getServerSideProps(context) {
     };
   }
 
-  const response = await searchAnime(query, page, 21);
-  const filtered = Array.isArray(response?.data) ? filterOutHentai(response.data) : [];
-  const results = slimAnimeResponse({ data: filtered });
-  const pagination = response?.pagination || {};
+  try {
+    const response = await searchAnime(query, page, 21);
+    const filtered = Array.isArray(response?.data) ? filterOutHentai(response.data) : [];
+    const results = slimAnimeResponse({ data: filtered });
+    const pagination = response?.pagination || {};
 
-  return {
-    props: {
-      query,
-      page,
-      results,
-      pagination,
-    },
-  };
+    return {
+      props: {
+        query,
+        page,
+        results,
+        pagination,
+      },
+    };
+  } catch {
+    return {
+      props: {
+        query,
+        page,
+        results: { data: [] },
+        pagination: {},
+      },
+    };
+  }
 }

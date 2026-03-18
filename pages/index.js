@@ -364,39 +364,50 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
 }
 
 export async function getServerSideProps() {
-  const [currentRespostaRaw, moviesRespostaRaw] = await Promise.all([
-    getCurrentSeason(),
-    getTopAnimeMovies(),
-  ]);
+  try {
+    const [currentRespostaRaw, moviesRespostaRaw] = await Promise.all([
+      getCurrentSeason(),
+      getTopAnimeMovies(),
+    ]);
 
-  const currentFiltered = Array.isArray(currentRespostaRaw?.data)
-    ? filterOutHentai(currentRespostaRaw.data)
-    : [];
-  const currentResposta = slimAnimeResponse({ data: currentFiltered });
-  const moviesFiltered = Array.isArray(moviesRespostaRaw?.data)
-    ? filterOutHentai(moviesRespostaRaw.data)
-    : [];
-  const moviesResposta = slimAnimeResponse({ data: moviesFiltered });
+    const currentFiltered = Array.isArray(currentRespostaRaw?.data)
+      ? filterOutHentai(currentRespostaRaw.data)
+      : [];
+    const currentResposta = slimAnimeResponse({ data: currentFiltered });
+    const moviesFiltered = Array.isArray(moviesRespostaRaw?.data)
+      ? filterOutHentai(moviesRespostaRaw.data)
+      : [];
+    const moviesResposta = slimAnimeResponse({ data: moviesFiltered });
 
-  const pickRandom = (items, count) => {
-    const pool = [...items];
-    for (let i = pool.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    return pool.slice(0, count);
-  };
+    const pickRandom = (items, count) => {
+      const pool = [...items];
+      for (let i = pool.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      return pool.slice(0, count);
+    };
 
-  const topMovies = pickRandom(
-    moviesResposta.data.filter((item) => typeof item?.score === 'number' && item.score >= 7.5),
-    3,
-  );
+    const topMovies = pickRandom(
+      moviesResposta.data.filter((item) => typeof item?.score === 'number' && item.score >= 7.5),
+      3,
+    );
 
-  const ids = [
-    ...currentResposta.data.slice(0, 40).map((item) => item.mal_id),
-    ...moviesResposta.data.slice(0, 10).map((item) => item.mal_id),
-  ].filter(Boolean);
-  const aniListMap = await fetchAniListMediaByMalIds(ids);
+    const ids = [
+      ...currentResposta.data.slice(0, 40).map((item) => item.mal_id),
+      ...moviesResposta.data.slice(0, 10).map((item) => item.mal_id),
+    ].filter(Boolean);
+    const aniListMap = await fetchAniListMediaByMalIds(ids);
 
-  return { props: { currentResposta, moviesResposta, aniListMap, topMovies } };
+    return { props: { currentResposta, moviesResposta, aniListMap, topMovies } };
+  } catch {
+    return {
+      props: {
+        currentResposta: { data: [] },
+        moviesResposta: { data: [] },
+        aniListMap: {},
+        topMovies: [],
+      },
+    };
+  }
 }
