@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -41,6 +41,9 @@ export default function Seasons({
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [pendingAnime, setPendingAnime] = useState(null);
   const [pendingEntry, setPendingEntry] = useState(null);
+  const gridRef = useRef(null);
+  const [gridCols, setGridCols] = useState(1);
+  const [placeholderCount, setPlaceholderCount] = useState(0);
 
   const displaySeason = filters.season !== 'All Seasons' ? filters.season : 'All Seasons';
 
@@ -193,6 +196,41 @@ export default function Seasons({
     await addItem(pendingAnime, details);
     closeAddModal();
   };
+
+  useEffect(() => {
+    if (!gridRef.current) return undefined;
+    const grid = gridRef.current;
+
+    const computeColumns = () => {
+      const style = getComputedStyle(grid);
+      const cardWidth = Number.parseFloat(style.getPropertyValue('--card-width')) || 220;
+      const gap = Number.parseFloat(style.gap || style.columnGap || '0') || 0;
+      const width = grid.clientWidth;
+      const cols = Math.max(1, Math.floor((width + gap) / (cardWidth + gap)));
+      setGridCols(cols);
+    };
+
+    const raf = requestAnimationFrame(computeColumns);
+    const observer = new ResizeObserver(() => computeColumns());
+    observer.observe(grid);
+    window.addEventListener('resize', computeColumns);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      window.removeEventListener('resize', computeColumns);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (gridCols <= 0) {
+      setPlaceholderCount(0);
+      return;
+    }
+    const remainder = pagedItems.length % gridCols;
+    const nextCount = remainder === 0 ? 0 : gridCols - remainder;
+    setPlaceholderCount(nextCount);
+  }, [pagedItems.length, gridCols]);
 
   return (
     <Layout
@@ -379,7 +417,11 @@ export default function Seasons({
         </section>
 
         <section className={styles.section}>
-          <div className={styles.grid}>
+          <div
+            className={styles.grid}
+            ref={gridRef}
+            style={{ '--cols': gridCols }}
+          >
             {pagedItems.map((element, index) => {
               const media = aniListMap?.[element.mal_id];
               const imageUrl = getAnimeImageUrl(element, media);
@@ -441,6 +483,13 @@ export default function Seasons({
                 </div>
               );
             })}
+            {Array.from({ length: placeholderCount }).map((_, index) => (
+              <div
+                key={`placeholder-${index}`}
+                className={`${styles.card} ${styles.placeholderCard}`}
+                aria-hidden="true"
+              />
+            ))}
           </div>
         </section>
 

@@ -3,6 +3,9 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: min(2400px, 100%);
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .heroPanel {
@@ -196,12 +199,16 @@
 }
 
 .grid {
-  --card-width: 210px;
+  --card-width: 220px;
+  --cols: 1;
   display: grid;
-  grid-template-columns: repeat(8, var(--card-width));
-  column-gap: 60px;
-  row-gap: 30px;
+  grid-template-columns: repeat(var(--cols), var(--card-width));
+  column-gap: 40px;
+  row-gap: 24px;
+  width: 100%;
   justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .card {
@@ -224,6 +231,14 @@
   transform: translateY(-6px);
   border-color: rgba(125, 107, 255, 0.28);
   box-shadow: 0 18px 36px rgba(5, 8, 18, 0.55);
+}
+
+.placeholderCard {
+  visibility: hidden;
+  pointer-events: none;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .cardLink {
@@ -296,7 +311,7 @@
 }
 
 .cardMeta span + span::before {
-  content: '•';
+  content: '\2022';
   margin-right: 10px;
   color: rgba(120, 130, 160, 0.8);
 }
@@ -413,8 +428,7 @@
     grid-column: span 3;
   }
   .grid {
-    --card-width: 200px;
-    grid-template-columns: repeat(6, var(--card-width));
+    --card-width: 210px;
   }
 }
 
@@ -436,8 +450,7 @@
   }
 
   .grid {
-    --card-width: 180px;
-    grid-template-columns: repeat(4, var(--card-width));
+    --card-width: 190px;
   }
 }
 
@@ -451,8 +464,7 @@
   }
 
   .grid {
-    --card-width: 160px;
-    grid-template-columns: repeat(3, var(--card-width));
+    --card-width: 170px;
   }
 
   .poster {
@@ -462,6 +474,6 @@
 
 @media screen and (max-width: 420px) {
   .grid {
-    grid-template-columns: repeat(2, var(--card-width));
+    --card-width: 150px;
   }
 }
