@@ -1,15 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
-import AddToListModal from '../../components/modals/AddToListModal';
-import styles from '../../styles/year.module.css';
+import Button from '../../components/ui/Button';
+import IconButton from '../../components/ui/IconButton';
+import PosterCard from '../../components/cards/PosterCard';
+import styles from './[year].module.css';
 import useMyList from '../../hooks/useMyList';
-import { filterOutHentai, normalizeAnime } from '../../lib/utils/anime';
+import { filterOutHentai } from '../../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
 import { getSeasonByYear } from '../../lib/services/jikan';
-import { getAnimeImageUrl } from '../../lib/utils/media';
+
+const SEASONS = [
+  { key: 'winter', label: 'Winter' },
+  { key: 'spring', label: 'Spring' },
+  { key: 'summer', label: 'Summer' },
+  { key: 'fall', label: 'Fall' },
+];
+
+const SORT_OPTIONS = [
+  { id: 'popularity', label: 'Popularity' },
+  { id: 'rating', label: 'Rating' },
+  { id: 'recent', label: 'Recently added' },
+];
 
 export default function Seasons({
   winterResposta,
@@ -20,567 +33,307 @@ export default function Seasons({
   year,
 }) {
   const router = useRouter();
-  const safeData = (resp) => (Array.isArray(resp?.data) ? resp.data : []);
-  const seasonSets = [
-    { key: 'winter', label: 'Winter', data: safeData(winterResposta) },
-    { key: 'spring', label: 'Spring', data: safeData(springResposta) },
-    { key: 'summer', label: 'Summer', data: safeData(summerResposta) },
-    { key: 'fall', label: 'Fall', data: safeData(fallResposta) },
-  ];
-  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
-  const [filters, setFilters] = useState({
-    genre: 'All Genres',
-    format: 'All Formats',
-    season: 'All Seasons',
-    sort: 'Popularity',
-  });
+  const { isInList } = useMyList();
+  const safeData = (r) => (Array.isArray(r?.data) ? r.data : []);
+
+  const seasonMap = {
+    winter: safeData(winterResposta),
+    spring: safeData(springResposta),
+    summer: safeData(summerResposta),
+    fall: safeData(fallResposta),
+  };
+
+  const [activeSeason, setActiveSeason] = useState('all');
+  const [genre, setGenre] = useState('all');
+  const [format, setFormat] = useState('all');
+  const [sort, setSort] = useState('popularity');
+  const [openDropdown, setOpenDropdown] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 24;
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const currentYear = new Date().getFullYear();
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [pendingAnime, setPendingAnime] = useState(null);
-  const [pendingEntry, setPendingEntry] = useState(null);
-  const gridRef = useRef(null);
-  const [gridCols, setGridCols] = useState(1);
-  const [placeholderCount, setPlaceholderCount] = useState(0);
 
-  const displaySeason = filters.season !== 'All Seasons' ? filters.season : 'All Seasons';
+  const allItems = useMemo(() => {
+    return [...seasonMap.winter, ...seasonMap.spring, ...seasonMap.summer, ...seasonMap.fall];
+  }, [seasonMap]);
 
-  const filterOptions = useMemo(() => {
-    const allItems = seasonSets.flatMap((season) => season.data);
-    const genres = new Set();
-    const formats = new Set();
-    const statuses = new Set();
-    allItems.forEach((item) => {
-      item?.genres?.forEach((genre) => {
-        if (genre?.name) genres.add(genre.name);
-      });
-      if (item?.type) formats.add(item.type);
-      if (item?.status) statuses.add(item.status);
-    });
-    return {
-      genres: ['All Genres', ...Array.from(genres).sort()],
-      formats: ['All Formats', ...Array.from(formats).sort()],
-    };
-  }, [seasonSets]);
+  const genres = useMemo(() => {
+    const set = new Set();
+    allItems.forEach((item) => item?.genres?.forEach((g) => g?.name && set.add(g.name)));
+    return ['all', ...Array.from(set).sort()];
+  }, [allItems]);
 
-  const sortedSeasonSets = useMemo(() => {
-    const matchesFilters = (item, seasonKey) => {
-      if (filters.season !== 'All Seasons' && seasonKey !== filters.season.toLowerCase())
-        return false;
-      if (filters.genre !== 'All Genres') {
-        const genreMatch = item?.genres?.some((genre) => genre?.name === filters.genre);
-        if (!genreMatch) return false;
-      }
-      if (filters.format !== 'All Formats' && item?.type !== filters.format) return false;
-      return true;
-    };
+  const formats = useMemo(() => {
+    const set = new Set();
+    allItems.forEach((item) => item?.type && set.add(item.type));
+    return ['all', ...Array.from(set).sort()];
+  }, [allItems]);
 
-    const sortItems = (items) => {
-      const sorted = [...items];
-      if (filters.sort === 'Rating') {
-        sorted.sort((a, b) => (b?.score || 0) - (a?.score || 0));
-      } else if (filters.sort === 'Recently Added') {
-        sorted.sort((a, b) => {
-          const aDate = new Date(a?.aired?.from || 0).getTime();
-          const bDate = new Date(b?.aired?.from || 0).getTime();
-          return bDate - aDate;
-        });
-      } else {
-        sorted.sort((a, b) => (a?.popularity || 999999) - (b?.popularity || 999999));
-      }
-      return sorted;
-    };
-
-    return seasonSets
-      .map((season) => ({
-        ...season,
-        data: sortItems(season.data.filter((item) => matchesFilters(item, season.key))),
-      }))
-      .filter((season) => season.data.length > 0);
-  }, [filters, seasonSets]);
-
-  const displayedItems = useMemo(() => {
-    const allItems =
-      filters.season === 'All Seasons'
-        ? sortedSeasonSets.flatMap((season) => season.data)
-        : sortedSeasonSets[0]?.data || [];
-    const unique = [];
+  const filteredItems = useMemo(() => {
+    const pool = activeSeason === 'all' ? allItems : seasonMap[activeSeason] || [];
     const seen = new Set();
-    allItems.forEach((item) => {
-      if (!item?.mal_id) return;
-      if (seen.has(item.mal_id)) return;
+    const unique = [];
+    pool.forEach((item) => {
+      if (!item?.mal_id || seen.has(item.mal_id)) return;
       seen.add(item.mal_id);
       unique.push(item);
     });
-    return unique;
-  }, [filters.season, sortedSeasonSets]);
-
-  const totalPages = Math.max(1, Math.ceil(displayedItems.length / pageSize));
-  const pagedItems = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return displayedItems.slice(start, start + pageSize);
-  }, [currentPage, displayedItems]);
-
-  const getBadge = (item, index) => {
-    if (index < 2) return 'Popular';
-    if ((item?.score || 0) >= 8.5) return 'Hot';
-    return null;
-  };
-
-  const handleReset = () => {
-    setFilters({
-      genre: 'All Genres',
-      format: 'All Formats',
-      season: 'All Seasons',
-      sort: 'Popularity',
+    return unique.filter((item) => {
+      if (genre !== 'all') {
+        if (!item?.genres?.some((g) => g?.name === genre)) return false;
+      }
+      if (format !== 'all' && item?.type !== format) return false;
+      return true;
     });
+  }, [activeSeason, allItems, seasonMap, genre, format]);
+
+  const sortedItems = useMemo(() => {
+    const list = [...filteredItems];
+    if (sort === 'rating') {
+      list.sort((a, b) => (b?.score || 0) - (a?.score || 0));
+    } else if (sort === 'recent') {
+      list.sort((a, b) => {
+        const aDate = new Date(a?.aired?.from || 0).getTime();
+        const bDate = new Date(b?.aired?.from || 0).getTime();
+        return bDate - aDate;
+      });
+    } else {
+      list.sort((a, b) => (a?.popularity || 999999) - (b?.popularity || 999999));
+    }
+    return list;
+  }, [filteredItems, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedItems.length / pageSize));
+  const pagedItems = useMemo(
+    () => sortedItems.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [sortedItems, currentPage],
+  );
+
+  useEffect(() => {
     setCurrentPage(1);
-    if (String(year) !== String(currentYear)) {
-      router.push(`/seasons/${currentYear}`);
-    }
-  };
+  }, [activeSeason, genre, format, sort]);
 
-  const yearOptions = useMemo(() => {
-    const current = Number(year);
-    if (!Number.isFinite(current)) return [year];
-    const maxYear = new Date().getFullYear();
-    const oldestYear = 1963;
-    const startYear = maxYear;
-    const years = [];
-    for (let y = startYear; y >= oldestYear; y -= 1) {
-      years.push(y);
-    }
-    return years.length ? years : [current];
-  }, [year]);
-
-  const handleYearSelect = (nextYear) => {
-    if (nextYear && nextYear !== String(year)) {
-      router.push(`/seasons/${nextYear}`);
-    }
-    setOpenDropdown(null);
-  };
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   useEffect(() => {
     const handleOutside = (event) => {
-      if (!event.target.closest('[data-dropdown-root="true"]')) {
-        setOpenDropdown(null);
-      }
+      if (!event.target.closest('[data-dropdown-root="true"]')) setOpenDropdown(null);
     };
     document.addEventListener('mousedown', handleOutside);
     return () => document.removeEventListener('mousedown', handleOutside);
   }, []);
 
-  const setFilterValue = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setCurrentPage(1);
-    setOpenDropdown(null);
-  };
-
-  const openAddModal = (anime, entry = null) => {
-    if (!anime) return;
-    setPendingAnime(anime);
-    setPendingEntry(entry);
-    setAddModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setAddModalOpen(false);
-    setPendingAnime(null);
-    setPendingEntry(null);
-  };
-
-  const handleConfirmAdd = async (details) => {
-    if (!pendingAnime) return;
-    await addItem(pendingAnime, details);
-    closeAddModal();
-  };
-
-  useEffect(() => {
-    if (!gridRef.current) return undefined;
-    const grid = gridRef.current;
-
-    const computeColumns = () => {
-      const style = getComputedStyle(grid);
-      const cardWidth = Number.parseFloat(style.getPropertyValue('--card-width')) || 220;
-      const gap = Number.parseFloat(style.gap || style.columnGap || '0') || 0;
-      const width = grid.clientWidth;
-      const cols = Math.max(1, Math.floor((width + gap) / (cardWidth + gap)));
-      setGridCols(cols);
-    };
-
-    const raf = requestAnimationFrame(computeColumns);
-    const observer = new ResizeObserver(() => computeColumns());
-    observer.observe(grid);
-    window.addEventListener('resize', computeColumns);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      observer.disconnect();
-      window.removeEventListener('resize', computeColumns);
-    };
+  const yearOptions = useMemo(() => {
+    const maxYear = new Date().getFullYear();
+    const arr = [];
+    for (let y = maxYear; y >= 1990; y -= 1) arr.push(y);
+    return arr;
   }, []);
 
-  useEffect(() => {
-    if (gridCols <= 0) {
-      setPlaceholderCount(0);
-      return;
-    }
-    const remainder = pagedItems.length % gridCols;
-    const nextCount = remainder === 0 ? 0 : gridCols - remainder;
-    setPlaceholderCount(nextCount);
-  }, [pagedItems.length, gridCols]);
+  const handleYearSelect = (y) => {
+    setOpenDropdown(null);
+    if (String(y) !== String(year)) router.push(`/seasons/${y}`);
+  };
+
+  const resetFilters = () => {
+    setActiveSeason('all');
+    setGenre('all');
+    setFormat('all');
+    setSort('popularity');
+    setCurrentPage(1);
+  };
+
+  const renderDropdown = (id, current, options, onSelect, labelFn = (v) => (v === 'all' ? 'All' : v)) => (
+    <div className={styles.dropdownRoot} data-dropdown-root="true">
+      <button
+        className={styles.dropdownBtn}
+        type="button"
+        onClick={() => setOpenDropdown((p) => (p === id ? null : id))}
+        aria-expanded={openDropdown === id}
+      >
+        {labelFn(current)}
+        <ChevronDown size={14} />
+      </button>
+      {openDropdown === id ? (
+        <div className={styles.dropdownMenu}>
+          {options.map((opt) => (
+            <button
+              key={typeof opt === 'string' ? opt : opt.id}
+              type="button"
+              className={`${styles.dropdownOption} ${
+                (typeof opt === 'string' ? opt : opt.id) === current ? styles.dropdownOptionActive : ''
+              }`}
+              onClick={() => {
+                onSelect(typeof opt === 'string' ? opt : opt.id);
+                setOpenDropdown(null);
+              }}
+            >
+              {typeof opt === 'string' ? labelFn(opt) : opt.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
 
   return (
     <Layout
-      showSidebar={false}
-      headerVariant="dark"
-      layoutVariant="dark"
-      title="AnimeLegacy - Seasonal Library"
-      description="Explore every season's anime lineup by year, curated for easy discovery."
+      title={`AnimeLegacy · Seasons ${year}`}
+      description="Every season's anime lineup by year, curated for easy discovery."
     >
-      <main className={styles.main}>
-        <section className={styles.heroPanel}>
-          <div className={styles.hero}>
-            <div>
-              <h1 className={styles.title}>
-                Seasonal Anime{' '}
-                <span>
-                  {displaySeason} {year}
-                </span>
-              </h1>
-              <p className={styles.subtitle}>
-                Explore the latest releases, trending sequels, and hidden gems from the broadcast
-                season.
-              </p>
-            </div>
+      <div className={styles.page}>
+        <header className={styles.head}>
+          <div>
+            <div className={styles.eyebrow}>SEASONAL ARCHIVE</div>
+            <h1 className={styles.heading}>
+              {year} <span className={styles.headingHighlight}>seasons</span>
+            </h1>
+            <p className={styles.subtitle}>
+              Browse every winter, spring, summer, and fall release with filters for genre, format, and sort.
+            </p>
           </div>
-
-          <div className={styles.filters} aria-label="Filters">
-            <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>Genre</span>
-              <div className={styles.dropdownRoot} data-dropdown-root="true">
-                <button
-                  className={styles.dropdownButton}
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded={openDropdown === 'genre'}
-                  onClick={() => setOpenDropdown((prev) => (prev === 'genre' ? null : 'genre'))}
-                >
-                  {filters.genre}
-                  <span className={styles.dropdownCaret} aria-hidden="true" />
-                </button>
-                {openDropdown === 'genre' ? (
-                  <div className={styles.dropdownMenu} role="listbox">
-                    {filterOptions.genres.map((genre) => (
-                      <button
-                        key={genre}
-                        type="button"
-                        className={`${styles.dropdownOption} ${filters.genre === genre ? styles.dropdownOptionActive : ''}`}
-                        onClick={() => setFilterValue('genre', genre)}
-                      >
-                        {genre}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>Format</span>
-              <div className={styles.dropdownRoot} data-dropdown-root="true">
-                <button
-                  className={styles.dropdownButton}
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded={openDropdown === 'format'}
-                  onClick={() => setOpenDropdown((prev) => (prev === 'format' ? null : 'format'))}
-                >
-                  {filters.format}
-                  <span className={styles.dropdownCaret} aria-hidden="true" />
-                </button>
-                {openDropdown === 'format' ? (
-                  <div className={styles.dropdownMenu} role="listbox">
-                    {filterOptions.formats.map((format) => (
-                      <button
-                        key={format}
-                        type="button"
-                        className={`${styles.dropdownOption} ${filters.format === format ? styles.dropdownOptionActive : ''}`}
-                        onClick={() => setFilterValue('format', format)}
-                      >
-                        {format}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>Season</span>
-              <div className={styles.dropdownRoot} data-dropdown-root="true">
-                <button
-                  className={styles.dropdownButton}
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded={openDropdown === 'season'}
-                  onClick={() => setOpenDropdown((prev) => (prev === 'season' ? null : 'season'))}
-                >
-                  {filters.season}
-                  <span className={styles.dropdownCaret} aria-hidden="true" />
-                </button>
-                {openDropdown === 'season' ? (
-                  <div className={styles.dropdownMenu} role="listbox">
-                    <button
-                      type="button"
-                      className={`${styles.dropdownOption} ${filters.season === 'All Seasons' ? styles.dropdownOptionActive : ''}`}
-                      onClick={() => setFilterValue('season', 'All Seasons')}
-                    >
-                      All Seasons
-                    </button>
-                    {seasonSets.map((season) => (
-                      <button
-                        key={season.key}
-                        type="button"
-                        className={`${styles.dropdownOption} ${filters.season === season.label ? styles.dropdownOptionActive : ''}`}
-                        onClick={() => setFilterValue('season', season.label)}
-                      >
-                        {season.label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>Year</span>
-              <div className={styles.dropdownRoot} data-dropdown-root="true">
-                <button
-                  className={styles.dropdownButton}
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded={openDropdown === 'year'}
-                  onClick={() => setOpenDropdown((prev) => (prev === 'year' ? null : 'year'))}
-                >
-                  {year}
-                  <span className={styles.dropdownCaret} aria-hidden="true" />
-                </button>
-                {openDropdown === 'year' ? (
-                  <div className={styles.dropdownMenu} role="listbox">
-                    {yearOptions.map((optionYear) => (
-                      <button
-                        key={optionYear}
-                        type="button"
-                        className={`${styles.dropdownOption} ${String(optionYear) === String(year) ? styles.dropdownOptionActive : ''}`}
-                        onClick={() => handleYearSelect(String(optionYear))}
-                      >
-                        {optionYear}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <div className={styles.filterGroup}>
-              <span className={styles.filterLabel}>Sort By</span>
-              <div className={styles.dropdownRoot} data-dropdown-root="true">
-                <button
-                  className={styles.dropdownButton}
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded={openDropdown === 'sort'}
-                  onClick={() => setOpenDropdown((prev) => (prev === 'sort' ? null : 'sort'))}
-                >
-                  {filters.sort}
-                  <span className={styles.dropdownCaret} aria-hidden="true" />
-                </button>
-                {openDropdown === 'sort' ? (
-                  <div className={styles.dropdownMenu} role="listbox">
-                    {['Popularity', 'Rating', 'Recently Added'].map((sort) => (
-                      <button
-                        key={sort}
-                        type="button"
-                        className={`${styles.dropdownOption} ${filters.sort === sort ? styles.dropdownOptionActive : ''}`}
-                        onClick={() => setFilterValue('sort', sort)}
-                      >
-                        {sort}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-            <button className={styles.applyButton} type="button" onClick={handleReset}>
-              Clear Filters
-            </button>
+          <div className={styles.yearWrap}>
+            <span className={styles.filterLabel}>YEAR</span>
+            {renderDropdown(
+              'year',
+              String(year),
+              yearOptions.map(String),
+              handleYearSelect,
+              (v) => v,
+            )}
           </div>
-        </section>
+        </header>
 
-        <section className={styles.section}>
-          <div
-            className={styles.grid}
-            ref={gridRef}
-            style={{ '--cols': gridCols }}
+        <div className={styles.seasonTabs}>
+          <button
+            type="button"
+            className={`${styles.seasonTab} ${activeSeason === 'all' ? styles.seasonTabActive : ''}`}
+            onClick={() => setActiveSeason('all')}
           >
-            {pagedItems.map((element, index) => {
-              const media = aniListMap?.[element.mal_id];
-              const imageUrl = getAnimeImageUrl(element, media);
-              const normalized = normalizeAnime(element);
-              const badge = getBadge(element, index);
-              return (
-                <div
-                  key={element.mal_id}
-                  className={styles.card}
-                  style={{ animationDelay: `${index * 30}ms` }}
-                >
-                  <Link href={`/anime/${element.mal_id}`} legacyBehavior>
-                    <a className={styles.cardLink}>
-                      <div className={styles.poster}>
-                        {badge ? <span className={styles.badge}>{badge}</span> : null}
-                        <Image
-                          className={styles.posterImage}
-                          src={imageUrl || '/logo_no_text.png'}
-                          alt={element.title}
-                          fill
-                          sizes="200px"
-                        />
-                        <span className={styles.score}>{element.score || 'NR'}</span>
-                      </div>
-                      <div className={styles.cardTitle}>{element.title}</div>
-                      <div className={styles.cardMeta}>
-                        <span>{element.type || 'TV'}</span>
-                        <span>{element.episodes ? `${element.episodes} episodes` : 'TBA'}</span>
-                      </div>
-                    </a>
-                  </Link>
-                  {!canEdit ? (
-                    <button className={styles.listButton} type="button" disabled>
-                      Login to Add
-                    </button>
-                  ) : normalized && isInList(normalized.id) ? (
-                    <div className={styles.listActions}>
-                      <Link href="/my-list" legacyBehavior>
-                        <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
-                      </Link>
-                      <button
-                        className={`${styles.listButton} ${styles.editButton}`}
-                        type="button"
-                        onClick={() => openAddModal(normalized, getEntry(normalized.id))}
-                      >
-                        <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
-                        Edit
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      className={styles.listButton}
-                      type="button"
-                      onClick={() => openAddModal(normalized)}
-                    >
-                      Add to List
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-            {Array.from({ length: placeholderCount }).map((_, index) => (
-              <div
-                key={`placeholder-${index}`}
-                className={`${styles.card} ${styles.placeholderCard}`}
-                aria-hidden="true"
+            All seasons
+          </button>
+          {SEASONS.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              className={`${styles.seasonTab} ${activeSeason === s.key ? styles.seasonTabActive : ''}`}
+              onClick={() => setActiveSeason(s.key)}
+            >
+              {s.label}
+              <span className={styles.seasonCount}>{seasonMap[s.key]?.length || 0}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.filters}>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>GENRE</span>
+            {renderDropdown('genre', genre, genres, setGenre)}
+          </div>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>FORMAT</span>
+            {renderDropdown('format', format, formats, setFormat)}
+          </div>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>SORT</span>
+            {renderDropdown(
+              'sort',
+              sort,
+              SORT_OPTIONS,
+              setSort,
+              (v) => SORT_OPTIONS.find((o) => o.id === v)?.label || v,
+            )}
+          </div>
+          <Button variant="ghost" size="md" onClick={resetFilters}>
+            Reset
+          </Button>
+          <div className={styles.countBadge}>
+            {sortedItems.length} titles
+          </div>
+        </div>
+
+        {sortedItems.length === 0 ? (
+          <div className={styles.empty}>
+            <h2>No results</h2>
+            <p>Try removing a filter or switching seasons.</p>
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {pagedItems.map((item) => (
+              <PosterCard
+                key={item.mal_id}
+                anime={item}
+                media={aniListMap?.[item.mal_id]}
+                inList={isInList(item.mal_id)}
+                href={`/anime/${item.mal_id}`}
+                width="100%"
               />
             ))}
           </div>
-        </section>
+        )}
 
-        <section className={styles.pagination} aria-label="Pagination">
-          <button
-            className={styles.pageButton}
-            type="button"
-            aria-label="Previous page"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-          >
-            <i className="bi bi-chevron-left" aria-hidden="true" />
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .slice(0, 5)
-            .map((page) => (
+        {totalPages > 1 ? (
+          <div className={styles.pagination}>
+            <IconButton
+              icon={ChevronLeft}
+              tooltip="Previous page"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            />
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .slice(0, 5)
+              .map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  className={`${styles.pageBtn} ${currentPage === p ? styles.pageBtnActive : ''}`}
+                  onClick={() => setCurrentPage(p)}
+                >
+                  {p}
+                </button>
+              ))}
+            {totalPages > 5 ? <span className={styles.pageDots}>…</span> : null}
+            {totalPages > 5 ? (
               <button
-                key={page}
-                className={`${styles.pageButton} ${currentPage === page ? styles.pageButtonActive : ''}`}
                 type="button"
-                onClick={() => setCurrentPage(page)}
+                className={`${styles.pageBtn} ${currentPage === totalPages ? styles.pageBtnActive : ''}`}
+                onClick={() => setCurrentPage(totalPages)}
               >
-                {page}
+                {totalPages}
               </button>
-            ))}
-          {totalPages > 5 ? <span className={styles.pageEllipsis}>…</span> : null}
-          {totalPages > 5 ? (
-            <button
-              className={`${styles.pageButton} ${currentPage === totalPages ? styles.pageButtonActive : ''}`}
-              type="button"
-              onClick={() => setCurrentPage(totalPages)}
-            >
-              {totalPages}
-            </button>
-          ) : null}
-          <button
-            className={styles.pageButton}
-            type="button"
-            aria-label="Next page"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-          >
-            <i className="bi bi-chevron-right" aria-hidden="true" />
-          </button>
-        </section>
-      </main>
-      <AddToListModal
-        open={addModalOpen}
-        anime={pendingAnime}
-        onClose={closeAddModal}
-        onConfirm={handleConfirmAdd}
-        initialStatus={pendingEntry?.status}
-        initialProgress={pendingEntry?.progress}
-        initialFavorite={pendingEntry?.isFavorite}
-        initialRating={pendingEntry?.rating}
-        initialReview={pendingEntry?.review}
-        favoriteCount={favoritesCount}
-        isEditing={Boolean(pendingEntry)}
-      />
+            ) : null}
+            <IconButton
+              icon={ChevronRight}
+              tooltip="Next page"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            />
+          </div>
+        ) : null}
+      </div>
     </Layout>
   );
 }
 
 export async function getServerSideProps(context) {
   const { year } = context.query;
-
-  const [winterResposta, springResposta, summerResposta] = await Promise.all([
+  const [winterResposta, springResposta, summerResposta, fallResposta] = await Promise.all([
     getSeasonByYear(year, 'winter'),
     getSeasonByYear(year, 'spring'),
     getSeasonByYear(year, 'summer'),
+    getSeasonByYear(year, 'fall'),
   ]);
-
-  await new Promise((res) => setTimeout(res, 1000));
-  const fallResposta = await getSeasonByYear(year, 'fall');
-
-  if (Array.isArray(winterResposta?.data))
-    winterResposta.data = filterOutHentai(winterResposta.data);
-  if (Array.isArray(springResposta?.data))
-    springResposta.data = filterOutHentai(springResposta.data);
-  if (Array.isArray(summerResposta?.data))
-    summerResposta.data = filterOutHentai(summerResposta.data);
+  if (Array.isArray(winterResposta?.data)) winterResposta.data = filterOutHentai(winterResposta.data);
+  if (Array.isArray(springResposta?.data)) springResposta.data = filterOutHentai(springResposta.data);
+  if (Array.isArray(summerResposta?.data)) summerResposta.data = filterOutHentai(summerResposta.data);
   if (Array.isArray(fallResposta?.data)) fallResposta.data = filterOutHentai(fallResposta.data);
-
   const ids = [
-    ...(winterResposta?.data || []).map((item) => item.mal_id),
-    ...(springResposta?.data || []).map((item) => item.mal_id),
-    ...(summerResposta?.data || []).map((item) => item.mal_id),
-    ...(fallResposta?.data || []).map((item) => item.mal_id),
+    ...(winterResposta?.data || []).map((i) => i.mal_id),
+    ...(springResposta?.data || []).map((i) => i.mal_id),
+    ...(summerResposta?.data || []).map((i) => i.mal_id),
+    ...(fallResposta?.data || []).map((i) => i.mal_id),
   ].filter(Boolean);
   const aniListMap = await fetchAniListMediaByMalIds(ids);
-
   return {
     props: { winterResposta, springResposta, summerResposta, fallResposta, aniListMap, year },
   };

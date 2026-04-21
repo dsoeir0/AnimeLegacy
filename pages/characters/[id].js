@@ -1,8 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Star, ArrowRight } from 'lucide-react';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  increment,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
 import Layout from '../../components/layout/Layout';
-import styles from '../../styles/character.module.css';
+import Button from '../../components/ui/Button';
+import styles from './[id].module.css';
 import useAuth from '../../hooks/useAuth';
 import {
   getCharacterAnime,
@@ -11,7 +22,7 @@ import {
 } from '../../lib/services/jikan';
 import { getAnimeImageUrl, getCharacterImageUrl } from '../../lib/utils/media';
 import { getFirebaseClient } from '../../lib/firebase/client';
-import { collection, deleteDoc, doc, increment, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import { FAVORITE_LIMIT } from '../../lib/constants';
 
 const buildBio = (about = '') =>
   about
@@ -19,8 +30,7 @@ const buildBio = (about = '') =>
     .map((line) => line.trim())
     .filter((line) => line && !line.toLowerCase().startsWith('(source'));
 
-const toStatValue = (value, fallback = 'Unknown') =>
-  value ? String(value) : fallback;
+const toStatValue = (value, fallback = '—') => (value ? String(value) : fallback);
 
 const parseBioValue = (label, about = '') => {
   if (!about) return '';
@@ -47,9 +57,7 @@ export default function CharacterPage({
 }) {
   const character = characterResposta?.data || {};
   const anime = Array.isArray(characterAnimeResposta?.data) ? characterAnimeResposta.data : [];
-  const voicesRaw = Array.isArray(characterVoicesResposta?.data)
-    ? characterVoicesResposta.data
-    : [];
+  const voicesRaw = Array.isArray(characterVoicesResposta?.data) ? characterVoicesResposta.data : [];
   const voices = useMemo(() => {
     const priority = ['Japanese', 'English'];
     const rank = (lang) => {
@@ -64,10 +72,9 @@ export default function CharacterPage({
       return aLang.localeCompare(bLang);
     });
   }, [voicesRaw]);
-  const imageUrl = getCharacterImageUrl(character);
+  const imageUrl = getCharacterImageUrl(character) || '/logo_no_text.png';
   const biography = buildBio(character?.about || '');
-  const showAllDefault = false;
-  const [showAllAppearances, setShowAllAppearances] = useState(showAllDefault);
+  const [showAllAppearances, setShowAllAppearances] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteError, setFavoriteError] = useState('');
   const [favoriteTotal, setFavoriteTotal] = useState(0);
@@ -81,7 +88,7 @@ export default function CharacterPage({
     if (!db) return undefined;
     const favoritesRef = collection(db, 'users', user.uid, 'favoriteCharacters');
     const unsubscribe = onSnapshot(favoritesRef, (snapshot) => {
-      const ids = snapshot.docs.map((docItem) => String(docItem.id));
+      const ids = snapshot.docs.map((d) => String(d.id));
       setFavoriteCount(ids.length);
       setIsFavorite(ids.includes(String(character.mal_id)));
       setFavoriteLoaded(true);
@@ -91,30 +98,21 @@ export default function CharacterPage({
 
   useEffect(() => {
     let unsubscribe = null;
-    const loadFavorites = () => {
-      if (!character?.mal_id) return;
-      const { db } = getFirebaseClient();
-      if (!db) {
-        setFavoriteTotal(0);
-        return;
-      }
-      const ref = doc(db, 'characterStats', String(character.mal_id));
-      unsubscribe = onSnapshot(
-        ref,
-        (snapshot) => {
-          if (snapshot.exists()) {
-            const count = snapshot.data()?.favoritesCount;
-            setFavoriteTotal(typeof count === 'number' ? count : 0);
-          } else {
-            setFavoriteTotal(0);
-          }
-        },
-        () => {
-          setFavoriteTotal(0);
-        },
-      );
-    };
-    loadFavorites();
+    if (!character?.mal_id) return undefined;
+    const { db } = getFirebaseClient();
+    if (!db) {
+      setFavoriteTotal(0);
+      return undefined;
+    }
+    const ref = doc(db, 'characterStats', String(character.mal_id));
+    unsubscribe = onSnapshot(
+      ref,
+      (snap) => {
+        if (snap.exists()) setFavoriteTotal(snap.data()?.favoritesCount || 0);
+        else setFavoriteTotal(0);
+      },
+      () => setFavoriteTotal(0),
+    );
     return () => {
       if (unsubscribe) unsubscribe();
     };
@@ -127,29 +125,24 @@ export default function CharacterPage({
       return;
     }
     if (!favoriteLoaded) {
-      setFavoriteError('Loading favorites...');
+      setFavoriteError('Loading favorites…');
       return;
     }
     const next = !isFavorite;
-    if (next && favoriteCount >= 10) {
-      setFavoriteError('You can only favorite up to 10 characters.');
+    if (next && favoriteCount >= FAVORITE_LIMIT) {
+      setFavoriteError(`You can only favorite up to ${FAVORITE_LIMIT} characters.`);
       return;
     }
     setFavoriteError('');
     setIsFavorite(next);
-
     const delta = next ? 1 : -1;
-    setFavoriteTotal((current) => {
-      const base = typeof current === 'number' ? current : 0;
-      return Math.max(0, base + delta);
-    });
+    setFavoriteTotal((c) => Math.max(0, (c || 0) + delta));
     const { db } = getFirebaseClient();
     if (db) {
       try {
         const characterId = String(character.mal_id);
         const statsRef = doc(db, 'characterStats', characterId);
         await setDoc(statsRef, { favoritesCount: increment(delta) }, { merge: true });
-
         const favoriteRef = doc(db, 'users', user.uid, 'favoriteCharacters', characterId);
         if (next) {
           await setDoc(
@@ -172,58 +165,49 @@ export default function CharacterPage({
     }
   };
 
-  const ageValue = useMemo(
-    () => character?.age || parseBioValue('Age', character?.about || ''),
-    [character?.age, character?.about],
-  );
-  const heightValue = useMemo(
-    () => character?.height || parseBioValue('Height', character?.about || ''),
-    [character?.height, character?.about],
-  );
+  const ageValue = useMemo(() => character?.age || parseBioValue('Age', character?.about || ''), [character]);
+  const heightValue = useMemo(() => character?.height || parseBioValue('Height', character?.about || ''), [character]);
   const genderValue = useMemo(
     () =>
       character?.gender ||
       parseBioValue('Gender', character?.about || '') ||
       parseBioValue('Sex', character?.about || '') ||
       inferGenderFromAbout(character?.about || ''),
-    [character?.gender, character?.about],
+    [character],
   );
 
   const stats = [
-    { label: 'Favorites', value: toStatValue(favoriteTotal, '0') },
-    { label: 'Age', value: toStatValue(ageValue) },
-    { label: 'Height', value: toStatValue(heightValue) },
-    { label: 'Gender', value: toStatValue(genderValue) },
+    { label: 'FAVORITES', value: toStatValue(favoriteTotal, '0') },
+    { label: 'AGE', value: toStatValue(ageValue) },
+    { label: 'HEIGHT', value: toStatValue(heightValue) },
+    { label: 'GENDER', value: toStatValue(genderValue) },
   ];
 
   const nicknameTags = Array.isArray(character?.nicknames) ? character.nicknames : [];
+  const visibleAppearances = showAllAppearances ? anime : anime.slice(0, 6);
 
   return (
     <Layout
-      showSidebar={false}
-      headerVariant="dark"
-      layoutVariant="dark"
-      title={`AnimeLegacy - ${character?.name || 'Character'}`}
+      title={`${character?.name || 'Character'} · AnimeLegacy`}
       description={character?.about || 'Character profile and appearances.'}
     >
-      <main className={styles.page}>
+      <div className={styles.page}>
         <section className={styles.hero}>
-          <div className={styles.heroImage}>
-            <div className={styles.heroImageFrame}>
-              <Image
-                src={imageUrl || '/logo_no_text.png'}
-                alt={character?.name || 'Character'}
-                fill
-                sizes="(max-width: 900px) 100vw, 420px"
-                className={styles.heroImageMedia}
-              />
-            </div>
+          <div className={styles.heroImageFrame}>
+            <Image
+              src={imageUrl}
+              alt={character?.name || 'Character'}
+              fill
+              sizes="(max-width: 900px) 100vw, 360px"
+              className={styles.heroImage}
+
+            />
           </div>
-          <div className={styles.heroContent}>
-            <div className={styles.heroEyebrow}>Character Profile</div>
-            <h1 className={styles.heroTitle}>{character?.name || 'Unknown Character'}</h1>
+          <div className={styles.heroBody}>
+            <div className={styles.eyebrow}>CHARACTER PROFILE</div>
+            <h1 className={styles.title}>{character?.name || 'Unknown'}</h1>
             {character?.name_kanji ? (
-              <p className={styles.heroSubtitle}>{character.name_kanji}</p>
+              <div className={styles.subTitle}>{character.name_kanji}</div>
             ) : null}
             {nicknameTags.length ? (
               <div className={styles.tagRow}>
@@ -234,46 +218,43 @@ export default function CharacterPage({
                 ))}
               </div>
             ) : null}
+
             <div className={styles.statsGrid}>
-              {stats.map((stat) => (
-                <div key={stat.label} className={styles.statCard}>
-                  <div className={styles.statValue}>{stat.value}</div>
-                  <div className={styles.statLabel}>{stat.label}</div>
+              {stats.map((s) => (
+                <div key={s.label} className={styles.statCard}>
+                  <div className={styles.statLabel}>{s.label}</div>
+                  <div className={styles.statValue}>{s.value}</div>
                 </div>
               ))}
-              <div className={styles.statCardWide}>
-                <div className={styles.favoriteLabel}>Favorite</div>
-                <button
-                  className={styles.favoriteRow}
-                  type="button"
-                  onClick={toggleFavorite}
-                  aria-pressed={isFavorite}
-                  disabled={!user?.uid || !favoriteLoaded}
-                >
-                  <span
-                    className={`${styles.favoriteIcon} ${
-                      isFavorite ? styles.favoriteIconActive : ''
-                    }`}
-                    aria-hidden="true"
-                  >
-                    ★
-                  </span>
-                  <span>{isFavorite ? 'Favorited' : 'Mark as favorite'}</span>
-                </button>
+            </div>
+
+            <div className={styles.favoriteCard}>
+              <div className={styles.favoriteLeft}>
+                <div className={styles.favoriteTitle}>Favorite character</div>
                 <div className={styles.favoriteHint}>
-                  Favorites appear on your profile.
-                  {favoriteError ? (
-                    <span className={styles.favoriteError}>{favoriteError}</span>
-                  ) : null}
+                  {isFavorite
+                    ? 'Showcased on your profile.'
+                    : 'Mark to feature on your profile.'}
+                  {favoriteError ? <span className={styles.favoriteError}> {favoriteError}</span> : null}
                 </div>
               </div>
+              <Button
+                variant={isFavorite ? 'collection' : 'secondary'}
+                size="md"
+                icon={Star}
+                onClick={toggleFavorite}
+                disabled={!user?.uid || !favoriteLoaded}
+              >
+                {isFavorite ? 'Favorited' : 'Favorite'}
+              </Button>
             </div>
+
             <div className={styles.bioCard}>
-              <div className={styles.bioHeader}>Biography</div>
+              <div className={styles.sectionEyebrow}>BIOGRAPHY</div>
               {biography.length ? (
-                biography.map((paragraph, index) => (
-                  <p key={`${paragraph}-${index}`} className={styles.bioText}>
-                    {paragraph}
+                biography.map((p, i) => (
+                  <p key={`${p}-${i}`} className={styles.bioText}>
+                    {p}
                   </p>
                 ))
               ) : (
@@ -284,27 +265,27 @@ export default function CharacterPage({
         </section>
 
         <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Major Appearances</h2>
-            {anime.length > 5 ? (
-              <button
-                className={styles.sectionToggle}
-                type="button"
-                onClick={() => setShowAllAppearances((prev) => !prev)}
+          <div className={styles.sectionHeadRow}>
+            <div>
+              <div className={styles.sectionEyebrow}>APPEARANCES</div>
+              <h2 className={styles.sectionTitle}>Major appearances</h2>
+            </div>
+            {anime.length > 6 ? (
+              <Button
+                variant="plain"
+                size="sm"
+                iconRight={ArrowRight}
+                onClick={() => setShowAllAppearances((p) => !p)}
               >
-                {showAllAppearances ? 'Show Less' : 'View All'}
-              </button>
+                {showAllAppearances ? 'Show less' : 'View all'}
+              </Button>
             ) : null}
           </div>
           <div className={styles.appearanceGrid}>
-            {anime.length ? (
-              anime
-                .slice(0, showAllAppearances ? anime.length : 5)
-                .map((entry) => {
-                const title = entry?.anime?.title || 'Unknown Anime';
-                const image = getAnimeImageUrl(entry?.anime);
-                const typeLabel = entry?.anime?.type || 'TV';
-                const roleLabel = entry?.role || 'Role';
+            {visibleAppearances.length ? (
+              visibleAppearances.map((entry) => {
+                const title = entry?.anime?.title || 'Unknown anime';
+                const image = getAnimeImageUrl(entry?.anime) || '/logo_no_text.png';
                 const animeId = entry?.anime?.mal_id;
                 return (
                   <Link
@@ -314,73 +295,73 @@ export default function CharacterPage({
                   >
                     <div className={styles.appearancePoster}>
                       <Image
-                        src={image || '/logo_no_text.png'}
+                        src={image}
                         alt={title}
                         fill
-                        sizes="(max-width: 900px) 45vw, 220px"
+                        sizes="(max-width: 900px) 45vw, 200px"
+                        className={styles.posterImg}
+
                       />
-                      <span className={styles.appearanceBadge}>{typeLabel}</span>
+                      <div className={styles.appearanceGradient} />
+                      <span className={styles.appearanceBadge}>{entry?.anime?.type || 'TV'}</span>
                     </div>
-                    <div className={styles.appearanceTitle}>{title}</div>
                     <div className={styles.appearanceMeta}>
-                      <span className={styles.appearanceMetaLabel}>Role</span>
-                      <span className={styles.appearanceMetaValue}>{roleLabel}</span>
+                      <div className={styles.appearanceTitle}>{title}</div>
+                      <div className={styles.appearanceRole}>{entry?.role || 'Role'}</div>
                     </div>
                   </Link>
                 );
               })
             ) : (
-              <p className={styles.emptyState}>Appearances unavailable.</p>
+              <p className={styles.empty}>Appearances unavailable.</p>
             )}
           </div>
         </section>
 
         <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Voice Actors</h2>
-            <span className={styles.sectionHint}>{voices.length} listed</span>
+          <div className={styles.sectionHeadRow}>
+            <div>
+              <div className={styles.sectionEyebrow}>CAST</div>
+              <h2 className={styles.sectionTitle}>Voice actors</h2>
+            </div>
+            <span className={styles.eyebrowInline}>{voices.length} LISTED</span>
           </div>
           <div className={styles.voiceGrid}>
             {voices.length ? (
               voices.map((entry) => {
                 const actor = entry?.person;
-                const actorName = actor?.name || 'Unknown';
                 const actorImage =
-                  actor?.images?.jpg?.image_url || actor?.images?.webp?.image_url || '/logo_no_text.png';
+                  actor?.images?.webp?.image_url ||
+                  actor?.images?.jpg?.image_url ||
+                  '/logo_no_text.png';
                 return (
-                  <div key={`${actorName}-${actor?.mal_id || ''}`} className={styles.voiceCard}>
+                  <div key={`${actor?.name}-${actor?.mal_id || ''}`} className={styles.voiceCard}>
                     <div className={styles.voiceAvatar}>
-                      <Image
-                        src={actorImage}
-                        alt={actorName}
-                        fill
-                        sizes="72px"
-                      />
+                      <Image src={actorImage} alt={actor?.name || 'VA'} fill sizes="72px" className={styles.posterImg}/>
                     </div>
-                    <div>
-                      <div className={styles.voiceName}>{actorName}</div>
-                      <div className={styles.voiceLang}>{entry?.language || 'Unknown'}</div>
+                    <div className={styles.voiceMeta}>
+                      <div className={styles.voiceName}>{actor?.name || 'Unknown'}</div>
+                      <div className={styles.voiceLang}>{entry?.language || '—'}</div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <p className={styles.emptyState}>Voice actors unavailable.</p>
+              <p className={styles.empty}>Voice actors unavailable.</p>
             )}
           </div>
         </section>
-      </main>
+      </div>
     </Layout>
   );
 }
 
 export async function getServerSideProps(context) {
   const { id } = context.query;
-
-  const [characterResposta, characterAnimeResposta, characterVoicesResposta] =
-    await Promise.all([getCharacterById(id), getCharacterAnime(id), getCharacterVoices(id)]);
-
-  return {
-    props: { characterResposta, characterAnimeResposta, characterVoicesResposta },
-  };
+  const [characterResposta, characterAnimeResposta, characterVoicesResposta] = await Promise.all([
+    getCharacterById(id),
+    getCharacterAnime(id),
+    getCharacterVoices(id),
+  ]);
+  return { props: { characterResposta, characterAnimeResposta, characterVoicesResposta } };
 }

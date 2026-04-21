@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Layout from '../components/layout/Layout';
 import AddToListModal from '../components/modals/AddToListModal';
-import styles from '../styles/movies.module.css';
+import styles from './movies.module.css';
 import useMyList from '../hooks/useMyList';
 import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../lib/services/anilist';

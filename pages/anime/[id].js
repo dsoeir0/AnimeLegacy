@@ -1,43 +1,48 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { Plus, Check, Heart, BookOpen, ArrowLeft, ArrowRight, Pencil, Star } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
+import Button from '../../components/ui/Button';
+import StatusBadge, { STATUS_META } from '../../components/ui/StatusBadge';
+import ProgressBar from '../../components/ui/ProgressBar';
+import RatingDisplay from '../../components/ui/RatingDisplay';
 import AddToListModal from '../../components/modals/AddToListModal';
 import RatingReviewModal from '../../components/modals/RatingReviewModal';
-import styles from '../../styles/anime.module.css';
+import styles from './[id].module.css';
 import { getAnimeById, getAnimeCharacters } from '../../lib/services/jikan';
-import { isHentaiAnime } from '../../lib/utils/anime';
-import { isAiringAnime, normalizeAnime } from '../../lib/utils/anime';
+import { isHentaiAnime, isAiringAnime, normalizeAnime } from '../../lib/utils/anime';
 import { formatSeasonLabel } from '../../lib/utils/season';
 import { getAnimeBannerUrl, getAnimeImageUrl, getCharacterAvatarUrl } from '../../lib/utils/media';
 import useMyList from '../../hooks/useMyList';
 
 export default function AnimeDetail({ animeResposta, charactersResposta }) {
+  const router = useRouter();
   const data = animeResposta?.data ?? {};
   const genres = Array.isArray(data.genres)
-    ? data.genres.filter((genre) => genre?.name !== 'Hentai')
+    ? data.genres.filter((genre) => genre?.name !== 'Hentai').map((g) => g.name)
     : [];
   const producers = Array.isArray(data.producers) ? data.producers : [];
-  const posterUrl = getAnimeImageUrl(data);
-  const backdropUrl = getAnimeBannerUrl(data);
+  const posterUrl = getAnimeImageUrl(data) || '/logo_no_text.png';
+  const backdropUrl = getAnimeBannerUrl(data) || posterUrl;
   const trailerUrl = data?.trailer?.embed_url || '';
   const seasonLabel = formatSeasonLabel(data?.season, data?.year);
   const studioName =
     Array.isArray(data.studios) && data.studios.length > 0 ? data.studios[0].name : 'Unknown';
-  const ratingLabel = data?.rating || 'Not Rated';
-  const scoreLabel = typeof data?.score === 'number' ? data.score.toFixed(2) : 'N/A';
+  const studioList = Array.isArray(data.studios) ? data.studios.map((s) => s.name).join(' / ') : studioName;
+  const score = typeof data?.score === 'number' ? data.score : 0;
   const statusLabel = data?.airing ? 'Airing' : data.status || 'Unknown';
   const characters = Array.isArray(charactersResposta?.data) ? charactersResposta.data : [];
-  const rankLabel = data?.rank ? `#${data.rank}` : 'N/A';
-  const popularityLabel = data?.popularity ? `#${data.popularity}` : 'N/A';
-  const episodeLabel = data?.episodes ? `${data.episodes} (${data?.duration || '23 min'})` : 'TBA';
+  const rank = data?.rank || null;
+  const episodesCount = data?.episodes || 0;
   const synopsisText = data.synopsis || 'Synopsis not available.';
-  const [shortSynopsis, ...restSynopsis] = synopsisText.split('. ');
-  const secondarySynopsis = restSynopsis.join('. ').trim();
   const backgroundText = data?.background || '';
+  const ratingLabel = data?.rating || 'Not Rated';
+  const durationLabel = data?.duration || '—';
   const [showAllCharacters, setShowAllCharacters] = useState(false);
   const normalized = useMemo(() => normalizeAnime(data), [data]);
-  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
+  const { addItem, getEntry, canEdit, favoritesCount } = useMyList();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [pendingAnime, setPendingAnime] = useState(null);
   const [pendingEntry, setPendingEntry] = useState(null);
@@ -49,17 +54,6 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
     isAiringAnime(data) && currentEntry?.status === 'completed'
       ? 'watching'
       : currentEntry?.status || 'watching';
-  const displayPercent = data?.episodes
-    ? Math.min(100, Math.round((displayProgress / data.episodes) * 100))
-    : 0;
-  const buildStarState = (ratingValue, starIndex) => {
-    const fullValue = starIndex;
-    const halfValue = starIndex - 0.5;
-    if (typeof ratingValue !== 'number') return 'empty';
-    if (ratingValue >= fullValue) return 'full';
-    if (ratingValue >= halfValue) return 'half';
-    return 'empty';
-  };
 
   const openAddModal = (anime, entry = null) => {
     if (!anime) return;
@@ -67,30 +61,25 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
     setPendingEntry(entry);
     setAddModalOpen(true);
   };
-
   const closeAddModal = () => {
     setAddModalOpen(false);
     setPendingAnime(null);
     setPendingEntry(null);
   };
-
   const handleConfirmAdd = async (details) => {
     if (!pendingAnime) return;
     await addItem(pendingAnime, details);
     closeAddModal();
   };
-
   const openRatingModal = () => {
     if (!normalized) return;
     setRatingEntry(getEntry(normalized.id) || {});
     setRatingModalOpen(true);
   };
-
   const closeRatingModal = () => {
     setRatingModalOpen(false);
     setRatingEntry(null);
   };
-
   const handleSaveRating = async ({ rating, review }) => {
     if (!normalized) return;
     const detail = ratingEntry || {};
@@ -105,339 +94,369 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
     closeRatingModal();
   };
 
+  const mains = characters.filter((entry) => entry?.role === 'Main');
+  const supporting = characters.filter((entry) => entry?.role !== 'Main');
+  const orderedChars = [...mains, ...supporting];
+  const visibleChars = showAllCharacters ? orderedChars : orderedChars.slice(0, 6);
+
   return (
     <Layout
-      showSidebar={false}
-      headerVariant="dark"
-      layoutVariant="dark"
-      title={`${data.title || 'Anime'} - AnimeLegacy`}
+      title={`${data.title || 'Anime'} · AnimeLegacy`}
       description={data.synopsis || 'Anime details, characters, and highlights.'}
     >
       <div className={styles.page}>
-        <section className={styles.hero}>
-          {backdropUrl ? (
-            <div
-              className={styles.heroBackdrop}
-              style={{ backgroundImage: `url(${backdropUrl})` }}
-            />
-          ) : null}
-          <div className={styles.heroGlow} />
-          <div className={styles.heroContent}>
-            <div className={styles.heroBadges}>
-              <span className={styles.heroBadge}>Ranked {rankLabel}</span>
-              <span className={styles.heroBadgeMuted}>Popularity {popularityLabel}</span>
-            </div>
-            <h1 className={styles.heroTitle}>{data.title || 'Unknown Title'}</h1>
-            <div className={styles.heroMeta}>
-              <span className={styles.scorePill}>{scoreLabel}</span>
-              <span className={styles.metaText}>Score</span>
-              <span className={styles.metaDivider} />
-              <span className={styles.metaText}>{statusLabel}</span>
-              <span className={styles.metaDivider} />
-              <span className={styles.metaText}>{episodeLabel}</span>
-            </div>
-            <div className={styles.heroActions}>
-              {!canEdit || !normalized ? (
-                <button className={styles.primaryButton} type="button" disabled>
-                  Login to Add
-                </button>
-              ) : normalized && isInList(normalized.id) ? (
-                <div className={styles.listActions}>
-                  <Link href="/my-list" legacyBehavior>
-                    <a className={`${styles.primaryButton} ${styles.listLink}`}>In My List</a>
-                  </Link>
-                  <button
-                    className={`${styles.primaryButton} ${styles.editButton}`}
-                    type="button"
-                    onClick={() => openAddModal(normalized, getEntry(normalized.id))}
-                  >
-                    <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
-                    Edit
-                  </button>
-                </div>
-              ) : (
-                <button
-                  className={styles.primaryButton}
-                  type="button"
-                  onClick={() => openAddModal(normalized)}
-                >
-                  Add to List
-                </button>
-              )}
-              {normalized && isInList(normalized.id) ? null : null}
-            </div>
-          </div>
-          <div className={styles.heroPoster}>
+        <div className={styles.hero}>
+          <Image
+            src={backdropUrl}
+            alt=""
+            fill
+            sizes="100vw"
+            className={styles.heroImage}
+            priority
+
+          />
+          <div className={styles.heroGradient} />
+          <button type="button" className={styles.backBtn} onClick={() => router.back()}>
+            <ArrowLeft size={14} />
+            Back
+          </button>
+        </div>
+
+        <div className={styles.content}>
+          <div className={styles.headGrid}>
             <div className={styles.posterFrame}>
               <Image
-                className={styles.poster}
-                src={posterUrl || '/logo_no_text.png'}
-                alt={data.title || 'Anime poster'}
+                src={posterUrl}
+                alt={data.title || 'Poster'}
                 width={280}
-                height={380}
+                height={400}
+                className={styles.poster}
+
               />
             </div>
-          </div>
-        </section>
 
-        <section className={styles.mainGrid}>
-          <div className={styles.mainColumn}>
-            {normalized && isInList(normalized.id) ? (
-              <div className={styles.progressCard}>
-                <div className={styles.progressHeader}>
-                  <h2>Tracking Progress</h2>
-                  <div className={styles.progressActions}>
-                    {displayStatus === 'completed' ? (
-                      <button
-                        className={styles.progressRate}
-                        type="button"
-                        onClick={openRatingModal}
-                      >
-                        Rate
-                      </button>
-                    ) : null}
-                    <button
-                      className={styles.progressEdit}
-                      type="button"
-                      onClick={() => openAddModal(normalized, getEntry(normalized.id))}
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-                <div className={styles.progressMetaRow}>
-                  <span className={styles.progressLabel}>
-                    EP {displayProgress} / {data?.episodes || 'TBA'}
-                  </span>
-                  <span className={styles.progressStatus}>
-                    {(displayStatus || 'watching').toUpperCase()} {data?.episodes ? `${displayPercent}%` : ''}
-                  </span>
-                </div>
-                {typeof currentEntry?.rating === 'number' ? (
-                  <div className={styles.ratingRow}>
-                    <span className={styles.ratingLabel}>Your Rating</span>
-                    <div className={styles.ratingStars}>
-                      {Array.from({ length: 5 }, (_, index) => {
-                        const starIndex = index + 1;
-                        const starState = buildStarState(currentEntry.rating, starIndex);
-                        return (
-                          <i
-                            key={starIndex}
-                            className={`bi ${
-                              starState === 'full'
-                                ? 'bi-star-fill'
-                                : starState === 'half'
-                                ? 'bi-star-half'
-                                : 'bi-star'
-                            } ${styles.ratingStar}`}
-                            aria-hidden="true"
-                          />
-                        );
-                      })}
-                    </div>
-                    <span className={styles.ratingValue}>{currentEntry.rating}/5</span>
-                  </div>
-                ) : null}
-                <div className={styles.progressBar}>
-                  <span
-                    className={styles.progressFill}
-                    style={{
-                      width: data?.episodes ? `${displayPercent}%` : '0%',
-                    }}
-                  />
-                </div>
+            <div className={styles.headBody}>
+              <div className={styles.eyebrow}>
+                {studioName} {seasonLabel ? `· ${seasonLabel}` : ''}
               </div>
-            ) : null}
-            <div className={styles.section}>
-              <div className={styles.sectionEyebrow}>Synopsis</div>
-              <h2 className={styles.sectionTitle}>{shortSynopsis || synopsisText}</h2>
-              {secondarySynopsis ? <p className={styles.sectionBody}>{secondarySynopsis}</p> : null}
-            </div>
-            <div className={styles.section} id="trailer">
-              <div className={styles.sectionEyebrow}>Official Trailer</div>
-              <h2 className={styles.sectionTitle}>Official Trailer</h2>
-              {trailerUrl ? (
-                <div className={styles.videoFrame}>
-                  <div className={styles.videoBadge}>Trailer</div>
-                  <iframe
-                    className={styles.animeTrailer}
-                    title="Official trailer"
-                    allow="accelerometer; fullscreen;clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    src={trailerUrl}
-                  />
-                </div>
-              ) : (
-                <p className={styles.sectionBody}>Trailer not available.</p>
-              )}
-            </div>
-            {backgroundText ? (
-              <div className={styles.section}>
-                <div className={styles.sectionEyebrow}>Background</div>
-                <h2 className={styles.sectionTitle}>Background</h2>
-                <p className={styles.sectionBody}>{backgroundText}</p>
-              </div>
-            ) : null}
-            <div className={styles.section}>
-              <div className={styles.sectionEyebrow}>Key Characters</div>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>Key Characters</h2>
-                <button
-                  className={styles.linkButton}
-                  type="button"
-                  onClick={() => setShowAllCharacters((prev) => !prev)}
-                >
-                  {showAllCharacters ? 'Show Less' : 'View All Characters'}
-                </button>
-              </div>
-              <div className={styles.keyCharacters}>
-                {characters.length === 0 ? (
-                  <p className={styles.sectionBody}>Characters unavailable.</p>
+              <h1 className={styles.title}>{data.title || 'Unknown title'}</h1>
+              {data.title_japanese ? (
+                <div className={styles.subTitle}>{data.title_japanese}</div>
+              ) : null}
+
+              <div className={styles.actions}>
+                {!canEdit || !normalized ? (
+                  <Link href="/sign-in" className={styles.actionLink}>
+                    <Button variant="secondary" size="lg" icon={Plus}>
+                      Login to add
+                    </Button>
+                  </Link>
+                ) : currentEntry ? (
+                  <Button
+                    variant="collection"
+                    size="lg"
+                    icon={Check}
+                    onClick={() => openAddModal(normalized, currentEntry)}
+                  >
+                    In your list · {STATUS_META[currentEntry.status]?.label || 'Watching'}
+                  </Button>
                 ) : (
-                  (() => {
-                    const mains = characters.filter((entry) => entry?.role === 'Main');
-                    const supporting = characters.filter((entry) => entry?.role !== 'Main');
-                    const ordered = [...mains, ...supporting];
-                    const limit = showAllCharacters ? ordered.length : 4;
-                    const items = ordered.slice(0, limit).map((entry) => {
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    icon={Plus}
+                    onClick={() => openAddModal(normalized)}
+                  >
+                    Add to list
+                  </Button>
+                )}
+                {currentEntry ? (
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    icon={Heart}
+                    onClick={() => openAddModal(normalized, currentEntry)}
+                  >
+                    {currentEntry.isFavorite ? 'Favorited' : 'Favorite'}
+                  </Button>
+                ) : null}
+                {trailerUrl ? (
+                  <a className={styles.actionLink} href="#trailer">
+                    <Button variant="ghost" size="lg" icon={BookOpen}>
+                      Watch trailer
+                    </Button>
+                  </a>
+                ) : null}
+              </div>
+
+              <div className={styles.metaStrip}>
+                <div className={styles.metaCell}>
+                  <div className={styles.metaLabel}>MAL SCORE</div>
+                  <div className={styles.metaValue}>{score ? score.toFixed(2) : '—'}</div>
+                  <div className={styles.metaSub}>{rank ? `Rank #${rank}` : 'Unranked'}</div>
+                </div>
+                <div className={styles.metaCell}>
+                  <div className={styles.metaLabel}>EPISODES</div>
+                  <div className={styles.metaValue}>{episodesCount || 'TBA'}</div>
+                  <div className={styles.metaSub}>{data.type || 'TV'}</div>
+                </div>
+                <div className={styles.metaCell}>
+                  <div className={styles.metaLabel}>STATUS</div>
+                  <div className={styles.metaValueSmall}>{statusLabel}</div>
+                  <div className={styles.metaSub}>{seasonLabel || '—'}</div>
+                </div>
+                <div className={styles.metaCell}>
+                  <div className={styles.metaLabel}>STUDIO</div>
+                  <div className={styles.metaValueSmall}>{studioName}</div>
+                  <div className={styles.metaSub}>
+                    {studioList.includes('/') ? studioList.split(' / ').slice(1).join(' / ') : ratingLabel}
+                  </div>
+                </div>
+                <div className={styles.metaCell}>
+                  <div className={styles.metaLabel}>GENRES</div>
+                  <div className={styles.metaValue}>{genres.length}</div>
+                  <div className={styles.metaSub}>{genres.slice(0, 2).join(', ') || '—'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.mainGrid}>
+            <div className={styles.mainColumn}>
+              <section className={styles.section}>
+                <div className={styles.sectionEyebrow}>SYNOPSIS</div>
+                <p className={styles.synopsisText}>{synopsisText}</p>
+                <div className={styles.genreTags}>
+                  {genres.map((g) => (
+                    <span key={g} className={styles.genreTag}>
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              </section>
+
+              {trailerUrl ? (
+                <section className={styles.section} id="trailer">
+                  <div className={styles.sectionEyebrow}>OFFICIAL TRAILER</div>
+                  <h3 className={styles.sectionTitle}>Watch the trailer</h3>
+                  <div className={styles.videoFrame}>
+                    <iframe
+                      className={styles.trailerEmbed}
+                      title="Official trailer"
+                      allow="accelerometer; fullscreen; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      src={trailerUrl}
+                    />
+                  </div>
+                </section>
+              ) : null}
+
+              {backgroundText ? (
+                <section className={styles.section}>
+                  <div className={styles.sectionEyebrow}>BACKGROUND</div>
+                  <p className={styles.synopsisText}>{backgroundText}</p>
+                </section>
+              ) : null}
+
+              <section className={styles.section}>
+                <div className={styles.sectionHeaderRow}>
+                  <div>
+                    <div className={styles.sectionEyebrow}>CAST</div>
+                    <h3 className={styles.sectionTitle}>Main characters</h3>
+                  </div>
+                  {orderedChars.length > 6 ? (
+                    <Button
+                      variant="plain"
+                      size="sm"
+                      iconRight={ArrowRight}
+                      onClick={() => setShowAllCharacters((p) => !p)}
+                    >
+                      {showAllCharacters ? 'Show less' : 'View all'}
+                    </Button>
+                  ) : null}
+                </div>
+                {visibleChars.length === 0 ? (
+                  <p className={styles.synopsisText}>Characters unavailable.</p>
+                ) : (
+                  <div className={styles.castGrid}>
+                    {visibleChars.map((entry, index) => {
                       const actor = Array.isArray(entry?.voice_actors)
-                        ? entry.voice_actors.find((item) => item?.language === 'Japanese') ||
-                          entry.voice_actors[0]
+                        ? entry.voice_actors.find((v) => v?.language === 'Japanese') || entry.voice_actors[0]
                         : null;
-                      return { entry, actor };
-                    });
-                    return (
-                      <>
-                        <div className={styles.keyHeader}>Characters</div>
-                        <div className={styles.keyHeader}>Voice Actors</div>
-                        {items.map(({ entry, actor }, index) => (
-                          <div
-                            className={styles.keyRow}
-                            key={`${entry?.character?.name || 'Character'}-${index}`}
-                          >
-                            <Link
-                              href={`/characters/${entry?.character?.mal_id || ''}`}
-                              legacyBehavior
-                            >
-                              <a className={styles.characterLink}>
-                                <div className={styles.characterCard}>
-                                  <div className={styles.characterAvatar}>
-                                    <Image
-                                      src={getCharacterAvatarUrl(entry) || '/logo_no_text.png'}
-                                      alt={entry?.character?.name || 'Character'}
-                                      width={60}
-                                      height={60}
-                                    />
-                                  </div>
-                                  <div>
-                                    <div className={styles.characterName}>
-                                      {entry?.character?.name || 'Unknown'}
-                                    </div>
-                                    <div className={styles.characterRole}>
-                                      {entry?.role || 'Role'}
-                                    </div>
-                                  </div>
-                                </div>
-                              </a>
-                            </Link>
-                            <div className={styles.actorCard}>
-                              <div className={styles.actorAvatar}>
-                                <Image
-                                  src={
-                                    actor?.person?.images?.jpg?.image_url ||
-                                    actor?.person?.images?.webp?.image_url ||
-                                    '/logo_no_text.png'
-                                  }
-                                  alt={actor?.person?.name || 'Voice actor'}
-                                  width={48}
-                                  height={48}
-                                />
-                              </div>
-                              <div>
-                                <div className={styles.actorName}>
-                                  {actor?.person?.name || 'Unknown'}
-                                </div>
-                                <div className={styles.actorLanguage}>
-                                  {actor?.language || 'N/A'}
-                                </div>
+                      const charAvatar = getCharacterAvatarUrl(entry) || '/logo_no_text.png';
+                      const charId = entry?.character?.mal_id;
+                      const actorImage =
+                        actor?.person?.images?.webp?.image_url ||
+                        actor?.person?.images?.jpg?.image_url ||
+                        '/logo_no_text.png';
+                      return (
+                        <div className={styles.castCard} key={`${entry?.character?.name || 'c'}-${index}`}>
+                          <Link href={charId ? `/characters/${charId}` : '#'} className={styles.castLeft}>
+                            <Image
+                              src={charAvatar}
+                              alt={entry?.character?.name || 'Character'}
+                              width={60}
+                              height={84}
+                              className={styles.castAvatar}
+
+                            />
+                            <div className={styles.castMeta}>
+                              <div className={styles.castName}>{entry?.character?.name || 'Unknown'}</div>
+                              <div className={styles.castRole}>{entry?.role || 'Role'}</div>
+                              <div className={styles.castVA}>
+                                <span className={styles.castVALabel}>CV · </span>
+                                <span className={styles.castVAName}>{actor?.person?.name || 'Unknown'}</span>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </>
-                    );
-                  })()
+                          </Link>
+                          {actor?.person ? (
+                            <Image
+                              src={actorImage}
+                              alt={actor.person.name}
+                              width={44}
+                              height={44}
+                              className={styles.castVAImg}
+
+                            />
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            </div>
+
+            <aside className={styles.sideColumn}>
+              <div className={styles.asideCard}>
+                <div className={styles.sectionEyebrow}>YOUR PROGRESS</div>
+                {currentEntry ? (
+                  <>
+                    <div className={styles.asideStatus}>
+                      <StatusBadge status={displayStatus} size="md" />
+                    </div>
+                    <div className={styles.asideProgress}>
+                      <ProgressBar
+                        value={displayProgress}
+                        total={episodesCount || 0}
+                        variant={displayStatus === 'completed' ? 'completed' : 'primary'}
+                      />
+                    </div>
+                    <div className={styles.asideMetaGrid}>
+                      <div>
+                        <div className={styles.miniLabel}>YOUR SCORE</div>
+                        <div className={styles.miniScore}>{currentEntry.rating || '—'}</div>
+                      </div>
+                      <div>
+                        <div className={styles.miniLabel}>FAVORITED</div>
+                        <div className={styles.miniValue}>
+                          {currentEntry.isFavorite ? 'Yes' : 'No'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.asideActions}>
+                      <Button
+                        variant="secondary"
+                        size="md"
+                        fullWidth
+                        icon={Pencil}
+                        onClick={() => openAddModal(normalized, currentEntry)}
+                      >
+                        Update entry
+                      </Button>
+                      {displayStatus === 'completed' ? (
+                        <Button
+                          variant="ghost"
+                          size="md"
+                          fullWidth
+                          icon={Star}
+                          onClick={openRatingModal}
+                        >
+                          Rate & review
+                        </Button>
+                      ) : null}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className={styles.asideEmpty}>Not in your list yet.</p>
+                    {canEdit && normalized ? (
+                      <Button
+                        variant="primary"
+                        size="md"
+                        fullWidth
+                        icon={Plus}
+                        onClick={() => openAddModal(normalized)}
+                      >
+                        Add to list
+                      </Button>
+                    ) : (
+                      <Link href="/sign-in" className={styles.actionLink}>
+                        <Button variant="secondary" size="md" fullWidth>
+                          Sign in to track
+                        </Button>
+                      </Link>
+                    )}
+                  </>
                 )}
               </div>
-            </div>
+
+              <div className={styles.asideCard}>
+                <div className={styles.sectionEyebrow}>COMMUNITY</div>
+                <div className={styles.asideStats}>
+                  {score ? <RatingDisplay score={score} size="lg" /> : null}
+                  <div className={styles.asideStatRow}>
+                    <span>Members</span>
+                    <strong>{data?.members?.toLocaleString() || '—'}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Scored by</span>
+                    <strong>{data?.scored_by?.toLocaleString() || '—'}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Popularity</span>
+                    <strong>{data?.popularity ? `#${data.popularity}` : '—'}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Favorites</span>
+                    <strong>{data?.favorites?.toLocaleString() || '—'}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.asideCard}>
+                <div className={styles.sectionEyebrow}>DETAILS</div>
+                <div className={styles.asideStats}>
+                  <div className={styles.asideStatRow}>
+                    <span>Source</span>
+                    <strong>{data?.source || '—'}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Duration</span>
+                    <strong>{durationLabel}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Aired</span>
+                    <strong>{data?.aired?.string || '—'}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Rating</span>
+                    <strong>{ratingLabel}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Studios</span>
+                    <strong>{studioName}</strong>
+                  </div>
+                  <div className={styles.asideStatRow}>
+                    <span>Producers</span>
+                    <strong>{producers.slice(0, 2).map((p) => p.name).join(', ') || '—'}</strong>
+                  </div>
+                </div>
+              </div>
+            </aside>
           </div>
-
-          <aside className={styles.sideColumn}>
-            <div className={styles.card}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>Quick Facts</h3>
-                <span className={styles.cardBadge}>{data.type || 'TV'}</span>
-              </div>
-              <div className={styles.factRow}>
-                <span>Status</span>
-                <strong>{data.status || 'Unknown'}</strong>
-              </div>
-              <div className={styles.factRow}>
-                <span>Aired</span>
-                <strong>{seasonLabel}</strong>
-              </div>
-              <div className={styles.factRow}>
-                <span>Episodes</span>
-                <strong>{episodeLabel}</strong>
-              </div>
-              <div className={styles.factRow}>
-                <span>Rating</span>
-                <strong>{ratingLabel}</strong>
-              </div>
-              <div className={styles.factRow}>
-                <span>Genres</span>
-                <strong>
-                  {genres
-                    .slice(0, 2)
-                    .map((genre) => genre.name)
-                    .join(', ') || 'Unknown'}
-                </strong>
-              </div>
-              <div className={styles.tagRow}>
-                {genres.slice(0, 4).map((genre) => (
-                  <span className={styles.genreTag} key={genre.mal_id}>
-                    {genre.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.card}>
-              <h3 className={styles.cardTitle}>External</h3>
-              <div className={styles.factRow}>
-                <span>Official Website</span>
-                <strong>{data?.url ? 'Visit' : 'N/A'}</strong>
-              </div>
-              <div className={styles.factRow}>
-                <span>Anime DB</span>
-                <strong>{data?.url ? 'MAL' : 'N/A'}</strong>
-              </div>
-              <div className={styles.factRow}>
-                <span>Studios</span>
-                <strong>{studioName}</strong>
-              </div>
-              <div className={styles.factRow}>
-                <span>Producers</span>
-                <strong>
-                  {producers
-                    .slice(0, 2)
-                    .map((producer) => producer.name)
-                    .join(', ') || 'Unknown'}
-                </strong>
-              </div>
-            </div>
-          </aside>
-        </section>
+        </div>
       </div>
+
       <RatingReviewModal
         open={ratingModalOpen}
         anime={normalized}
@@ -469,14 +488,8 @@ export async function getServerSideProps(context) {
     getAnimeById(id),
     getAnimeCharacters(id),
   ]);
-
   if (isHentaiAnime(animeResposta?.data)) {
     return { notFound: true };
   }
-  return {
-    props: {
-      animeResposta,
-      charactersResposta,
-    },
-  };
+  return { props: { animeResposta, charactersResposta } };
 }

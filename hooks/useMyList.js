@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { ensureAnimeCatalog } from '../lib/services/animeCatalog';
 import { addUserActivity, upsertUserAnime, updateUserAnime } from '../lib/services/userAnime';
+import { FAVORITE_LIMIT } from '../lib/constants';
 import { isAiringAnime } from '../lib/utils/anime';
 
 export default function useMyList() {
@@ -67,7 +68,7 @@ export default function useMyList() {
       const currentFavorite = Boolean(existingEntry?.isFavorite);
       const desiredFavorite =
         typeof requestedFavorite === 'boolean' ? requestedFavorite : currentFavorite;
-      const canFavorite = !desiredFavorite || currentFavorite || currentFavorites < 10;
+      const canFavorite = !desiredFavorite || currentFavorite || currentFavorites < FAVORITE_LIMIT;
       const isFavorite = desiredFavorite && canFavorite;
       const hasRating =
         typeof options.rating === 'number' || options.rating === null;

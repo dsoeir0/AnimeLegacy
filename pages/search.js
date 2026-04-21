@@ -1,193 +1,144 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Layout from '../components/layout/Layout';
+import HorizontalRow from '../components/cards/HorizontalRow';
+import IconButton from '../components/ui/IconButton';
+import Button from '../components/ui/Button';
 import AddToListModal from '../components/modals/AddToListModal';
-import styles from '../styles/search.module.css';
+import styles from './search.module.css';
 import useMyList from '../hooks/useMyList';
 import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
 import { searchAnime, slimAnimeResponse } from '../lib/services/jikan';
-import { getAnimeImageUrl } from '../lib/utils/media';
 
 export default function Search({ query, page, results, pagination }) {
   const router = useRouter();
-  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
+  const { addItem, canEdit, favoritesCount, list } = useMyList();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [pendingAnime, setPendingAnime] = useState(null);
   const [pendingEntry, setPendingEntry] = useState(null);
   const items = Array.isArray(results?.data) ? results.data : [];
   const total = pagination?.items?.total || items.length;
   const lastPage = pagination?.last_visible_page || 1;
-
-  const titleQuery = query ? `"${query}"` : 'your search';
   const hasResults = items.length > 0;
 
-  const buildLink = (nextPage) => ({
-    pathname: '/search',
-    query: { q: query, page: nextPage },
-  });
-
+  const buildLink = (nextPage) => ({ pathname: '/search', query: { q: query, page: nextPage } });
   const openAddModal = (anime, entry = null) => {
     if (!anime) return;
     setPendingAnime(anime);
     setPendingEntry(entry);
     setAddModalOpen(true);
   };
-
   const closeAddModal = () => {
     setAddModalOpen(false);
     setPendingAnime(null);
     setPendingEntry(null);
   };
-
   const handleConfirmAdd = async (details) => {
     if (!pendingAnime) return;
     await addItem(pendingAnime, details);
     closeAddModal();
   };
 
+  const entryFor = (mal_id) => list.find((e) => e.id === mal_id) || null;
+
   return (
     <Layout
-      showSidebar={false}
-      headerVariant="dark"
-      layoutVariant="dark"
-      title={`AnimeLegacy - Search Results for ${query || 'Anime'}`}
+      title={`AnimeLegacy · Search for ${query || 'anime'}`}
       description="Search results from AnimeLegacy."
     >
-      <main className={styles.main}>
-        <section className={styles.heroPanel}>
-          <div className={styles.hero}>
-            <div>
-              <div className={styles.eyebrow}>Search</div>
-              <h1 className={styles.title}>
-                Results for <span>{titleQuery}</span>
-              </h1>
-              <p className={styles.subtitle}>
-                {query
-                  ? `Showing ${total} result${total === 1 ? '' : 's'} for your search.`
-                  : 'Type a title in the search bar to discover anime.'}
-              </p>
-            </div>
-            {query ? (
-              <button className={styles.backButton} type="button" onClick={() => router.back()}>
-                Back
-              </button>
-            ) : null}
+      <div className={styles.page}>
+        <header className={styles.head}>
+          <div>
+            <div className={styles.eyebrow}>DISCOVER</div>
+            <h1 className={styles.heading}>
+              {query ? (
+                <>
+                  Results for <span className={styles.highlight}>&ldquo;{query}&rdquo;</span>
+                </>
+              ) : (
+                'Search the archive'
+              )}
+            </h1>
+            <p className={styles.subtitle}>
+              {query
+                ? `${total} result${total === 1 ? '' : 's'} found. Filter, sort, and add to your list in one place.`
+                : 'Type a title in the top bar above to search thousands of anime series and films.'}
+            </p>
           </div>
-        </section>
+          {query ? (
+            <Button variant="ghost" size="md" onClick={() => router.back()}>
+              Back
+            </Button>
+          ) : null}
+        </header>
 
-        <section className={styles.section}>
-          {hasResults ? (
-            <div className={styles.grid}>
-              {items.map((element, index) => {
-                const imageUrl = getAnimeImageUrl(element);
+        {hasResults ? (
+          <>
+            <div className={styles.resultsInfo}>
+              <span className={styles.eyebrowInline}>{items.length} TITLES ON THIS PAGE</span>
+              <span className={styles.pageInfo}>
+                Page {page} of {lastPage}
+              </span>
+            </div>
+            <div className={styles.list}>
+              {items.map((element) => {
                 const normalized = normalizeAnime(element);
+                const entry = entryFor(element.mal_id);
                 return (
-                  <div
-                    key={element.mal_id || `${element.title}-${index}`}
-                    className={styles.card}
-                    style={{ animationDelay: `${index * 30}ms` }}
-                  >
-                    <Link href={`/anime/${element.mal_id}`} legacyBehavior>
-                      <a className={styles.cardLink}>
-                        <div className={styles.poster}>
-                          <Image
-                            className={styles.posterImage}
-                            src={imageUrl || '/logo_no_text.png'}
-                            alt={element.title || 'Anime'}
-                            fill
-                            sizes="200px"
-                          />
-                          <span className={styles.score}>{element.score || 'NR'}</span>
-                        </div>
-                        <div className={styles.cardTitle}>{element.title}</div>
-                        <div className={styles.cardMeta}>
-                          <span>{element.type || 'TV'}</span>
-                          <span>{element.year || element?.aired?.prop?.from?.year || 'TBA'}</span>
-                          <span>{element.episodes ? `${element.episodes} eps` : 'Ongoing'}</span>
-                        </div>
-                      </a>
-                    </Link>
-                    {!canEdit ? (
-                      <button className={styles.listButton} type="button" disabled>
-                        Login to Add
-                      </button>
-                    ) : normalized && isInList(normalized.id) ? (
-                      <div className={styles.listActions}>
-                        <Link href="/my-list" legacyBehavior>
-                          <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
-                        </Link>
-                        <button
-                          className={`${styles.listButton} ${styles.editButton}`}
-                          type="button"
-                          onClick={() => openAddModal(normalized, getEntry(normalized.id))}
-                        >
-                          <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
-                          Edit
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        className={styles.listButton}
-                        type="button"
-                        onClick={() => openAddModal(normalized)}
-                      >
-                        Add to List
-                      </button>
-                    )}
-                  </div>
+                  <HorizontalRow
+                    key={element.mal_id}
+                    anime={element}
+                    entry={entry}
+                    href={`/anime/${element.mal_id}`}
+                    onEdit={canEdit ? () => openAddModal(normalized, entry) : undefined}
+                  />
                 );
               })}
             </div>
-          ) : (
-            <div className={styles.emptyState}>
-              <h2>No results yet</h2>
-              <p>Try a different title, or check your spelling.</p>
-            </div>
-          )}
-        </section>
 
-        {hasResults ? (
-          <section className={styles.pagination} aria-label="Pagination">
-            <Link href={buildLink(Math.max(1, page - 1))} legacyBehavior>
-              <a
-                className={`${styles.pageButton} ${page === 1 ? styles.pageButtonDisabled : ''}`}
-                aria-disabled={page === 1}
-              >
-                <i className="bi bi-chevron-left" aria-hidden="true" />
-              </a>
-            </Link>
-            {Array.from({ length: Math.min(5, lastPage) }, (_, i) => i + 1).map((pageNumber) => (
-              <Link key={pageNumber} href={buildLink(pageNumber)} legacyBehavior>
-                <a
-                  className={`${styles.pageButton} ${page === pageNumber ? styles.pageButtonActive : ''}`}
-                >
-                  {pageNumber}
-                </a>
+            <div className={styles.pagination}>
+              <Link href={buildLink(Math.max(1, page - 1))} className={styles.pageLink}>
+                <IconButton icon={ChevronLeft} tooltip="Previous page" disabled={page === 1} />
               </Link>
-            ))}
-            {lastPage > 5 ? <span className={styles.pageEllipsis}>...</span> : null}
-            {lastPage > 5 ? (
-              <Link href={buildLink(lastPage)} legacyBehavior>
-                <a
-                  className={`${styles.pageButton} ${page === lastPage ? styles.pageButtonActive : ''}`}
-                >
-                  {lastPage}
-                </a>
+              {Array.from({ length: Math.min(5, lastPage) }, (_, i) => i + 1).map((p) => (
+                <Link key={p} href={buildLink(p)} className={styles.pageLink}>
+                  <button
+                    type="button"
+                    className={`${styles.pageBtn} ${page === p ? styles.pageBtnActive : ''}`}
+                  >
+                    {p}
+                  </button>
+                </Link>
+              ))}
+              {lastPage > 5 ? <span className={styles.pageDots}>…</span> : null}
+              {lastPage > 5 ? (
+                <Link href={buildLink(lastPage)} className={styles.pageLink}>
+                  <button
+                    type="button"
+                    className={`${styles.pageBtn} ${page === lastPage ? styles.pageBtnActive : ''}`}
+                  >
+                    {lastPage}
+                  </button>
+                </Link>
+              ) : null}
+              <Link href={buildLink(Math.min(lastPage, page + 1))} className={styles.pageLink}>
+                <IconButton icon={ChevronRight} tooltip="Next page" disabled={page === lastPage} />
               </Link>
-            ) : null}
-            <Link href={buildLink(Math.min(lastPage, page + 1))} legacyBehavior>
-              <a
-                className={`${styles.pageButton} ${page === lastPage ? styles.pageButtonDisabled : ''}`}
-                aria-disabled={page === lastPage}
-              >
-                <i className="bi bi-chevron-right" aria-hidden="true" />
-              </a>
-            </Link>
-          </section>
-        ) : null}
-      </main>
+            </div>
+          </>
+        ) : (
+          <div className={styles.empty}>
+            <h2>{query ? 'No results yet' : 'Start searching'}</h2>
+            <p>
+              {query
+                ? 'Try a different title, or check your spelling.'
+                : 'Use the search bar in the top of the page to discover new anime.'}
+            </p>
+          </div>
+        )}
+      </div>
       <AddToListModal
         open={addModalOpen}
         anime={pendingAnime}
@@ -210,38 +161,15 @@ export async function getServerSideProps(context) {
   const page = Number.parseInt(context.query?.page, 10) || 1;
 
   if (!query) {
-    return {
-      props: {
-        query: '',
-        page: 1,
-        results: { data: [] },
-        pagination: {},
-      },
-    };
+    return { props: { query: '', page: 1, results: { data: [] }, pagination: {} } };
   }
-
   try {
     const response = await searchAnime(query, page, 21);
     const filtered = Array.isArray(response?.data) ? filterOutHentai(response.data) : [];
     const results = slimAnimeResponse({ data: filtered });
     const pagination = response?.pagination || {};
-
-    return {
-      props: {
-        query,
-        page,
-        results,
-        pagination,
-      },
-    };
+    return { props: { query, page, results, pagination } };
   } catch {
-    return {
-      props: {
-        query,
-        page,
-        results: { data: [] },
-        pagination: {},
-      },
-    };
+    return { props: { query, page, results: { data: [] }, pagination: {} } };
   }
 }

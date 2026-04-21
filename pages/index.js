@@ -1,79 +1,273 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from '../styles/home.module.css';
+import { Play, Plus, Check, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import styles from './index.module.css';
 import Layout from '../components/layout/Layout';
+import Button from '../components/ui/Button';
+import IconButton from '../components/ui/IconButton';
+import RatingDisplay from '../components/ui/RatingDisplay';
+import PosterCard from '../components/cards/PosterCard';
 import AddToListModal from '../components/modals/AddToListModal';
 import useMyList from '../hooks/useMyList';
 import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
 import { getCurrentSeason, getTopAnimeMovies, slimAnimeResponse } from '../lib/services/jikan';
 import { getSeasonFromDate } from '../lib/utils/season';
-import { getAnimeBannerUrl, getAnimeImageUrl } from '../lib/utils/media';
+import { getAnimeBannerUrl } from '../lib/utils/media';
+import { toCardShape } from '../lib/utils/cardShape';
+
+function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit }) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (slides.length <= 1) return undefined;
+    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 7000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+
+  if (!slides.length) return null;
+  const current = slides[idx];
+  const media = aniListMap?.[current.mal_id];
+  const card = toCardShape(current, media);
+  const normalized = normalizeAnime(current);
+  const entry = normalized ? getEntry(normalized.id) : null;
+
+  return (
+    <section className={styles.hero}>
+      {slides.map((slide, i) => {
+        const slideMedia = aniListMap?.[slide.mal_id];
+        const slideBanner = getAnimeBannerUrl(slide, slideMedia) || slide?.images?.webp?.large_image_url || slide?.images?.jpg?.large_image_url;
+        return (
+          <div
+            key={slide.mal_id}
+            className={`${styles.heroSlide} ${i === idx ? styles.heroSlideActive : ''}`}
+            aria-hidden={i !== idx}
+          >
+            {slideBanner ? (
+              <Image src={slideBanner} alt="" fill priority={i === 0} sizes="100vw" className={styles.heroImage} />
+            ) : null}
+            <div className={styles.heroGradient} />
+          </div>
+        );
+      })}
+
+      <div className={styles.heroContent} key={current.mal_id}>
+        <div className={styles.heroEyebrow}>EDITOR'S PICK · {getSeasonFromDate()?.toUpperCase()} {new Date().getFullYear()}</div>
+        <div className={styles.heroMetaTop}>
+          {card.studio} · {card.year || '—'} {card.episodes ? `· ${card.episodes} episodes` : ''}
+        </div>
+        <h1 className={styles.heroTitle}>{card.title}</h1>
+        <p className={styles.heroSynopsis}>{card.synopsis || 'Discover this season\'s most-watched series.'}</p>
+        <div className={styles.heroActions}>
+          <Link href={`/anime/${current.mal_id}`} className={styles.heroLink}>
+            <Button variant="primary" size="lg" icon={Play}>View details</Button>
+          </Link>
+          {!canEdit ? (
+            <Link href="/sign-in" className={styles.heroLink}>
+              <Button variant="secondary" size="lg" icon={Plus}>Login to add</Button>
+            </Link>
+          ) : entry ? (
+            <Button
+              variant="collection"
+              size="lg"
+              icon={Check}
+              onClick={() => onOpenModal(normalized, entry)}
+            >
+              In your list · {entry.progress || 0}/{entry.episodesTotal || card.episodes || 0}
+            </Button>
+          ) : (
+            <Button variant="secondary" size="lg" icon={Plus} onClick={() => onOpenModal(normalized, null)}>
+              Add to list
+            </Button>
+          )}
+          <div className={styles.heroMeta}>
+            <RatingDisplay score={card.score} size="md" />
+            <div className={styles.heroGenres}>
+              {card.genres.slice(0, 3).map((g) => (
+                <span key={g} className={styles.heroGenre}>
+                  {g}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.heroPagination}>
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setIdx(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`${styles.heroDot} ${i === idx ? styles.heroDotActive : ''}`}
+            />
+          ))}
+          <span className={styles.heroCount}>
+            {String(idx + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ScrollRow({ title, eyebrow, cta, onCta, children, cardWidth = 200 }) {
+  const ref = useRef(null);
+  const scroll = (dir) => ref.current?.scrollBy({ left: dir * (cardWidth + 16) * 3, behavior: 'smooth' });
+  return (
+    <section className={styles.row}>
+      <div className={styles.rowHead}>
+        <div>
+          {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
+          <h2 className={styles.rowTitle}>{title}</h2>
+        </div>
+        <div className={styles.rowControls}>
+          {cta ? (
+            <Button variant="plain" size="sm" iconRight={ArrowRight} onClick={onCta}>
+              {cta}
+            </Button>
+          ) : null}
+          <IconButton icon={ChevronLeft} tooltip="Scroll left" onClick={() => scroll(-1)} />
+          <IconButton icon={ChevronRight} tooltip="Scroll right" onClick={() => scroll(1)} />
+        </div>
+      </div>
+      <div ref={ref} className={styles.rowTrack}>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function ContinueWatching({ entries, animeById, onEditEntry }) {
+  const watching = entries.filter((e) => e.status === 'watching');
+  if (!watching.length) return null;
+  return (
+    <section className={styles.continue}>
+      <div className={styles.eyebrow} style={{ marginBottom: 6 }}>ONGOING · YOUR QUEUE</div>
+      <h2 className={styles.rowTitle}>Continue watching</h2>
+      <div className={styles.continueGrid}>
+        {watching.slice(0, 6).map((e) => {
+          const anime = animeById[e.id] || e;
+          const total = e.episodesTotal || 0;
+          const progress = e.progress || 0;
+          const pct = total > 0 ? (progress / total) * 100 : 0;
+          const next = progress + 1;
+          return (
+            <Link key={e.id} href={`/anime/${e.id}`} className={styles.continueCard}>
+              <div className={styles.continuePoster}>
+                <Image
+                  src={anime.image || anime.posterUrl || '/logo_no_text.png'}
+                  alt={anime.title}
+                  fill
+                  sizes="120px"
+
+                />
+                <div className={styles.continuePlay}>
+                  <Play size={14} fill="#060709" stroke="#060709" />
+                </div>
+              </div>
+              <div className={styles.continueBody}>
+                <div>
+                  <div className={styles.eyebrow} style={{ fontSize: 10, marginBottom: 3 }}>
+                    {total > 0 ? `Next up · episode ${Math.min(next, total)}` : 'Ongoing'}
+                  </div>
+                  <div className={styles.continueTitle}>{anime.title}</div>
+                </div>
+                <div style={{ marginTop: 'auto' }}>
+                  <div className={styles.continueTrack}>
+                    <div className={styles.continueFill} style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className={styles.continueProgress}>
+                    <span>
+                      {progress} / {total || '?'} episodes
+                    </span>
+                    <button
+                      type="button"
+                      className={styles.continueEdit}
+                      onClick={(ev) => {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        onEditEntry(e);
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function EditorialStrip() {
+  const currentSeason = getSeasonFromDate()?.toUpperCase();
+  const currentYear = new Date().getFullYear();
+  return (
+    <section className={styles.strip}>
+      <div className={styles.stripCard}>
+        <div>
+          <div className={`${styles.eyebrow} ${styles.stripEyebrow}`}>DISPATCH · {currentSeason} {currentYear}</div>
+          <h2 className={styles.rowTitle}>Slow anime, serious stakes.</h2>
+          <p className={styles.stripText}>
+            A short reading list for the season — titles that trade spectacle for patience, and the restraint
+            that lets the rest land harder.
+          </p>
+        </div>
+        <Link href="/seasons">
+          <Button variant="secondary" size="md" iconRight={ArrowRight}>
+            Browse seasons
+          </Button>
+        </Link>
+      </div>
+    </section>
+  );
+}
 
 export default function Home({ currentResposta, moviesResposta, aniListMap, topMovies }) {
   const currentData = Array.isArray(currentResposta?.data) ? currentResposta.data : [];
   const currentSeason = getSeasonFromDate();
   const currentYear = new Date().getFullYear();
-  const heroData = currentData.slice(0, 5);
-  const trendingData = Array.isArray(currentResposta?.data)
-    ? currentResposta.data.filter((item) => {
-        if (item?.type !== 'TV') return false;
-        const matchesSeason = item?.season ? item.season === currentSeason : true;
-        const matchesYear = item?.year ? item.year === currentYear : true;
-        return matchesSeason && matchesYear;
-      })
-    : [];
+  const trendingData = currentData.filter((item) => {
+    if (item?.type !== 'TV') return false;
+    const matchesSeason = item?.season ? item.season === currentSeason : true;
+    const matchesYear = item?.year ? item.year === currentYear : true;
+    return matchesSeason && matchesYear;
+  });
+  const heroSlides = (trendingData.length >= 4 ? trendingData : currentData).slice(0, 5);
   const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : [];
   const moviePool = useMemo(() => {
     const scored = movieData.filter((item) => typeof item?.score === 'number' && item.score >= 7.5);
     return scored.length >= 3 ? scored : movieData;
   }, [movieData]);
-  const [featuredIndex, setFeaturedIndex] = useState(0);
-  const featured =
-    heroData[featuredIndex] || heroData[0] || trendingData[0] || movieData[0] || null;
-  const featuredMedia = featured ? aniListMap?.[featured.mal_id] : null;
-  const featuredImage = featured ? getAnimeBannerUrl(featured, featuredMedia) : '';
-  const featuredNormalized = featured ? normalizeAnime(featured) : null;
-  const trendingRef = useRef(null);
-  const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
-  const slideDuration = 6;
+  const [moviePicks, setMoviePicks] = useState(topMovies);
+
+  const { list, addItem, isInList, getEntry, canEdit } = useMyList();
+  const animeById = useMemo(() => {
+    const map = {};
+    list.forEach((e) => {
+      if (e?.id) map[e.id] = e;
+    });
+    return map;
+  }, [list]);
+
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [pendingAnime, setPendingAnime] = useState(null);
   const [pendingEntry, setPendingEntry] = useState(null);
-  const [moviePicks, setMoviePicks] = useState(topMovies);
-
-  useEffect(() => {
-    if (heroData.length <= 1) return;
-    const interval = setInterval(() => {
-      setFeaturedIndex((prev) => (prev + 1) % heroData.length);
-    }, slideDuration * 1000);
-    return () => clearInterval(interval);
-  }, [heroData.length]);
-
-  const handleScroll = (direction) => {
-    if (!trendingRef.current) return;
-    const container = trendingRef.current;
-    const step = direction === 'left' ? -1 : 1;
-    const cardWidth = 220;
-    const gap = 24;
-    const delta = (cardWidth + gap) * 3 * step;
-    container.scrollBy({ left: delta, behavior: 'smooth' });
-  };
-
   const openAddModal = (anime, entry = null) => {
     if (!anime) return;
     setPendingAnime(anime);
     setPendingEntry(entry);
     setAddModalOpen(true);
   };
-
   const closeAddModal = () => {
     setAddModalOpen(false);
     setPendingAnime(null);
     setPendingEntry(null);
   };
-
   const handleConfirmAdd = async (details) => {
     if (!pendingAnime) return;
     await addItem(pendingAnime, details);
@@ -90,262 +284,102 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
     }
     return shuffled.slice(0, count);
   };
-
   const refreshMovies = () => {
     const currentIds = new Set(moviePicks.map((item) => item?.mal_id));
-    setMoviePicks(pickRandom(moviePool, 3, currentIds));
+    setMoviePicks(pickRandom(moviePool, 6, currentIds));
   };
 
   return (
-    <Layout
-      showSidebar={false}
-      headerVariant="dark"
-      layoutVariant="dark"
-      title="AnimeLegacy - Seasonal Highlights"
-      description="Discover curated seasonal anime, trending series, and top movies in one place."
-    >
-      <main className={styles.main}>
-        <section className={`${styles.heroSection} ${styles.heroSectionFull}`}>
-          <div className={styles.heroBackdrop}>
-            {featuredImage ? (
-              <Image
-                key={`hero-image-${featured?.mal_id || featuredIndex}`}
-                className={styles.heroBackdropImage}
-                src={featuredImage}
-                alt={featured?.title || 'Featured background'}
-                fill
-                sizes="100vw"
-                priority
+    <Layout title="AnimeLegacy - Seasonal Highlights" description="Curated seasonal anime, trending series, and top movies.">
+      <div className={styles.main}>
+        {heroSlides.length > 0 ? (
+          <HeroCarousel
+            slides={heroSlides}
+            aniListMap={aniListMap}
+            onOpenModal={openAddModal}
+            getEntry={getEntry}
+            canEdit={canEdit}
+          />
+        ) : null}
+
+        <ContinueWatching
+          entries={list}
+          animeById={animeById}
+          onEditEntry={(entry) => {
+            const normalized = {
+              id: entry.id,
+              title: entry.title,
+              image: entry.image,
+              episodes: entry.episodesTotal,
+              type: entry.type,
+              season: entry.season,
+              year: entry.year,
+              genres: entry.genres || [],
+              synopsis: entry.synopsis || '',
+              malScore: entry.malScore,
+              airing: entry.airing,
+              aired: entry.aired,
+            };
+            openAddModal(normalized, entry);
+          }}
+        />
+
+        <ScrollRow
+          eyebrow={`TRENDING · ${currentSeason?.toUpperCase()} ${currentYear}`}
+          title="What's airing now"
+          cta="Browse seasons"
+          onCta={() => {}}
+        >
+          {trendingData.map((item) => (
+            <div key={item.mal_id} style={{ flexShrink: 0 }}>
+              <PosterCard
+                anime={item}
+                media={aniListMap?.[item.mal_id]}
+                inList={isInList(item.mal_id)}
+                href={`/anime/${item.mal_id}`}
+                width={200}
               />
-            ) : null}
-          </div>
-          <div className={styles.heroOverlay} />
-          <div
-            key={`hero-content-${featured?.mal_id || featuredIndex}`}
-            className={styles.heroContent}
-          >
-            <div className={styles.heroBadge}>Featured This Season</div>
-            <h1 className={styles.heroTitle}>{featured?.title || 'Discover New Worlds'}</h1>
-            <p className={styles.heroDescription}>
-              {featured?.synopsis ||
-                'Curated picks from this season and beyond. Dive into epic adventures, heartfelt stories, and unforgettable worlds.'}
-            </p>
-            <div className={styles.heroActions}>
-              {featured ? (
-                <Link href={`/anime/${featured.mal_id}`} legacyBehavior>
-                  <a className={`${styles.button} ${styles.primaryButton}`}>View Details</a>
-                </Link>
-              ) : null}
-              {featured ? (
-                !canEdit ? (
-                  <button className={`${styles.button} ${styles.ghostButton}`} type="button" disabled>
-                    Login to Add
-                  </button>
-                ) : featuredNormalized && isInList(featuredNormalized.id) ? (
-                  <div className={styles.heroListActions}>
-                    <Link href="/my-list" legacyBehavior>
-                      <a className={`${styles.button} ${styles.ghostButton}`}>In My List</a>
-                    </Link>
-                    <button
-                      className={`${styles.button} ${styles.ghostButton} ${styles.editButton}`}
-                      type="button"
-                      onClick={() => openAddModal(featuredNormalized, getEntry(featuredNormalized.id))}
-                    >
-                      <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
-                      Edit
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    className={`${styles.button} ${styles.ghostButton}`}
-                    type="button"
-                    onClick={() => openAddModal(featuredNormalized)}
-                  >
-                    Add to List
-                  </button>
-                )
-              ) : null}
             </div>
-          </div>
-          <div className={styles.heroPosterSpacer} />
-        </section>
+          ))}
+        </ScrollRow>
 
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <div className={styles.sectionEyebrow}>Current Season</div>
-              <h2 className={styles.sectionTitle}>This season&apos;s TV lineup</h2>
-            </div>
-            <Link href={`/seasons/${currentYear}`} legacyBehavior>
-              <a className={styles.sectionLink}>See all</a>
-            </Link>
-          </div>
-          <div className={styles.carouselWrapper}>
-            <button
-              className={styles.carouselButton}
-              type="button"
-              onClick={() => handleScroll('left')}
-              aria-label="Scroll left"
-            >
-              <i className="bi bi-chevron-left" aria-hidden="true" />
-            </button>
-            <div className={styles.cardRow} ref={trendingRef} style={{ '--card-width': '220px' }}>
-              <div className={styles.carouselSpacer} aria-hidden="true" />
-              {trendingData.map((element, index) => {
-                const media = aniListMap?.[element.mal_id];
-                const imageUrl = getAnimeImageUrl(element, media);
-                const normalized = normalizeAnime(element);
-                return (
-                  <div
-                    key={element.mal_id}
-                    className={styles.trendingCard}
-                    style={{ animationDelay: `${index * 60}ms` }}
-                  >
-                    <Link href={`/anime/${element.mal_id}`} legacyBehavior>
-                      <a className={styles.trendingLink}>
-                        <div className={styles.trendingPoster}>
-                          <Image
-                            className={styles.trendingImage}
-                            src={imageUrl || '/logo_no_text.png'}
-                            alt={element.title}
-                            fill
-                            sizes="220px"
-                            priority={index < 6}
-                          />
-                          <span className={styles.ratingBadge}>{element.score || 'NR'}</span>
-                        </div>
-                        <div className={styles.trendingMeta}>
-                          <div className={styles.trendingTitle}>{element.title}</div>
-                          <div className={styles.trendingTags}>
-                            {element.type || 'Series'} -{' '}
-                            {element.episodes ? `${element.episodes} eps` : 'Ongoing'}
-                          </div>
-                        </div>
-                      </a>
-                    </Link>
-                    {!canEdit ? (
-                      <button className={styles.listButton} type="button" disabled>
-                        Login to Add
-                      </button>
-                    ) : normalized && isInList(normalized.id) ? (
-                      <div className={styles.listActions}>
-                        <Link href="/my-list" legacyBehavior>
-                          <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
-                        </Link>
-                        <button
-                          className={`${styles.listButton} ${styles.editButton}`}
-                          type="button"
-                          onClick={() => openAddModal(normalized, getEntry(normalized.id))}
-                        >
-                          <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
-                          Edit
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        className={styles.listButton}
-                        type="button"
-                        onClick={() => openAddModal(normalized)}
-                      >
-                        Add to List
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-              <div className={styles.carouselSpacer} aria-hidden="true" />
-            </div>
-            <button
-              className={styles.carouselButton}
-              type="button"
-              onClick={() => handleScroll('right')}
-              aria-label="Scroll right"
-            >
-              <i className="bi bi-chevron-right" aria-hidden="true" />
-            </button>
-          </div>
-        </section>
+        <EditorialStrip />
 
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <div className={styles.sectionEyebrow}>Recommended</div>
-              <h2 className={styles.sectionTitle}>Recommended movies to watch tonight</h2>
+        <ScrollRow
+          eyebrow="CURATED"
+          title="Films, reshuffled"
+          cta="Shuffle picks"
+          onCta={refreshMovies}
+          cardWidth={200}
+        >
+          {moviePicks.map((item) => (
+            <div key={item.mal_id} style={{ flexShrink: 0 }}>
+              <PosterCard
+                anime={item}
+                media={aniListMap?.[item.mal_id]}
+                inList={isInList(item.mal_id)}
+                href={`/anime/${item.mal_id}`}
+                width={200}
+              />
             </div>
-            <button className={styles.sectionLink} type="button" onClick={refreshMovies}>
-              <i className={`bi bi-arrow-repeat ${styles.sectionLinkIcon}`} aria-hidden="true" />
-              Shuffle picks
-            </button>
-          </div>
-          <div className={styles.movieGrid}>
-            {moviePicks.map((element, index) => {
-              const media = aniListMap?.[element.mal_id];
-              const imageUrl = getAnimeImageUrl(element, media);
-              const normalized = normalizeAnime(element);
-              return (
-                <div
-                  key={element.mal_id}
-                  className={styles.movieCard}
-                  style={{ animationDelay: `${index * 120}ms` }}
-                >
-                  <Link href={`/anime/${element.mal_id}`} legacyBehavior>
-                    <a className={styles.movieLink}>
-                      <div className={styles.moviePoster}>
-                        <Image
-                          className={styles.moviePosterImage}
-                          src={imageUrl || '/logo_no_text.png'}
-                          alt={element.title}
-                          fill
-                          sizes="120px"
-                        />
-                      </div>
-                      <div className={styles.movieInfo}>
-                        <div className={styles.movieTitle}>{element.title}</div>
-                        <p className={styles.movieDescription}>
-                          {element.synopsis ||
-                            'A visual masterpiece that blends emotion, artistry, and unforgettable storytelling.'}
-                        </p>
-                        <div className={styles.movieMeta}>
-                          <span>{element.type || 'Movie'}</span>
-                          <span>{element.year || element.aired?.prop?.from?.year || '-'}</span>
-                          <span>{element.score ? `${element.score}` : 'NR'}</span>
-                        </div>
-                      </div>
-                    </a>
-                  </Link>
-                  {!canEdit ? (
-                    <button className={styles.listButton} type="button" disabled>
-                      Login to Add
-                    </button>
-                  ) : normalized && isInList(normalized.id) ? (
-                    <div className={styles.listActions}>
-                      <Link href="/my-list" legacyBehavior>
-                        <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
-                      </Link>
-                      <button
-                        className={`${styles.listButton} ${styles.editButton}`}
-                        type="button"
-                        onClick={() => openAddModal(normalized, getEntry(normalized.id))}
-                      >
-                        <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
-                        Edit
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      className={styles.listButton}
-                      type="button"
-                      onClick={() => openAddModal(normalized)}
-                    >
-                      Add to List
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      </main>
+          ))}
+        </ScrollRow>
+
+        <ScrollRow eyebrow="CURRENT SEASON" title="Season highlights">
+          {currentData.slice(0, 12).map((item) => (
+            <div key={item.mal_id} style={{ flexShrink: 0 }}>
+              <PosterCard
+                anime={item}
+                media={aniListMap?.[item.mal_id]}
+                inList={isInList(item.mal_id)}
+                href={`/anime/${item.mal_id}`}
+                width={180}
+              />
+            </div>
+          ))}
+        </ScrollRow>
+      </div>
+
       <AddToListModal
         open={addModalOpen}
         anime={pendingAnime}
@@ -356,7 +390,7 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
         initialFavorite={pendingEntry?.isFavorite}
         initialRating={pendingEntry?.rating}
         initialReview={pendingEntry?.review}
-        favoriteCount={favoritesCount}
+        favoriteCount={list.filter((e) => e.isFavorite).length}
         isEditing={Boolean(pendingEntry)}
       />
     </Layout>
@@ -369,7 +403,6 @@ export async function getServerSideProps() {
       getCurrentSeason(),
       getTopAnimeMovies(),
     ]);
-
     const currentFiltered = Array.isArray(currentRespostaRaw?.data)
       ? filterOutHentai(currentRespostaRaw.data)
       : [];
@@ -387,15 +420,14 @@ export async function getServerSideProps() {
       }
       return pool.slice(0, count);
     };
-
     const topMovies = pickRandom(
       moviesResposta.data.filter((item) => typeof item?.score === 'number' && item.score >= 7.5),
-      3,
+      6,
     );
 
     const ids = [
       ...currentResposta.data.slice(0, 40).map((item) => item.mal_id),
-      ...moviesResposta.data.slice(0, 10).map((item) => item.mal_id),
+      ...moviesResposta.data.slice(0, 20).map((item) => item.mal_id),
     ].filter(Boolean);
     const aniListMap = await fetchAniListMediaByMalIds(ids);
 
