@@ -1,0 +1,46 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.star {
+  color: var(--al-warm);
+  fill: var(--al-warm);
+}
+
+.score {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--al-fg-1);
+}
+
+.label {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: var(--al-fg-2);
+}
+
+.size_sm .score {
+  font-size: 13px;
+}
+.size_sm .label {
+  font-size: 10px;
+}
+
+.size_md .score {
+  font-size: 16px;
+}
+.size_md .label {
+  font-size: 10.5px;
+}
+
+.size_lg .score {
+  font-size: 22px;
+}
+.size_lg .label {
+  font-size: 11px;
+}

@@ -1,0 +1,231 @@
+/* =========================================================================
+   AnimeLegacy × Fortec hybrid tokens
+   Dark-first cinematic surface (AnimeLegacy) + Fortec typographic discipline
+   ========================================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root {
+  /* ---- Base surface (AnimeLegacy dark — near-black, slightly warm) ---- */
+  --al-ink-0: #060709;          /* deepest — letterbox, inside cards */
+  --al-ink-1: #0b0c10;          /* app background */
+  --al-ink-2: #101218;          /* raised surface */
+  --al-ink-3: #161923;          /* card */
+  --al-ink-4: #1d2030;          /* hover card */
+  --al-ink-5: #262a3c;          /* border-strong */
+
+  /* Borders — Fortec discipline: 1px hairline dividers, not floaty shadows */
+  --al-border:         rgba(255,255,255,0.07);
+  --al-border-strong:  rgba(255,255,255,0.13);
+  --al-border-subtle:  rgba(255,255,255,0.04);
+
+  /* Foreground ramp */
+  --al-fg-1: #f3f4f8;   /* primary text */
+  --al-fg-2: #a5a9bd;   /* secondary */
+  --al-fg-3: #6b6f85;   /* tertiary / placeholder */
+  --al-fg-4: #494d63;   /* disabled */
+
+  /* ---- Accent system --------------------------------------------------- */
+  /* Primary cyan-blue gradient (AnimeLegacy's signature) */
+  --al-primary-1: #6f83ff;
+  --al-primary-2: #84d9ff;
+  --al-primary-gradient: linear-gradient(135deg, #6f83ff 0%, #84d9ff 100%);
+  --al-primary-gradient-soft: linear-gradient(135deg, rgba(111,131,255,0.18), rgba(132,217,255,0.14));
+  --al-primary-ink: #b7c6ff;     /* text on dark using primary hue */
+
+  /* In-list / collection purple */
+  --al-collection: #7d6bff;
+  --al-collection-soft: rgba(125,107,255,0.16);
+
+  /* Warm editorial accent (for favorites / highlights / ratings) */
+  --al-warm: #e8b468;
+  --al-warm-soft: rgba(232,180,104,0.14);
+  --al-warm-ink: #f4c988;
+
+  /* Semantic (Fortec-derived, dark-tuned) */
+  --al-success: #3dd68c;
+  --al-success-soft: rgba(61,214,140,0.14);
+  --al-danger:  #ff6a5b;
+  --al-danger-soft: rgba(255,106,91,0.14);
+  --al-warn:    #ffb648;
+  --al-warn-soft: rgba(255,182,72,0.14);
+
+  /* Status tokens (anime list status) */
+  --al-status-watching: #84d9ff;
+  --al-status-completed: #3dd68c;
+  --al-status-plan: #a5a9bd;
+  --al-status-dropped: #ff6a5b;
+  --al-status-paused: #ffb648;
+
+  /* ---- Typography ------------------------------------------------------ */
+  --font-body: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  /* Informational type scale (Fortec-disciplined) */
+  --fs-hero: 72px;    --lh-hero: 1.02;   --tr-hero: -0.035em;
+  --fs-display: 56px; --lh-display: 1.04; --tr-display: -0.03em;
+  --fs-h1: 40px;      --lh-h1: 1.1;     --tr-h1: -0.025em;
+  --fs-h2: 28px;      --lh-h2: 1.18;    --tr-h2: -0.02em;
+  --fs-h3: 20px;      --lh-h3: 1.3;     --tr-h3: -0.01em;
+  --fs-body-lg: 16px; --lh-body-lg: 1.5;
+  --fs-body: 14px;    --lh-body: 1.55;
+  --fs-small: 13px;   --lh-small: 1.45;
+  --fs-xs: 12px;      --lh-xs: 1.4;
+  --fs-eyebrow: 11px; --lh-eyebrow: 1.3; --tr-eyebrow: 0.14em;
+
+  /* ---- Radius, spacing, motion (Fortec) -------------------------------- */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Shadows — Fortec restrained */
+  --shadow-xs: 0 1px 0 0 rgba(0,0,0,0.5);
+  --shadow-sm: 0 2px 4px -1px rgba(0,0,0,0.4);
+  --shadow-md: 0 8px 16px -4px rgba(0,0,0,0.45);
+  --shadow-lg: 0 24px 48px -12px rgba(0,0,0,0.6);
+  --shadow-focus: 0 0 0 3px rgba(132,217,255,0.25);
+
+  /* Motion — slightly more breathing room than Fortec (this is entertainment, not finance) */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 280ms;
+  --dur-4: 420ms;
+}
+
+/* ---------- Base styles ------------------------------------------------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--al-ink-1);
+  color: var(--al-fg-1);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "cv11";
+}
+
+* { box-sizing: border-box; }
+
+.display-hero, .display-1, .h1, .h2, .h3, .eyebrow {
+  font-family: var(--font-display);
+}
+
+.display-hero {
+  font-size: var(--fs-hero);
+  line-height: var(--lh-hero);
+  letter-spacing: var(--tr-hero);
+  font-weight: 700;
+}
+.display-1 {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  font-weight: 700;
+}
+.h1 { font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: var(--tr-h1); font-weight: 700; }
+.h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); letter-spacing: var(--tr-h2); font-weight: 600; }
+.h3 { font-size: var(--fs-h3); line-height: var(--lh-h3); letter-spacing: var(--tr-h3); font-weight: 600; }
+.body-lg { font-size: var(--fs-body-lg); line-height: var(--lh-body-lg); }
+.small { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--al-fg-2); }
+.xs { font-size: var(--fs-xs); line-height: var(--lh-xs); }
+
+.eyebrow {
+  font-size: var(--fs-eyebrow);
+  line-height: var(--lh-eyebrow);
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--al-fg-2);
+}
+
+.num, .mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "zero";
+}
+
+/* Scrollbars — subtle, dark */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+
+/* Selection */
+::selection { background: rgba(132,217,255,0.3); color: #fff; }
+
+/* Utility gradient text */
+.grad-text {
+  background: var(--al-primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Card base — Fortec discipline: border-first, hairline shadow */
+.al-card {
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--dur-2) var(--ease-standard),
+              transform var(--dur-2) var(--ease-standard),
+              background-color var(--dur-2) var(--ease-standard);
+}
+.al-card:hover {
+  border-color: var(--al-border-strong);
+  background: var(--al-ink-4);
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: inherit;
+}
+
+/* Fade/rise entry */
+@keyframes al-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.al-rise { animation: al-rise var(--dur-4) var(--ease-out) both; }
+
+/* Skeleton shimmer */
+@keyframes al-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.al-skeleton {
+  background: linear-gradient(90deg,
+    var(--al-ink-3) 0%,
+    var(--al-ink-4) 50%,
+    var(--al-ink-3) 100%);
+  background-size: 800px 100%;
+  animation: al-shimmer 1.6s linear infinite;
+  border-radius: var(--radius);
+}

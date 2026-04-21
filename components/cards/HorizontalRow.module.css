@@ -1,0 +1,155 @@
+.link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 16px;
+  padding: 12px;
+  align-items: center;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  transition: border-color var(--dur-2) var(--ease-standard),
+    background-color var(--dur-2) var(--ease-standard);
+}
+
+.card:hover {
+  border-color: var(--al-border-strong);
+  background: var(--al-ink-4);
+}
+
+.poster {
+  position: relative;
+  width: 72px;
+  height: 104px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--al-ink-2);
+}
+
+.posterImage {
+  object-fit: cover;
+}
+
+.main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+}
+
+.heart {
+  color: var(--al-warm);
+  fill: var(--al-warm);
+}
+
+.subRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--al-fg-2);
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--al-fg-2);
+}
+
+.dotSep {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--al-fg-3);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.progressTrackWrap {
+  flex: 1;
+  max-width: 260px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--al-primary-gradient);
+}
+
+.progressFillCompleted {
+  background: var(--al-success);
+}
+
+.progressLabel {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--al-fg-2);
+  min-width: 46px;
+  text-align: right;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.yourScore {
+  text-align: right;
+}
+
+.yourScoreNum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--al-warm-ink);
+  line-height: 1;
+}

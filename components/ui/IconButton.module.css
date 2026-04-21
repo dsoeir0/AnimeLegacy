@@ -1,0 +1,26 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--al-fg-2);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--dur-2) var(--ease-standard);
+}
+
+.btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--al-fg-1);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--al-fg-1);
+  border-color: var(--al-border-strong);
+}

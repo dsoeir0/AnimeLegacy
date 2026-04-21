@@ -1,0 +1,91 @@
+.page {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.card {
+  max-width: 520px;
+  width: 100%;
+  padding: 40px 32px 32px;
+  background:
+    linear-gradient(135deg, rgba(111, 131, 255, 0.08) 0%, rgba(132, 217, 255, 0.04) 100%),
+    var(--al-ink-3);
+  border: 1px solid rgba(132, 217, 255, 0.2);
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.iconWrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--al-primary-gradient);
+  color: #060709;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--al-primary-ink);
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--al-fg-1);
+}
+
+.body {
+  font-size: 15px;
+  color: var(--al-fg-2);
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+.bullets {
+  list-style: none;
+  padding: 16px 20px;
+  margin: 0 0 24px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  border-radius: 12px;
+  text-align: left;
+  color: var(--al-fg-2);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.bullets li::before {
+  content: '→';
+  color: var(--al-primary-ink);
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}

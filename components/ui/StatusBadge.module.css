@@ -1,0 +1,41 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid;
+  border-radius: 999px;
+  font-family: var(--font-body);
+}
+
+.dot {
+  border-radius: 50%;
+}
+
+.size_xs {
+  padding: 2px 8px;
+  font-size: 10.5px;
+}
+.size_xs .dot {
+  width: 5px;
+  height: 5px;
+}
+
+.size_sm {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+.size_sm .dot {
+  width: 6px;
+  height: 6px;
+}
+
+.size_md {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.size_md .dot {
+  width: 7px;
+  height: 7px;
+}

@@ -1,0 +1,33 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mark {
+  flex-shrink: 0;
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: var(--al-fg-1);
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  margin-top: 2px;
+  color: var(--al-fg-3);
+  text-transform: uppercase;
+  font-weight: 600;
+}

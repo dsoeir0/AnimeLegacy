@@ -1,0 +1,41 @@
+.base {
+  display: block;
+}
+
+.variant_block {
+  border-radius: var(--radius);
+  min-height: 16px;
+}
+
+.variant_poster {
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  width: 100%;
+}
+
+.variant_avatar {
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+}
+
+.variant_circle {
+  border-radius: 50%;
+}
+
+.variant_row {
+  height: 104px;
+  border-radius: var(--radius-lg);
+  width: 100%;
+}
+
+.textStack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.textLine {
+  height: 12px;
+  border-radius: 6px;
+}
