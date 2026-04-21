@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { AlertTriangle, ChevronDown, Minus, Plus, Star, X } from 'lucide-react';
 import { isAiringAnime } from '../../lib/utils/anime';
 import { getSeasonFromDate } from '../../lib/utils/season';
+import { FAVORITE_LIMIT, FAVORITE_LIMIT_MESSAGE } from '../../lib/constants';
 import styles from '../../styles/add-to-list.module.css';
 
 const statusOptions = [
@@ -104,8 +106,7 @@ export default function AddToListModal({
     isAiring && totalEpisodes ? Math.max(totalEpisodes - 1, 0) : totalEpisodes ?? undefined;
   const progressValue = clamp(progress, 0, maxProgress);
   const isCompleted = status === 'completed';
-  const favoriteLimit = 10;
-  const favoriteLimitReached = favoriteCount >= favoriteLimit && !initialFavorite;
+  const favoriteLimitReached = favoriteCount >= FAVORITE_LIMIT && !initialFavorite;
   const progressPercent = totalEpisodes
     ? Math.min(100, Math.round((progressValue / totalEpisodes) * 100))
     : null;
@@ -126,7 +127,7 @@ export default function AddToListModal({
             </div>
           </div>
           <button className={styles.closeButton} type="button" onClick={onClose} aria-label="Close">
-            <i className={`bi bi-x-lg ${styles.icon}`} aria-hidden="true" />
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 
@@ -161,7 +162,7 @@ export default function AddToListModal({
                   onClick={() => setStatusOpen((prev) => !prev)}
                 >
                   {statusOptions.find((option) => option.value === status)?.label}
-                  <i className={`bi bi-chevron-down ${styles.selectCaretIcon}`} aria-hidden="true" />
+                  <ChevronDown size={14} className={styles.selectCaretIcon} aria-hidden="true" />
                 </button>
                 {statusOpen ? (
                   <div className={styles.selectMenu} role="listbox">
@@ -198,7 +199,7 @@ export default function AddToListModal({
               </div>
               {airingCompletionWarning || shouldWarnAiringCompletion ? (
                 <div className={styles.warning} role="status" aria-live="polite">
-                  <i className={`bi bi-exclamation-triangle ${styles.warningIcon}`} aria-hidden="true" />
+                  <AlertTriangle size={14} className={styles.warningIcon} aria-hidden="true" />
                   <span>
                     {airingCompletionWarning ||
                       'This title is still airing, so it cannot be marked as Completed yet.'}
@@ -219,7 +220,7 @@ export default function AddToListModal({
                     onClick={() => setProgress((prev) => clamp(prev - 1, 0, maxProgress))}
                     aria-label="Decrease episodes watched"
                   >
-                    <i className={`bi bi-dash ${styles.icon}`} aria-hidden="true" />
+                    <Minus size={14} aria-hidden="true" />
                   </button>
                   <input
                     id="progress-input"
@@ -239,7 +240,7 @@ export default function AddToListModal({
                     onClick={() => setProgress((prev) => clamp(prev + 1, 0, maxProgress))}
                     aria-label="Increase episodes watched"
                   >
-                    <i className={`bi bi-plus ${styles.icon}`} aria-hidden="true" />
+                    <Plus size={14} aria-hidden="true" />
                   </button>
                   <span className={styles.progressMeta}>
                     {totalEpisodes ? `of ${totalEpisodes}` : 'of ?'}
@@ -270,16 +271,17 @@ export default function AddToListModal({
                   onClick={() => setIsFavorite((prev) => !prev)}
                   disabled={favoriteLimitReached}
                 >
-                  <i
-                    className={`bi ${isFavorite ? 'bi-star-fill' : 'bi-star'} ${styles.favoriteIcon}`}
+                  <Star
+                    size={14}
+                    className={styles.favoriteIcon}
+                    fill={isFavorite ? 'currentColor' : 'none'}
+                    strokeWidth={1.75}
                     aria-hidden="true"
                   />
                   <span>{isFavorite ? 'Marked as favorite' : 'Mark as favorite'}</span>
                 </button>
                 <p className={styles.helper}>
-                  {favoriteLimitReached
-                    ? 'You already have 10 favorites. Remove one to add another.'
-                    : 'Favorites appear on your profile.'}
+                  {favoriteLimitReached ? FAVORITE_LIMIT_MESSAGE : 'Favorites appear on your profile.'}
                 </p>
               </div>
             ) : null}

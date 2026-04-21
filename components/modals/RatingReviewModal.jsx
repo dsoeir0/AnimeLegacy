@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Check, Circle, Star, StarHalf, X } from 'lucide-react';
 import styles from '../../styles/add-to-list.module.css';
 
 const buildStarState = (rating, starIndex) => {
@@ -49,7 +50,7 @@ export default function RatingReviewModal({
             </div>
           </div>
           <button className={styles.closeButton} type="button" onClick={onClose} aria-label="Close">
-            <i className={`bi bi-x-lg ${styles.icon}`} aria-hidden="true" />
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 
@@ -72,16 +73,14 @@ export default function RatingReviewModal({
                   {Array.from({ length: 5 }, (_, index) => {
                     const starIndex = index + 1;
                     const starState = buildStarState(rating, starIndex);
+                    const StarIcon = starState === 'half' ? StarHalf : Star;
+                    const filled = starState !== 'empty';
                     return (
                       <span key={starIndex} className={styles.starWrap}>
-                        <i
-                          className={`bi ${
-                            starState === 'full'
-                              ? 'bi-star-fill'
-                              : starState === 'half'
-                              ? 'bi-star-half'
-                              : 'bi-star'
-                          }`}
+                        <StarIcon
+                          size={20}
+                          strokeWidth={1.5}
+                          fill={filled ? 'currentColor' : 'none'}
                           aria-hidden="true"
                         />
                         <button
@@ -122,10 +121,11 @@ export default function RatingReviewModal({
                   aria-pressed={reviewEnabled}
                   onClick={() => setReviewEnabled((prev) => !prev)}
                 >
-                  <i
-                    className={`bi ${reviewEnabled ? 'bi-check-circle-fill' : 'bi-circle'} ${styles.reviewToggleIcon}`}
-                    aria-hidden="true"
-                  />
+                  {reviewEnabled ? (
+                    <Check size={14} className={styles.reviewToggleIcon} aria-hidden="true" />
+                  ) : (
+                    <Circle size={14} className={styles.reviewToggleIcon} aria-hidden="true" />
+                  )}
                   <span>{reviewEnabled ? 'Review enabled' : 'Enable review'}</span>
                 </button>
               </div>
