@@ -1,26 +1,19 @@
-import { useState } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import styles from '../../styles/layout.module.css';
+import styles from './Layout.module.css';
 
 export default function Layout({
   children,
   showSidebar = true,
-  headerVariant = 'default',
-  layoutVariant = 'default',
+  showHeader = true,
   title = 'AnimeLegacy',
   description = 'Curated anime seasons, movies, and personal watchlists.',
 }) {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(showSidebar);
-  const handleOnClick = () => {
-    setIsSidebarVisible((oldValue) => !oldValue);
-  };
-
-  const layoutClass = layoutVariant === 'dark' ? styles.layoutDark : styles.layoutDefault;
-
+  const router = useRouter();
   return (
-    <div className={`${styles.layout} ${layoutClass}`}>
+    <div className={styles.shell}>
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -28,15 +21,13 @@ export default function Layout({
         <link rel="icon" href="/logo_no_text.png" type="image/png" sizes="16x16" />
         <link rel="apple-touch-icon" href="/logo_no_text.png" />
       </Head>
-      <Header
-        handleOnClick={handleOnClick}
-        showSidebarToggle={showSidebar}
-        variant={headerVariant}
-      />
-      <div className={styles.contentWrapper}>
-        {showSidebar && isSidebarVisible ? <Sidebar /> : null}
-        <div className={styles.content}>{children}</div>
-      </div>
+      {showSidebar ? <Sidebar /> : null}
+      <main className={styles.main}>
+        {showHeader ? <Header /> : null}
+        <div key={router.asPath} className={`${styles.content} al-rise`}>
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

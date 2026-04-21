@@ -1,15 +1,47 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import styles from '../../styles/header.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { Search, Bell, Sparkles, ArrowLeft } from 'lucide-react';
 import { filterOutHentai } from '../../lib/utils/anime';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
+import IconButton from '../ui/IconButton';
+import LanguageSwitcher from './LanguageSwitcher';
+import styles from './Header.module.css';
 
-const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }) => {
-  const currentYear = new Date().getFullYear();
-  const headerClass = variant === 'dark' ? styles.headerDark : styles.headerLight;
+const BREADCRUMBS = [
+  { pattern: /^\/$/, label: 'Home' },
+  { pattern: /^\/seasons/, label: 'Seasons' },
+  { pattern: /^\/my-list/, label: 'My list' },
+  { pattern: /^\/profile/, label: 'Profile' },
+  { pattern: /^\/search/, label: 'Discover' },
+  { pattern: /^\/anime\//, label: 'Anime' },
+  { pattern: /^\/characters\/[^/]+/, label: 'Character' },
+  { pattern: /^\/characters$/, label: 'Characters' },
+  { pattern: /^\/voices\/[^/]+/, label: 'Voice actor' },
+  { pattern: /^\/voices$/, label: 'Voice actors' },
+  { pattern: /^\/studios\/[^/]+/, label: 'Studio' },
+  { pattern: /^\/studios$/, label: 'Studios' },
+  { pattern: /^\/calendar/, label: 'Calendar' },
+  { pattern: /^\/collections/, label: 'Collections' },
+  { pattern: /^\/compare/, label: 'Compare' },
+  { pattern: /^\/movies/, label: 'Movies' },
+  { pattern: /^\/sign-in/, label: 'Sign in' },
+  { pattern: /^\/sign-up/, label: 'Sign up' },
+];
+
+const getBreadcrumb = (path) => {
+  const match = BREADCRUMBS.find((b) => b.pattern.test(path));
+  return match?.label || 'AnimeLegacy';
+};
+
+const BACK_PATHS = [/^\/anime\//, /^\/characters\/[^/]+/, /^\/voices\/[^/]+/, /^\/studios\/[^/]+/];
+const shouldShowBack = (path) => BACK_PATHS.some((p) => p.test(path));
+
+export default function Header({ variant = 'default' }) {
+  const router = useRouter();
+  const path = router.asPath.split('?')[0];
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +51,6 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
   const searchRef = useRef(null);
   const profileRef = useRef(null);
   const searchResultsId = 'global-search-results';
-  const router = useRouter();
   const { user, loading: authLoading, signOutUser } = useAuth();
   const profile = useUserProfile(user?.uid);
   const displayName = profile?.username || user?.displayName || 'AnimeLegacy User';
@@ -35,7 +66,6 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
         isActive = false;
       };
     }
-
     setIsLoading(true);
     const timer = setTimeout(async () => {
       try {
@@ -55,7 +85,6 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
         if (isActive) setIsLoading(false);
       }
     }, 350);
-
     return () => {
       isActive = false;
       clearTimeout(timer);
@@ -64,11 +93,9 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
 
   useEffect(() => {
     if (!isOpen) return undefined;
-    const handlePointerDown = (event) => {
+    const handlePointerDown = (e) => {
       if (!searchRef.current) return;
-      if (!searchRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
+      if (!searchRef.current.contains(e.target)) setIsOpen(false);
     };
     document.addEventListener('mousedown', handlePointerDown);
     document.addEventListener('touchstart', handlePointerDown);
@@ -80,11 +107,9 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
 
   useEffect(() => {
     if (!isProfileOpen) return undefined;
-    const handlePointerDown = (event) => {
+    const handlePointerDown = (e) => {
       if (!profileRef.current) return;
-      if (!profileRef.current.contains(event.target)) {
-        setIsProfileOpen(false);
-      }
+      if (!profileRef.current.contains(e.target)) setIsProfileOpen(false);
     };
     document.addEventListener('mousedown', handlePointerDown);
     document.addEventListener('touchstart', handlePointerDown);
@@ -94,135 +119,106 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
     };
   }, [isProfileOpen]);
 
+  const breadcrumb = getBreadcrumb(path);
+  const showBack = shouldShowBack(path);
+
   return (
-    <header className={`${styles.header} ${headerClass}`}>
+    <header className={`${styles.header} ${variant === 'dark' ? styles.dark : ''}`}>
       <div className={styles.left}>
-        {showSidebarToggle ? (
-          <button
-            type="button"
-            className={styles.burger}
-            onClick={() => {
-              handleOnClick();
-            }}
-            aria-label="Toggle sidebar"
-          >
-            <i className={`bi bi-list ${styles.burgerIcon}`} aria-hidden="true" />
-          </button>
+        {showBack ? (
+          <IconButton icon={ArrowLeft} tooltip="Back" onClick={() => router.back()} />
         ) : null}
-        <Link href="/" legacyBehavior>
-          <a className={styles.logo} aria-label="AnimeLegacy home">
-            <Image
-              className={styles.logoImage}
-              src="/logo_text.png"
-              alt="AnimeLegacy"
-              width={320}
-              height={72}
-              priority
-            />
-          </a>
-        </Link>
-        <nav className={styles.nav}>
-          <Link href="/" legacyBehavior>
-            <a className={styles.navLink}>Home</a>
-          </Link>
-          <Link href={`/seasons/${currentYear}`} legacyBehavior>
-            <a className={styles.navLink}>Seasonal</a>
-          </Link>
-          <Link href="/my-list" legacyBehavior>
-            <a className={styles.navLink}>My List</a>
-          </Link>
-        </nav>
+        <div className={styles.eyebrow}>{breadcrumb}</div>
       </div>
+
+      <div className={styles.searchWrap} ref={searchRef}>
+        <Search size={16} className={styles.searchIcon} />
+        <input
+          className={styles.searchInput}
+          type="search"
+          placeholder="Search anime, characters, studios…"
+          aria-label="Search anime"
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-controls={searchResultsId}
+          aria-autocomplete="list"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => {
+            if (trimmedQuery.length >= 2) setIsOpen(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setIsOpen(false);
+              e.currentTarget.blur();
+              return;
+            }
+            if (e.key === 'Enter' && trimmedQuery.length >= 2) {
+              e.preventDefault();
+              setIsOpen(false);
+              router.push(`/search?q=${encodeURIComponent(trimmedQuery)}&page=1`);
+            }
+          }}
+        />
+        <kbd className={styles.kbd}>⌘K</kbd>
+        {isOpen ? (
+          <div className={styles.searchResults} role="listbox" id={searchResultsId}>
+            {isLoading ? (
+              <div className={styles.searchEmpty}>Searching…</div>
+            ) : results.length === 0 ? (
+              <div className={styles.searchEmpty}>No matches found.</div>
+            ) : (
+              results.map((item) => (
+                <Link
+                  key={item.mal_id}
+                  href={`/anime/${item.mal_id}`}
+                  className={styles.searchItem}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <div className={styles.searchThumb}>
+                    <Image
+                      src={item?.images?.webp?.image_url || item?.images?.jpg?.image_url || '/logo_no_text.png'}
+                      alt={item.title}
+                      width={40}
+                      height={52}
+                    />
+                  </div>
+                  <div className={styles.searchMeta}>
+                    <div className={styles.searchTitle}>{item.title}</div>
+                    <div className={styles.searchSub}>
+                      <span>{item.type || 'Anime'}</span>
+                      <span>·</span>
+                      <span>{item.year || item?.aired?.prop?.from?.year || '—'}</span>
+                      <span>·</span>
+                      <span>{item.score ? `★ ${item.score}` : 'NR'}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+        ) : null}
+      </div>
+
       <div className={styles.right}>
-        <div className={styles.search} ref={searchRef}>
-          <i className={`bi bi-search ${styles.searchIcon}`} aria-hidden="true" />
-          <input
-            className={styles.searchInput}
-            type="search"
-            placeholder="Search anime, studios, genres..."
-            aria-label="Search anime"
-            role="combobox"
-            aria-expanded={isOpen}
-            aria-controls={searchResultsId}
-            aria-autocomplete="list"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onFocus={() => {
-              if (trimmedQuery.length >= 2) setIsOpen(true);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') {
-                setIsOpen(false);
-                event.currentTarget.blur();
-                return;
-              }
-              if (event.key === 'Enter') {
-                if (trimmedQuery.length >= 2) {
-                  event.preventDefault();
-                  setIsOpen(false);
-                  router.push(`/search?q=${encodeURIComponent(trimmedQuery)}&page=1`);
-                }
-              }
-            }}
-          />
-          {isOpen ? (
-            <div className={styles.searchResults} role="listbox" id={searchResultsId}>
-              {isLoading ? (
-                <div className={styles.searchEmpty}>Searching...</div>
-              ) : results.length === 0 ? (
-                <div className={styles.searchEmpty}>No matches found.</div>
-              ) : (
-                results.map((item) => (
-                  <Link key={item.mal_id} href={`/anime/${item.mal_id}`} legacyBehavior>
-                    <a className={styles.searchItem} onClick={() => setIsOpen(false)}>
-                      <div className={styles.searchThumb}>
-                        <Image
-                          src={
-                            item?.images?.webp?.image_url ||
-                            item?.images?.jpg?.image_url ||
-                            '/logo_no_text.png'
-                          }
-                          alt={item.title}
-                          width={56}
-                          height={72}
-                        />
-                      </div>
-                      <div className={styles.searchMeta}>
-                        <div className={styles.searchTitle}>{item.title}</div>
-                        <div className={styles.searchSub}>
-                          <span>{item.type || 'Anime'}</span>
-                          <span>{item.year || item?.aired?.prop?.from?.year || '—'}</span>
-                          <span>{item.score ? `${item.score}` : 'NR'}</span>
-                        </div>
-                      </div>
-                    </a>
-                  </Link>
-                ))
-              )}
-            </div>
-          ) : null}
-        </div>
+        <LanguageSwitcher />
+        <div className={styles.divider} />
+        <IconButton icon={Sparkles} tooltip="What's new" />
+        <IconButton icon={Bell} tooltip="Notifications" />
+        <div className={styles.divider} />
         <div className={styles.profile} ref={profileRef}>
           <button
             className={styles.profileButton}
             type="button"
-            onClick={async () => {
-              if (authLoading) return;
-              if (!user) {
-                setIsProfileOpen((prev) => !prev);
-                return;
-              }
-              setIsProfileOpen((prev) => !prev);
-            }}
             aria-haspopup="menu"
             aria-expanded={isProfileOpen}
+            onClick={() => {
+              if (authLoading) return;
+              setIsProfileOpen((prev) => !prev);
+            }}
           >
             {avatar ? (
-              <img
-                className={styles.profileAvatar}
-                src={avatar}
-                alt={displayName || 'Profile'}
-              />
+              <img className={styles.profileAvatar} src={avatar} alt={displayName || 'Profile'} />
             ) : (
               <span className={styles.profileInitials}>
                 {(displayName || 'U').slice(0, 1).toUpperCase()}
@@ -237,23 +233,19 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
                     <strong>{displayName}</strong>
                     <span>{user.email || ''}</span>
                   </div>
-                  <Link href="/profile" legacyBehavior>
-                    <a
-                      className={styles.profileItem}
-                      role="menuitem"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Profile
-                    </a>
+                  <Link
+                    href="/profile"
+                    className={styles.profileItem}
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    Profile
                   </Link>
-                  <Link href="/my-list" legacyBehavior>
-                    <a
-                      className={styles.profileItem}
-                      role="menuitem"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      My List
-                    </a>
+                  <Link
+                    href="/my-list"
+                    className={styles.profileItem}
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    My List
                   </Link>
                   <button
                     className={styles.profileItem}
@@ -268,23 +260,19 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
                 </>
               ) : (
                 <>
-                  <Link href="/sign-in" legacyBehavior>
-                    <a
-                      className={styles.profileItem}
-                      role="menuitem"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Sign in
-                    </a>
+                  <Link
+                    href="/sign-in"
+                    className={styles.profileItem}
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    Sign in
                   </Link>
-                  <Link href="/sign-up" legacyBehavior>
-                    <a
-                      className={styles.profileItem}
-                      role="menuitem"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Sign up
-                    </a>
+                  <Link
+                    href="/sign-up"
+                    className={styles.profileItem}
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    Sign up
                   </Link>
                 </>
               )}
@@ -294,6 +282,4 @@ const Header = ({ handleOnClick, showSidebarToggle = true, variant = 'default' }
       </div>
     </header>
   );
-};
-
-export default Header;
+}
