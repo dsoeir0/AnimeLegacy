@@ -1,0 +1,120 @@
+.page {
+  padding: 40px 48px 80px;
+}
+
+.head {
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--al-border);
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--al-fg-2);
+  margin-bottom: 12px;
+}
+
+.heading {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  color: var(--al-fg-1);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--al-fg-2);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 560px;
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.day {
+  border-top: 1px solid var(--al-border-subtle);
+  padding-top: 20px;
+}
+
+.dayToday {
+  border-top-color: var(--al-primary-2);
+}
+
+.dayHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.dayLabel {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--al-fg-1);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.todayTag {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 9.5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(132, 217, 255, 0.12);
+  color: var(--al-primary-ink);
+  border: 1px solid rgba(132, 217, 255, 0.3);
+}
+
+.dayCount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--al-fg-3);
+  padding: 6px 12px;
+  border: 1px solid var(--al-border);
+  border-radius: 999px;
+}
+
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.emptyDay {
+  padding: 24px;
+  color: var(--al-fg-3);
+  font-size: 13px;
+  text-align: center;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: var(--radius-lg);
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 28px 20px 80px;
+  }
+  .dayGrid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+}

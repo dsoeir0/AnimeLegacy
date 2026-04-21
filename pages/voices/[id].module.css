@@ -1,0 +1,306 @@
+.page { padding: 40px 48px 80px; }
+
+.empty {
+  padding: 64px 32px;
+  text-align: center;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: var(--radius-lg);
+}
+
+.empty h1 {
+  font-family: var(--font-display);
+  margin: 0 0 8px;
+  color: var(--al-fg-1);
+}
+
+.empty p { color: var(--al-fg-2); margin: 0 0 16px; }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 40px;
+  margin-bottom: 56px;
+}
+
+.heroImage {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--al-border-strong);
+  box-shadow: var(--shadow-lg);
+  background: var(--al-ink-3);
+  position: sticky;
+  top: 88px;
+}
+
+.heroImg { object-fit: cover; }
+
+.heroBody { min-width: 0; }
+
+.eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--al-primary-ink);
+  margin-bottom: 14px;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  color: var(--al-fg-1);
+}
+
+.subTitle {
+  font-size: 17px;
+  color: var(--al-fg-3);
+  font-family: var(--font-display);
+  margin-bottom: 24px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat {
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.statLabel {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 9.5px;
+  color: var(--al-fg-2);
+  margin-bottom: 6px;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--al-fg-1);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.statValueSmall {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--al-fg-1);
+  line-height: 1.2;
+}
+
+.bioCard {
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+
+.sectionEyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--al-fg-2);
+  margin-bottom: 12px;
+}
+
+.bioText {
+  color: var(--al-fg-1);
+  line-height: 1.65;
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.bioText:last-child { margin-bottom: 0; }
+
+/* Section heads */
+.section { margin-top: 56px; }
+
+.sectionHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--al-fg-1);
+}
+
+.sectionEmpty {
+  color: var(--al-fg-2);
+  font-size: 13px;
+  padding: 24px;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: 12px;
+  margin: 0;
+}
+
+/* Roles */
+.rolesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.roleCard {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--dur-2) var(--ease-standard);
+}
+
+.roleCard:hover {
+  border-color: var(--al-border-strong);
+  background: var(--al-ink-4);
+}
+
+.roleAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--al-ink-2);
+}
+
+.roleMeta { min-width: 0; }
+
+.roleName {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roleAnime {
+  font-size: 12px;
+  color: var(--al-fg-3);
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roleTag {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 9.5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(132, 217, 255, 0.1);
+  color: var(--al-primary-ink);
+  border: 1px solid rgba(132, 217, 255, 0.25);
+}
+
+/* Anime filmography */
+.animeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+}
+
+.animeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--dur-2) var(--ease-standard);
+}
+
+.animeCard:hover { transform: translateY(-2px); }
+
+.animePoster {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--al-border);
+  background: var(--al-ink-3);
+}
+
+.animeImg { object-fit: cover; }
+
+.animeGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.75) 100%);
+  pointer-events: none;
+}
+
+.animeRole {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(6, 7, 9, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--al-border-strong);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+}
+
+.animeTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+@media (max-width: 900px) {
+  .page { padding: 28px 20px 80px; }
+  .hero { grid-template-columns: 1fr; gap: 20px; }
+  .heroImage { position: relative; top: auto; max-width: 260px; margin: 0 auto; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
