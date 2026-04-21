@@ -1,0 +1,550 @@
+/* =========================== TOP BAR =========================== */
+.topBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.topBarText {
+  font-size: 13px;
+  color: var(--al-fg-3);
+}
+
+/* =========================== FORM AREA =========================== */
+.formArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.formWrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--al-fg-2);
+  margin-bottom: 14px;
+}
+
+.heading {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  color: var(--al-fg-1);
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--al-fg-2);
+  line-height: 1.6;
+  margin: 0 0 36px;
+  max-width: 380px;
+}
+
+/* =========================== GOOGLE BUTTON =========================== */
+.googleBtn {
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border-strong);
+  border-radius: 12px;
+  color: var(--al-fg-1);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur-2) var(--ease-standard);
+}
+
+.googleBtn:hover:not(:disabled) {
+  background: var(--al-ink-3);
+}
+
+.googleBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================== DIVIDER =========================== */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--al-border);
+}
+
+.dividerText {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--al-fg-2);
+}
+
+/* =========================== FIELDS =========================== */
+.field {
+  margin-bottom: 18px;
+}
+
+.fieldHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--al-fg-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.inlineLink {
+  font-size: 12px;
+  color: var(--al-primary-ink);
+  text-decoration: none;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  border-radius: 10px;
+  color: var(--al-fg-1);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--dur-2) var(--ease-standard), box-shadow var(--dur-2) var(--ease-standard);
+}
+
+.input:focus {
+  border-color: var(--al-primary-2);
+  box-shadow: 0 0 0 3px rgba(132, 217, 255, 0.12);
+}
+
+.input::placeholder {
+  color: var(--al-fg-3);
+}
+
+.inputError {
+  border-color: rgba(255, 106, 91, 0.5);
+}
+
+.inputError:focus {
+  border-color: var(--al-danger);
+  box-shadow: 0 0 0 3px rgba(255, 106, 91, 0.15);
+}
+
+.passwordInput {
+  padding-right: 44px;
+}
+
+.inputToggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--al-fg-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--dur-2) var(--ease-standard);
+}
+
+.inputToggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--al-fg-1);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 14px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  border-radius: 10px;
+  color: var(--al-fg-1);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.textarea:focus {
+  border-color: var(--al-primary-2);
+  box-shadow: 0 0 0 3px rgba(132, 217, 255, 0.12);
+}
+
+.fieldError {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--al-danger);
+}
+
+/* =========================== RULES =========================== */
+.ruleList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  font-size: 11.5px;
+  color: var(--al-fg-3);
+}
+
+.ruleItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--dur-2) var(--ease-standard);
+}
+
+.ruleItem::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--al-fg-4);
+  flex-shrink: 0;
+  transition: background var(--dur-2) var(--ease-standard);
+}
+
+.rulePassed {
+  color: var(--al-success);
+}
+
+.rulePassed::before {
+  background: var(--al-success);
+}
+
+/* =========================== CHECKBOX =========================== */
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--al-fg-2);
+  cursor: pointer;
+}
+
+.checkbox {
+  accent-color: var(--al-primary-2);
+  width: 14px;
+  height: 14px;
+}
+
+/* =========================== FEEDBACK =========================== */
+.error {
+  background: var(--al-danger-soft);
+  color: var(--al-danger);
+  border: 1px solid rgba(255, 106, 91, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  margin-top: 14px;
+}
+
+.success {
+  background: var(--al-success-soft);
+  color: var(--al-success);
+  border: 1px solid rgba(61, 214, 140, 0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  margin-top: 14px;
+}
+
+/* =========================== LEGAL =========================== */
+.legal {
+  font-size: 11.5px;
+  color: var(--al-fg-3);
+  line-height: 1.6;
+  margin-top: 24px;
+  text-align: center;
+}
+
+.legal a {
+  color: var(--al-fg-2);
+  text-decoration: underline;
+  text-decoration-color: var(--al-border-strong);
+  text-underline-offset: 3px;
+}
+
+.legal a:hover {
+  color: var(--al-fg-1);
+}
+
+/* =========================== SIGNED-IN CARD =========================== */
+.signedIn {
+  padding: 18px 20px;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.signedIn p {
+  margin: 0 0 12px;
+  color: var(--al-fg-1);
+  font-size: 14px;
+}
+
+/* =========================== ALT LINK =========================== */
+.altLink {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--al-fg-3);
+}
+
+.altLink a {
+  color: var(--al-primary-ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.altLink a:hover {
+  text-decoration: underline;
+}
+
+/* =========================== AVATAR =========================== */
+.avatarCenter {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.avatarCircle {
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border-strong);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--al-fg-3);
+}
+
+.avatarCircle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fileInput {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--al-fg-2);
+}
+
+.fileInput::file-selector-button {
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  color: var(--al-fg-1);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all var(--dur-2) var(--ease-standard);
+  font-family: var(--font-body);
+}
+
+.fileInput::file-selector-button:hover {
+  background: var(--al-ink-4);
+}
+
+.removeInline {
+  background: transparent;
+  border: none;
+  color: var(--al-fg-3);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  padding: 6px 0;
+}
+
+.removeInline:hover:not(:disabled) {
+  color: var(--al-danger);
+}
+
+.removeInline:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =========================== FORM ACTIONS =========================== */
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.formActions > * {
+  flex: 1;
+}
+
+/* =========================== FOOTER =========================== */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--al-border-subtle);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--al-fg-3);
+}
+
+.footerLinks {
+  display: flex;
+  gap: 20px;
+  font-size: 11.5px;
+}
+
+.footerLinks a {
+  color: inherit;
+  text-decoration: none;
+  font-family: var(--font-body);
+}
+
+.footerLinks a:hover {
+  color: var(--al-fg-1);
+}
+
+/* =========================== MODAL (Google new-user) =========================== */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(6, 7, 9, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn var(--dur-3) var(--ease-out);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalCard {
+  width: 100%;
+  max-width: 440px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border-strong);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: 24px 26px;
+  animation: rise var(--dur-4) var(--ease-out);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modalHeader {
+  margin-bottom: 18px;
+}
+
+.modalHeader h2 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--al-fg-1);
+}
+
+.modalHeader p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--al-fg-3);
+}
+
+/* =========================== BACK LINK =========================== */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--al-fg-2);
+  font-size: 13px;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all var(--dur-2) var(--ease-standard);
+}
+
+.backLink:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--al-fg-1);
+}

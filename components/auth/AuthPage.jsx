@@ -1,14 +1,145 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Layout from '../layout/Layout';
+import { ArrowRight, Eye, EyeOff, Sparkles, Plus } from 'lucide-react';
+import { deleteUser, updateProfile } from 'firebase/auth';
+import AuthShell from './AuthShell';
+import Button from '../ui/Button';
 import useAuth from '../../hooks/useAuth';
 import { getFirebaseClient } from '../../lib/firebase/client';
 import { claimUsername, getUserProfile, upsertUserProfile } from '../../lib/services/userProfile';
-import { deleteUser, updateProfile } from 'firebase/auth';
-import styles from '../../styles/auth.module.css';
+import {
+  PASSWORD_RULES,
+  MAX_AVATAR_SIZE_BYTES,
+  MAX_AVATAR_SIZE_LABEL,
+  isValidEmail,
+  findPasswordRuleError,
+} from '../../lib/constants';
+import styles from './AuthForms.module.css';
 
-const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
+const formatAuthError = (err) => {
+  const code = err?.code || '';
+  if (code === 'auth/user-not-found') return 'No account found for this email.';
+  if (code === 'auth/wrong-password') return 'Incorrect password.';
+  if (code === 'auth/invalid-credential') return 'Incorrect email or password, or this account was deleted.';
+  if (code === 'auth/invalid-email') return 'Email address is invalid.';
+  if (code === 'auth/email-already-in-use') return 'An account already exists with this email.';
+  if (code === 'auth/weak-password') return 'Password is too weak.';
+  if (code === 'auth/not-configured') return 'Sign-in is not configured. Add Firebase env vars to enable login.';
+  return err?.message || 'Unable to sign in right now.';
+};
+
+const fileToDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    if (!file) return resolve('');
+    if (file.size > MAX_AVATAR_SIZE_BYTES) {
+      return reject(new Error(`Avatar must be under ${MAX_AVATAR_SIZE_LABEL}.`));
+    }
+    if (!file.type.startsWith('image/')) return reject(new Error('Avatar must be an image file.'));
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Failed to read image file.'));
+    reader.readAsDataURL(file);
+  });
+
+function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submitting, error }) {
+  const [username, setUsername] = useState(initialUsername);
+  const [bio, setBio] = useState('');
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarError, setAvatarError] = useState('');
+  const avatarPreview = useMemo(() => (avatarFile ? URL.createObjectURL(avatarFile) : ''), [avatarFile]);
+
+  useEffect(() => () => avatarPreview && URL.revokeObjectURL(avatarPreview), [avatarPreview]);
+
+  const handleFile = (event) => {
+    const file = event.target.files?.[0] || null;
+    setAvatarError('');
+    if (file && file.size > MAX_AVATAR_SIZE_BYTES) {
+      setAvatarError(`Avatar must be under ${MAX_AVATAR_SIZE_LABEL}.`);
+      setAvatarFile(null);
+      return;
+    }
+    if (file && !file.type.startsWith('image/')) {
+      setAvatarError('Avatar must be an image file.');
+      setAvatarFile(null);
+      return;
+    }
+    setAvatarFile(file);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (!username.trim()) return;
+    onSubmit({ username: username.trim(), bio: bio.trim(), avatarFile });
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div className={styles.modalHeader}>
+          <h2>Complete your profile</h2>
+          <p>Add a username, bio, and avatar to finish setup.</p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.avatarCenter}>
+            <div className={styles.avatarCircle}>
+              {avatarPreview ? <img src={avatarPreview} alt="Avatar preview" /> : <Plus size={24} />}
+            </div>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Username</label>
+            <input
+              type="text"
+              className={styles.input}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="ZenithRunner"
+              required
+              autoFocus
+            />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Avatar</label>
+            <div className={styles.fileRow}>
+              <input type="file" accept="image/*" className={styles.fileInput} onChange={handleFile} />
+              <button
+                type="button"
+                className={styles.removeInline}
+                onClick={() => setAvatarFile(null)}
+                disabled={!avatarFile}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Bio</label>
+            <textarea
+              className={styles.textarea}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={3}
+              placeholder="A quick line about your anime taste."
+            />
+          </div>
+          {avatarError ? <div className={styles.error}>{avatarError}</div> : null}
+          {error ? <div className={styles.error}>{error}</div> : null}
+          <div className={styles.formActions}>
+            <Button variant="ghost" size="md" onClick={onClose} type="button">
+              Cancel
+            </Button>
+            <Button variant="primary" size="md" type="submit" disabled={submitting || !username.trim()}>
+              {submitting ? 'Saving…' : 'Save profile'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthPage({ initialMode = 'signin' }) {
+  const router = useRouter();
   const {
     user,
     loading: authLoading,
@@ -17,60 +148,32 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
     signUpWithEmail,
     signOutUser,
   } = useAuth();
-  const [error, setError] = useState('');
+  const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [bio, setBio] = useState('');
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarError, setAvatarError] = useState('');
-  const [activeTab, setActiveTab] = useState('account');
+  const [showPw, setShowPw] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [error, setError] = useState('');
   const [touched, setTouched] = useState({});
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [modalUsername, setModalUsername] = useState('');
-  const [modalBio, setModalBio] = useState('');
-  const [modalAvatarFile, setModalAvatarFile] = useState(null);
-  const [modalAvatarError, setModalAvatarError] = useState('');
-  const router = useRouter();
-  const MAX_AVATAR_SIZE = 512 * 1024;
+  const [submitting, setSubmitting] = useState(false);
+  const [profileModal, setProfileModal] = useState(null);
+  const [modalError, setModalError] = useState('');
+  const [modalSubmitting, setModalSubmitting] = useState(false);
 
-  const passwordRules = [
-    { id: 'min', label: 'At least 8 characters', test: (value) => value.length >= 8 },
-    { id: 'upper', label: 'One uppercase letter', test: (value) => /[A-Z]/.test(value) },
-    { id: 'lower', label: 'One lowercase letter', test: (value) => /[a-z]/.test(value) },
-    { id: 'number', label: 'One number', test: (value) => /\d/.test(value) },
-    { id: 'symbol', label: 'One symbol', test: (value) => /[^A-Za-z0-9]/.test(value) },
-  ];
+  useEffect(() => {
+    setError('');
+    setTouched({});
+  }, [mode]);
 
-  const fileToDataUrl = (file) =>
-    new Promise((resolve, reject) => {
-      if (!file) resolve('');
-      if (file.size > MAX_AVATAR_SIZE) {
-        reject(new Error('Avatar must be under 512KB.'));
-        return;
-      }
-      if (!file.type.startsWith('image/')) {
-        reject(new Error('Avatar must be an image file.'));
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error('Failed to read image file.'));
-      reader.readAsDataURL(file);
-    });
-
-  const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   const emailError = !email
     ? 'Email is required.'
-    : !validateEmail(email)
+    : !isValidEmail(email)
       ? 'Enter a valid email address.'
       : '';
   const passwordError =
     mode === 'signup'
-      ? passwordRules.find((rule) => !rule.test(password))
-        ? 'Password does not meet the required rules.'
-        : ''
+      ? findPasswordRuleError(password)
       : !password
         ? 'Password is required.'
         : '';
@@ -80,490 +183,369 @@ const AuthPage = ({ title, subtitle, altHref, altLabel, mode = 'login' }) => {
       : mode === 'signup' && confirmPassword !== password
         ? 'Passwords do not match.'
         : '';
-  const usernameError = mode === 'signup' && !username.trim() ? 'Username is required.' : '';
+  const isFormValid = !emailError && !passwordError && !confirmError;
 
-  const isFormValid = !emailError && !passwordError && !confirmError && !usernameError;
-
-  const formatAuthError = (err) => {
-    const code = err?.code || '';
-    if (code === 'auth/user-not-found') return 'No account found for this email.';
-    if (code === 'auth/wrong-password') return 'Incorrect password.';
-    if (code === 'auth/invalid-credential') {
-      return 'Incorrect email or password, or this account was deleted.';
-    }
-    if (code === 'auth/invalid-email') return 'Email address is invalid.';
-    if (code === 'auth/email-already-in-use') return 'An account already exists with this email.';
-    if (code === 'auth/weak-password') return 'Password is too weak.';
-    return err?.message || 'Unable to sign in right now.';
+  const toggleMode = () => {
+    setMode((m) => (m === 'signin' ? 'signup' : 'signin'));
+    setError('');
+    setTouched({});
   };
 
-  const handleGoogleSignIn = async () => {
+  const saveProfile = async ({ username, bio, avatarFile }) => {
+    const { auth } = getFirebaseClient();
+    if (!auth?.currentUser) {
+      setModalError('Not signed in.');
+      return;
+    }
+    setModalSubmitting(true);
+    setModalError('');
+    try {
+      const claim = await claimUsername({ uid: auth.currentUser.uid, username });
+      if (!claim.ok) {
+        setModalError('Username is already taken.');
+        return;
+      }
+      const avatarData = avatarFile ? await fileToDataUrl(avatarFile) : '';
+      await updateProfile(auth.currentUser, { displayName: username, photoURL: null });
+      await upsertUserProfile({
+        uid: auth.currentUser.uid,
+        username,
+        bio,
+        avatarData,
+        email: auth.currentUser.email || '',
+        displayName: username,
+      });
+      setProfileModal(null);
+      router.push('/my-list');
+    } catch (err) {
+      setModalError(err?.message || 'Unable to save profile.');
+    } finally {
+      setModalSubmitting(false);
+    }
+  };
+
+  const handleGoogle = async () => {
     setError('');
     try {
       const result = await signInWithGoogle();
       const authUser = result?.user;
-      if (authUser?.uid) {
-        const existing = await getUserProfile(authUser.uid);
-        if (!existing?.username) {
-          setModalUsername(authUser.displayName || authUser.email || '');
-          setModalBio('');
-          setModalAvatarFile(null);
-          setError('');
-          setShowProfileModal(true);
-          return;
-        }
-        await upsertUserProfile({
-          uid: authUser.uid,
-          username:
-            existing.username || authUser.displayName || authUser.email || 'AnimeLegacy User',
-          bio: existing.bio || '',
-          avatarData: existing.avatarData || '',
-          email: authUser.email || '',
-          displayName:
-            existing.username || authUser.displayName || authUser.email || 'AnimeLegacy User',
+      if (!authUser?.uid) return;
+      const existing = await getUserProfile(authUser.uid);
+      if (!existing?.username) {
+        setProfileModal({
+          initialUsername: authUser.displayName || (authUser.email || '').split('@')[0] || '',
         });
+        return;
       }
+      await upsertUserProfile({
+        uid: authUser.uid,
+        username: existing.username,
+        bio: existing.bio || '',
+        avatarData: existing.avatarData || '',
+        email: authUser.email || '',
+        displayName: existing.username,
+      });
       router.push('/my-list');
     } catch (err) {
-      const message =
-        err?.code === 'auth/not-configured'
-          ? 'Sign-in is not configured. Add Firebase env vars to enable login.'
-          : formatAuthError(err);
-      setError(message);
+      setError(formatAuthError(err));
     }
   };
 
-  const handleEmailAuth = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setTouched({ email: true, password: true, confirm: true });
     setError('');
-    setTouched({ email: true, password: true, confirm: true, username: true });
-    if (mode === 'signup' && activeTab === 'account') {
-      if (!isFormValid) return;
-      setActiveTab('profile');
-      return;
-    }
     if (!isFormValid) return;
+    setSubmitting(true);
     try {
       if (mode === 'signup') {
         await signUpWithEmail(email, password);
-        const { auth } = getFirebaseClient();
-        if (auth?.currentUser) {
-          const claim = await claimUsername({
-            uid: auth.currentUser.uid,
-            username: username.trim(),
-          });
-          if (!claim.ok) {
-            setError('Username is already taken.');
-            try {
-              await deleteUser(auth.currentUser);
-            } catch {
-              await signOutUser();
-            }
-            return;
-          }
-          const avatarData = avatarFile ? await fileToDataUrl(avatarFile) : '';
-          await updateProfile(auth.currentUser, {
-            displayName: username.trim(),
-            photoURL: null,
-          });
-          await upsertUserProfile({
-            uid: auth.currentUser.uid,
-            username: username.trim(),
-            bio: bio.trim(),
-            avatarData,
-            email,
-            displayName: username.trim(),
-          });
-        }
+        setProfileModal({
+          initialUsername: email.split('@')[0] || '',
+        });
       } else {
         await signInWithEmail(email, password);
+        router.push('/my-list');
       }
-      router.push('/my-list');
     } catch (err) {
-      const message =
-        err?.code === 'auth/not-configured'
-          ? 'Sign-in is not configured. Add Firebase env vars to enable login.'
-          : formatAuthError(err);
-      setError(message);
+      setError(formatAuthError(err));
+      // If signup created a user but we failed later, make sure we clean up session
+      if (mode === 'signup') {
+        const { auth } = getFirebaseClient();
+        if (auth?.currentUser) {
+          try {
+            await deleteUser(auth.currentUser);
+          } catch {
+            await signOutUser();
+          }
+        }
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleCompleteProfile = async (event) => {
-    event.preventDefault();
-    setError('');
-    if (!modalUsername.trim()) {
-      setError('Username is required.');
-      return;
-    }
-    const { auth } = getFirebaseClient();
-    if (!auth?.currentUser) return;
-    try {
-      const claim = await claimUsername({
-        uid: auth.currentUser.uid,
-        username: modalUsername.trim(),
-      });
-      if (!claim.ok) {
-        setError('Username is already taken.');
-        return;
-      }
-      const existing = await getUserProfile(auth.currentUser.uid);
-      const avatarData = modalAvatarFile
-        ? await fileToDataUrl(modalAvatarFile)
-        : existing?.avatarData || '';
-      await updateProfile(auth.currentUser, {
-        displayName: modalUsername.trim(),
-        photoURL: null,
-      });
-      await upsertUserProfile({
-        uid: auth.currentUser.uid,
-        username: modalUsername.trim(),
-        bio: modalBio.trim(),
-        avatarData,
-        email: auth.currentUser.email || '',
-        displayName: modalUsername.trim(),
-      });
-      setShowProfileModal(false);
-      router.push('/my-list');
-    } catch (err) {
-      setError(err?.message || 'Unable to save profile.');
-    }
-  };
-
-  const signupAvatarPreview = useMemo(() => {
-    if (!avatarFile) return '';
-    return URL.createObjectURL(avatarFile);
-  }, [avatarFile]);
-
-  const modalAvatarPreview = useMemo(() => {
-    if (!modalAvatarFile) return '';
-    return URL.createObjectURL(modalAvatarFile);
-  }, [modalAvatarFile]);
-
-  useEffect(() => {
-    return () => {
-      if (signupAvatarPreview) URL.revokeObjectURL(signupAvatarPreview);
-    };
-  }, [signupAvatarPreview]);
-
-  useEffect(() => {
-    return () => {
-      if (modalAvatarPreview) URL.revokeObjectURL(modalAvatarPreview);
-    };
-  }, [modalAvatarPreview]);
-
-  return (
-    <Layout
-      showSidebar={false}
-      headerVariant="dark"
-      layoutVariant="dark"
-      title={`AnimeLegacy - ${title}`}
-      description={`${title} to manage your watchlist and keep your anime synced.`}
-    >
-      <main className={styles.main}>
-        <section className={styles.card}>
-          <div className={styles.eyebrow}>AnimeLegacy Access</div>
-          <h1 className={styles.title}>{title}</h1>
-          <p className={styles.subtitle}>{subtitle}</p>
-
-          {user ? (
+  // Already signed in — show a brief CTA
+  if (user && !profileModal) {
+    return (
+      <AuthShell title="AnimeLegacy · Welcome back">
+        <div className={styles.topBar} />
+        <div className={styles.formArea}>
+          <div className={styles.formWrap}>
+            <div className={styles.eyebrow}>ALREADY SIGNED IN</div>
+            <h2 className={styles.heading}>Welcome back.</h2>
             <div className={styles.signedIn}>
               <p>
-                You're already signed in as{' '}
+                You&apos;re signed in as{' '}
                 <strong>{user.displayName || user.email || 'AnimeLegacy User'}</strong>.
               </p>
-              <Link href="/my-list" legacyBehavior>
-                <a className={styles.primaryAction}>Go to My List</a>
+              <Link href="/my-list">
+                <Button variant="primary" size="md" fullWidth icon={ArrowRight}>
+                  Go to my list
+                </Button>
               </Link>
             </div>
-          ) : (
-            <>
-              <form className={styles.form} onSubmit={handleEmailAuth}>
-                {mode === 'signup' ? (
-                  <label className={styles.label}>
-                    Username
-                    <input
-                      className={`${styles.input} ${touched.username && usernameError ? styles.inputError : ''}`}
-                      type="text"
-                      value={username}
-                      onChange={(event) => setUsername(event.target.value)}
-                      onBlur={() => setTouched((prev) => ({ ...prev, username: true }))}
-                      placeholder="ZenithRunner"
-                      required
-                    />
-                    {touched.username && usernameError ? (
-                      <span className={styles.fieldError}>{usernameError}</span>
-                    ) : null}
-                  </label>
-                ) : null}
-                {mode !== 'signup' || activeTab === 'account' ? (
-                  <label className={styles.label}>
-                    Email
-                    <input
-                      className={`${styles.input} ${touched.email && emailError ? styles.inputError : ''}`}
-                      type="email"
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
-                      placeholder="you@example.com"
-                      required
-                    />
-                    {touched.email && emailError ? (
-                      <span className={styles.fieldError}>{emailError}</span>
-                    ) : null}
-                  </label>
-                ) : null}
-                {mode !== 'signup' || activeTab === 'account' ? (
-                  <label className={styles.label}>
-                    Password
-                    <input
-                      className={`${styles.input} ${touched.password && passwordError ? styles.inputError : ''}`}
-                      type="password"
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
-                      placeholder="********"
-                      required
-                      minLength={mode === 'signup' ? 8 : undefined}
-                    />
-                    {touched.password && passwordError ? (
-                      <span className={styles.fieldError}>{passwordError}</span>
-                    ) : null}
-                    {mode === 'signup' ? (
-                      <ul className={styles.ruleList}>
-                        {passwordRules.map((rule) => (
-                          <li
-                            key={rule.id}
-                            className={`${styles.ruleItem} ${rule.test(password) ? styles.rulePassed : ''}`}
-                          >
-                            {rule.label}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </label>
-                ) : null}
-                {mode === 'login' ? (
-                  <Link href="/forgot-password" legacyBehavior>
-                    <a className={styles.linkButton}>Forgot password?</a>
-                  </Link>
-                ) : null}
-                {mode === 'signup' && activeTab === 'account' ? (
-                  <label className={styles.label}>
-                    Confirm password
-                    <input
-                      className={`${styles.input} ${touched.confirm && confirmError ? styles.inputError : ''}`}
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(event) => setConfirmPassword(event.target.value)}
-                      onBlur={() => setTouched((prev) => ({ ...prev, confirm: true }))}
-                      placeholder="********"
-                      required
-                      minLength={8}
-                    />
-                    {touched.confirm && confirmError ? (
-                      <span className={styles.fieldError}>{confirmError}</span>
-                    ) : null}
-                  </label>
-                ) : null}
-                {mode === 'signup' && activeTab === 'profile' ? (
-                  <div className={styles.avatarCenter}>
-                    <div className={styles.avatarCircle}>
-                      {signupAvatarPreview ? (
-                        <img src={signupAvatarPreview} alt="Profile preview" />
-                      ) : (
-                        <i className={`bi bi-plus-lg ${styles.avatarIcon}`} aria-hidden="true" />
-                      )}
-                    </div>
-                  </div>
-                ) : null}
-                {mode === 'signup' && activeTab === 'profile' ? (
-                  <label className={styles.label}>
-                    Profile picture
-                    <div className={styles.fileRow}>
-                      <input
-                        className={styles.fileInput}
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => {
-                          const file = event.target.files?.[0] || null;
-                          setAvatarError('');
-                          if (file && file.size > MAX_AVATAR_SIZE) {
-                            setAvatarError('Avatar must be under 512KB.');
-                            setAvatarFile(null);
-                            return;
-                          }
-                          if (file && !file.type.startsWith('image/')) {
-                            setAvatarError('Avatar must be an image file.');
-                            setAvatarFile(null);
-                            return;
-                          }
-                          setAvatarFile(file);
-                        }}
-                      />
-                      <button
-                        className={styles.removeInline}
-                        type="button"
-                        onClick={() => setAvatarFile(null)}
-                        disabled={!avatarFile}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </label>
-                ) : null}
-                {mode === 'signup' && activeTab === 'profile' ? (
-                  <label className={styles.label}>
-                    Bio
-                    <textarea
-                      className={styles.textarea}
-                      value={bio}
-                      onChange={(event) => setBio(event.target.value)}
-                      placeholder="A quick line about your anime taste."
-                      rows={3}
-                    />
-                  </label>
-                ) : null}
-                {mode === 'signup' && activeTab === 'profile' && avatarError ? (
-                  <div className={styles.error}>{avatarError}</div>
-                ) : null}
-                <div className={styles.formActions}>
-                  {mode === 'signup' && activeTab === 'profile' ? (
-                    <button
-                      className={styles.secondaryAction}
-                      type="button"
-                      onClick={() => setActiveTab('account')}
-                    >
-                      Back
-                    </button>
-                  ) : null}
-                  <button className={styles.primaryAction} type="submit" disabled={authLoading}>
-                    {mode === 'signup'
-                      ? activeTab === 'account'
-                        ? 'Next'
-                        : 'Create account'
-                      : 'Login with email'}
-                  </button>
-                </div>
-              </form>
-              <div className={styles.divider}>or</div>
+            <div className={styles.altLink}>
+              <span>Not you?</span>
               <button
-                className={styles.primaryAction}
                 type="button"
-                onClick={handleGoogleSignIn}
-                disabled={authLoading}
+                onClick={signOutUser}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--al-primary-ink)',
+                  fontSize: 13,
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  padding: 0,
+                }}
               >
-                Continue with Google
+                Sign out
               </button>
-              {error ? <div className={styles.error}>{error}</div> : null}
-              <div className={styles.altLink}>
-                <span>Need the other page?</span>
-                <Link href={altHref} legacyBehavior>
-                  <a>{altLabel}</a>
-                </Link>
-              </div>
-            </>
-          )}
-        </section>
-        {showProfileModal ? (
-          <div className={styles.modalOverlay}>
-            <div
-              className={styles.modalCard}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Complete profile"
-            >
-              <div className={styles.modalHeader}>
-                <h2>Complete your profile</h2>
-                <p>Add a username and profile photo to finish setup.</p>
-              </div>
-              <form className={styles.form} onSubmit={handleCompleteProfile}>
-                <label className={styles.label}>
-                  Username
-                  <input
-                    className={styles.input}
-                    type="text"
-                    value={modalUsername}
-                    onChange={(event) => setModalUsername(event.target.value)}
-                    placeholder="ZenithRunner"
-                    required
-                  />
-                </label>
-                <div className={styles.avatarCenter}>
-                  <div className={styles.avatarCircle}>
-                    {modalAvatarPreview ? (
-                      <img src={modalAvatarPreview} alt="Profile preview" />
-                    ) : (
-                      <i className={`bi bi-plus-lg ${styles.avatarIcon}`} aria-hidden="true" />
-                    )}
-                  </div>
-                </div>
-                <label className={styles.label}>
-                  Profile picture
-                  <div className={styles.fileRow}>
-                    <input
-                      className={styles.fileInput}
-                      type="file"
-                      accept="image/*"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0] || null;
-                        setModalAvatarError('');
-                        if (file && file.size > MAX_AVATAR_SIZE) {
-                          setModalAvatarError('Avatar must be under 512KB.');
-                          setModalAvatarFile(null);
-                          return;
-                        }
-                        if (file && !file.type.startsWith('image/')) {
-                          setModalAvatarError('Avatar must be an image file.');
-                          setModalAvatarFile(null);
-                          return;
-                        }
-                        setModalAvatarFile(file);
-                      }}
-                    />
-                    <button
-                      className={styles.removeInline}
-                      type="button"
-                      onClick={() => setModalAvatarFile(null)}
-                      disabled={!modalAvatarFile}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </label>
-                <label className={styles.label}>
-                  Bio
-                  <textarea
-                    className={styles.textarea}
-                    value={modalBio}
-                    onChange={(event) => setModalBio(event.target.value)}
-                    placeholder="A quick line about your anime taste."
-                    rows={3}
-                  />
-                </label>
-                {modalAvatarError ? <div className={styles.error}>{modalAvatarError}</div> : null}
-                {error ? <div className={styles.error}>{error}</div> : null}
-                <div className={styles.formActions}>
-                  <button
-                    className={styles.secondaryAction}
-                    type="button"
-                    onClick={() => {
-                      setError('');
-                      setShowProfileModal(false);
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button className={styles.primaryAction} type="submit">
-                    Save profile
-                  </button>
-                </div>
-              </form>
             </div>
           </div>
-        ) : null}
-      </main>
-    </Layout>
-  );
-};
+        </div>
+      </AuthShell>
+    );
+  }
 
-export default AuthPage;
+  return (
+    <>
+      <AuthShell
+        title={mode === 'signin' ? 'AnimeLegacy · Sign in' : 'AnimeLegacy · Create account'}
+        description={
+          mode === 'signin'
+            ? 'Sign in to AnimeLegacy and keep your list in sync.'
+            : 'Create an AnimeLegacy account to start your chronicle.'
+        }
+      >
+        <div className={styles.topBar}>
+          <span className={styles.topBarText}>
+            {mode === 'signin' ? 'New to AnimeLegacy?' : 'Already have an account?'}
+          </span>
+          <Button variant="secondary" size="sm" onClick={toggleMode}>
+            {mode === 'signin' ? 'Create account' : 'Sign in'}
+          </Button>
+        </div>
+
+        <div className={styles.formArea}>
+          <div className={styles.formWrap}>
+            <div className={styles.eyebrow}>
+              {mode === 'signin' ? 'SIGN IN · WELCOME BACK' : 'CREATE ACCOUNT · START YOUR LIST'}
+            </div>
+            <h2 className={styles.heading}>
+              {mode === 'signin' ? 'Pick up where you left off.' : 'Start your chronicle.'}
+            </h2>
+            <p className={styles.subtitle}>
+              {mode === 'signin'
+                ? 'Your list, progress, favorites, and ratings — synced across every device.'
+                : 'A free account gives you a personal list, rating tools, and weekly seasonal recaps.'}
+            </p>
+
+            <button
+              type="button"
+              className={styles.googleBtn}
+              onClick={handleGoogle}
+              disabled={authLoading || submitting}
+            >
+              <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+                <path
+                  fill="#EA4335"
+                  d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                />
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className={styles.divider}>
+              <span className={styles.dividerLine} />
+              <span className={styles.dividerText}>OR WITH EMAIL</span>
+              <span className={styles.dividerLine} />
+            </div>
+
+            <form onSubmit={handleSubmit} noValidate>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="email">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  className={`${styles.input} ${touched.email && emailError ? styles.inputError : ''}`}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => setTouched((p) => ({ ...p, email: true }))}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                />
+                {touched.email && emailError ? (
+                  <span className={styles.fieldError}>{emailError}</span>
+                ) : null}
+              </div>
+
+              <div className={styles.field}>
+                <div className={styles.fieldHead}>
+                  <label className={styles.label} htmlFor="password">
+                    Password
+                  </label>
+                  {mode === 'signin' ? (
+                    <Link href="/forgot-password" className={styles.inlineLink}>
+                      Forgot?
+                    </Link>
+                  ) : null}
+                </div>
+                <div className={styles.inputWrap}>
+                  <input
+                    id="password"
+                    type={showPw ? 'text' : 'password'}
+                    className={`${styles.input} ${styles.passwordInput} ${
+                      touched.password && passwordError ? styles.inputError : ''
+                    }`}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onBlur={() => setTouched((p) => ({ ...p, password: true }))}
+                    placeholder={mode === 'signin' ? 'Enter your password' : 'At least 8 characters'}
+                    autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className={styles.inputToggle}
+                    onClick={() => setShowPw((v) => !v)}
+                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                  >
+                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {touched.password && passwordError ? (
+                  <span className={styles.fieldError}>{passwordError}</span>
+                ) : null}
+                {mode === 'signup' ? (
+                  <ul className={styles.ruleList}>
+                    {PASSWORD_RULES.map((rule) => (
+                      <li
+                        key={rule.id}
+                        className={`${styles.ruleItem} ${rule.test(password) ? styles.rulePassed : ''}`}
+                      >
+                        {rule.label}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+
+              {mode === 'signup' ? (
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="confirm">
+                    Confirm password
+                  </label>
+                  <input
+                    id="confirm"
+                    type="password"
+                    className={`${styles.input} ${
+                      touched.confirm && confirmError ? styles.inputError : ''
+                    }`}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onBlur={() => setTouched((p) => ({ ...p, confirm: true }))}
+                    placeholder="Repeat your password"
+                    autoComplete="new-password"
+                    required
+                  />
+                  {touched.confirm && confirmError ? (
+                    <span className={styles.fieldError}>{confirmError}</span>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className={styles.checkRow}>
+                <label className={styles.checkLabel}>
+                  <input
+                    type="checkbox"
+                    className={styles.checkbox}
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  {mode === 'signin' ? 'Remember me for 30 days' : 'Email me about new seasons'}
+                </label>
+              </div>
+
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                type="submit"
+                icon={mode === 'signin' ? ArrowRight : Sparkles}
+                disabled={submitting || authLoading}
+              >
+                {submitting
+                  ? mode === 'signin'
+                    ? 'Signing in…'
+                    : 'Creating account…'
+                  : mode === 'signin'
+                    ? 'Sign in'
+                    : 'Create account'}
+              </Button>
+
+              {error ? <div className={styles.error}>{error}</div> : null}
+
+              <div className={styles.legal}>
+                Your list, ratings, and progress are stored securely against your account.
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <footer className={styles.footer}>
+          <span>© {new Date().getFullYear()} AnimeLegacy</span>
+        </footer>
+      </AuthShell>
+
+      {profileModal ? (
+        <ProfileCompletionModal
+          initialUsername={profileModal.initialUsername}
+          onClose={() => {
+            setProfileModal(null);
+            setModalError('');
+          }}
+          onSubmit={saveProfile}
+          submitting={modalSubmitting}
+          error={modalError}
+        />
+      ) : null}
+    </>
+  );
+}
