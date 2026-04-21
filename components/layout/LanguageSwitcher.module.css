@@ -1,0 +1,112 @@
+.root {
+  position: relative;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--al-fg-2);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-2) var(--ease-standard);
+}
+
+.toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--al-fg-1);
+}
+
+.toggle[aria-expanded='true'] {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--al-fg-1);
+  border-color: var(--al-border-strong);
+}
+
+.flag {
+  width: 20px;
+  height: 14px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.caret {
+  color: var(--al-fg-3);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border-strong);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: var(--shadow-lg);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--al-fg-1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease-standard);
+  width: 100%;
+}
+
+.option:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.optionActive {
+  background: rgba(132, 217, 255, 0.12);
+  color: var(--al-primary-ink);
+  font-weight: 600;
+}
+
+.optionActive:hover {
+  background: rgba(132, 217, 255, 0.18);
+}
+
+@media (max-width: 768px) {
+  .label {
+    display: none;
+  }
+  .caret {
+    display: none;
+  }
+  .toggle {
+    padding: 0 8px;
+  }
+}
