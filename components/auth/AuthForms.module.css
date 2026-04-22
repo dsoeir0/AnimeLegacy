@@ -362,6 +362,21 @@
   text-decoration: underline;
 }
 
+.inlineTextButton {
+  background: transparent;
+  border: none;
+  color: var(--al-primary-ink);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.inlineTextButton:hover {
+  text-decoration: underline;
+}
+
 /* =========================== AVATAR =========================== */
 .avatarCenter {
   display: flex;

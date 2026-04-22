@@ -1181,3 +1181,73 @@
     font-size: 16px;
   }
 }
+
+/* =========================== DANGER ZONE =========================== */
+.dangerZone {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 106, 91, 0.25);
+  border-radius: var(--radius-md);
+  background: rgba(255, 106, 91, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dangerExpanded {
+  border-color: rgba(255, 106, 91, 0.45);
+  background: rgba(255, 106, 91, 0.08);
+}
+
+.dangerFallback {
+  border-color: var(--al-border-strong);
+  background: var(--al-ink-3);
+}
+
+.dangerHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.dangerIcon {
+  color: var(--al-danger);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.dangerTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  margin-bottom: 4px;
+}
+
+.dangerText {
+  font-size: 12.5px;
+  color: var(--al-fg-3);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.dangerInput {
+  background: var(--al-ink-1);
+  border: 1px solid rgba(255, 106, 91, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--al-fg-1);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+  letter-spacing: 0.04em;
+}
+
+.dangerInput:focus {
+  border-color: var(--al-danger);
+}
+
+.dangerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

@@ -1,60 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { collection, doc, getDoc, limit, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
 import { getFirebaseClient } from '../lib/firebase/client';
-import { isAiringAnime } from '../lib/utils/anime';
 import { getAnimeById } from '../lib/services/jikan';
 import { ensureAnimeCatalog } from '../lib/services/animeCatalog';
-
-const EPISODE_MINUTES = 24;
-
-const computeStats = (items) => {
-  const normalizeStatus = (item) =>
-    isAiringAnime(item) && item.status === 'completed' ? 'watching' : item.status;
-  const watchedCount = items.filter((item) => normalizeStatus(item) === 'completed').length;
-  const totalEpisodes = items.reduce((sum, item) => {
-    if (typeof item.progress === 'number') return sum + item.progress;
-    if (normalizeStatus(item) === 'completed' && typeof item.episodesTotal === 'number') {
-      return sum + item.episodesTotal;
-    }
-    return sum;
-  }, 0);
-  const daysSpent = (totalEpisodes * EPISODE_MINUTES) / 60 / 24;
-  const scored = items.filter((item) => typeof item.rating === 'number');
-  const myAvgScore = scored.length
-    ? scored.reduce((sum, item) => sum + item.rating, 0) / scored.length
-    : null;
-  const malScored = items.filter((item) => typeof item.malScore === 'number');
-  const malAvgScore = malScored.length
-    ? malScored.reduce((sum, item) => sum + item.malScore, 0) / malScored.length
-    : null;
-  const reviewCount = items.filter(
-    (item) => typeof item.review === 'string' && item.review.trim().length > 0,
-  ).length;
-
-  return {
-    watchedCount,
-    totalEpisodes,
-    daysSpent,
-    myAvgScore,
-    malAvgScore,
-    reviewCount,
-  };
-};
-
-const computeGenres = (items) => {
-  const tally = new Map();
-  items.forEach((item) => {
-    if (!Array.isArray(item.genres)) return;
-    item.genres.forEach((genre) => {
-      const key = String(genre);
-      tally.set(key, (tally.get(key) || 0) + 1);
-    });
-  });
-  return Array.from(tally.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([genre]) => genre);
-};
+import { computeGenres, computeStats } from '../lib/utils/profileStats';
 
 export default function useProfileData(uid) {
   const [profile, setProfile] = useState(null);
