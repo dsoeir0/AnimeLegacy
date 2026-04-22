@@ -10,7 +10,7 @@ import Button from '../components/ui/Button';
 import AddToListModal from '../components/modals/AddToListModal';
 import styles from './search.module.css';
 import useMyList from '../hooks/useMyList';
-import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
+import { dedupeByMalId, filterOutHentai, normalizeAnime } from '../lib/utils/anime';
 import { searchAnime, slimAnimeResponse } from '../lib/services/jikan';
 
 function Search({ query, page, results, pagination, t }) {
@@ -165,7 +165,9 @@ export async function getServerSideProps(context) {
   }
   try {
     const response = await searchAnime(query, page, 21);
-    const filtered = Array.isArray(response?.data) ? filterOutHentai(response.data) : [];
+    const filtered = Array.isArray(response?.data)
+      ? dedupeByMalId(filterOutHentai(response.data))
+      : [];
     const results = slimAnimeResponse({ data: filtered });
     const pagination = response?.pagination || {};
     return { props: { query, page, results, pagination } };

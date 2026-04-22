@@ -4,7 +4,7 @@ import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import PosterCard from '../../components/cards/PosterCard';
 import { getProducerById, getAnimeByProducer } from '../../lib/services/jikan';
-import { filterOutHentai } from '../../lib/utils/anime';
+import { dedupeByMalId, filterOutHentai } from '../../lib/utils/anime';
 import styles from './[id].module.css';
 
 const pickName = (producer) => {
@@ -124,7 +124,9 @@ export async function getServerSideProps(context) {
     getProducerById(id),
     getAnimeByProducer(id),
   ]);
-  const works = Array.isArray(worksRes?.data) ? filterOutHentai(worksRes.data) : [];
+  const works = Array.isArray(worksRes?.data)
+    ? dedupeByMalId(filterOutHentai(worksRes.data))
+    : [];
   return {
     props: {
       producer: producerRes?.data || null,

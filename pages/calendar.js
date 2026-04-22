@@ -2,7 +2,7 @@ import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import PosterCard from '../components/cards/PosterCard';
 import { getSchedules } from '../lib/services/jikan';
-import { filterOutHentai } from '../lib/utils/anime';
+import { dedupeByMalId, filterOutHentai } from '../lib/utils/anime';
 import styles from './calendar.module.css';
 
 const DAYS = [
@@ -85,7 +85,9 @@ export async function getServerSideProps() {
     const schedulesByDay = Object.fromEntries(
       entries.map(([key, res]) => [
         key,
-        Array.isArray(res?.data) ? filterOutHentai(res.data).slice(0, 18) : [],
+        Array.isArray(res?.data)
+          ? dedupeByMalId(filterOutHentai(res.data)).slice(0, 18)
+          : [],
       ]),
     );
     return { props: { schedulesByDay } };

@@ -11,7 +11,7 @@ import RatingDisplay from '../components/ui/RatingDisplay';
 import PosterCard from '../components/cards/PosterCard';
 import AddToListModal from '../components/modals/AddToListModal';
 import useMyList from '../hooks/useMyList';
-import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
+import { dedupeByMalId, filterOutHentai, normalizeAnime } from '../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
 import { getCurrentSeason, getTopAnimeMovies, slimAnimeResponse } from '../lib/services/jikan';
 import { getSeasonFromDate } from '../lib/utils/season';
@@ -439,11 +439,11 @@ export async function getServerSideProps() {
       getTopAnimeMovies(),
     ]);
     const currentFiltered = Array.isArray(currentRespostaRaw?.data)
-      ? filterOutHentai(currentRespostaRaw.data)
+      ? dedupeByMalId(filterOutHentai(currentRespostaRaw.data))
       : [];
     const currentResposta = slimAnimeResponse({ data: currentFiltered });
     const moviesFiltered = Array.isArray(moviesRespostaRaw?.data)
-      ? filterOutHentai(moviesRespostaRaw.data)
+      ? dedupeByMalId(filterOutHentai(moviesRespostaRaw.data))
       : [];
     const moviesResposta = slimAnimeResponse({ data: moviesFiltered });
 

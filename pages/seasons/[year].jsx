@@ -8,7 +8,7 @@ import IconButton from '../../components/ui/IconButton';
 import PosterCard from '../../components/cards/PosterCard';
 import styles from './[year].module.css';
 import useMyList from '../../hooks/useMyList';
-import { filterOutHentai } from '../../lib/utils/anime';
+import { dedupeByMalId, filterOutHentai } from '../../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
 import { getSeasonByYear } from '../../lib/services/jikan';
 
@@ -330,10 +330,10 @@ export async function getServerSideProps(context) {
     getSeasonByYear(year, 'summer'),
     getSeasonByYear(year, 'fall'),
   ]);
-  if (Array.isArray(winterResposta?.data)) winterResposta.data = filterOutHentai(winterResposta.data);
-  if (Array.isArray(springResposta?.data)) springResposta.data = filterOutHentai(springResposta.data);
-  if (Array.isArray(summerResposta?.data)) summerResposta.data = filterOutHentai(summerResposta.data);
-  if (Array.isArray(fallResposta?.data)) fallResposta.data = filterOutHentai(fallResposta.data);
+  if (Array.isArray(winterResposta?.data)) winterResposta.data = dedupeByMalId(filterOutHentai(winterResposta.data));
+  if (Array.isArray(springResposta?.data)) springResposta.data = dedupeByMalId(filterOutHentai(springResposta.data));
+  if (Array.isArray(summerResposta?.data)) summerResposta.data = dedupeByMalId(filterOutHentai(summerResposta.data));
+  if (Array.isArray(fallResposta?.data)) fallResposta.data = dedupeByMalId(filterOutHentai(fallResposta.data));
   const ids = [
     ...(winterResposta?.data || []).map((i) => i.mal_id),
     ...(springResposta?.data || []).map((i) => i.mal_id),
