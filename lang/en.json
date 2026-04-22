@@ -158,6 +158,7 @@
     "usernameTaken": "Username is already taken.",
     "avatarTooBig": "Avatar must be under {{size}}.",
     "avatarNotImage": "Avatar must be an image file.",
+    "avatarReadFailed": "Failed to read image file.",
     "saveFailed": "Unable to save profile.",
     "signInFailed": "Unable to sign in right now.",
     "notConfigured": "Sign-in is not configured. Add Firebase env vars to enable login.",
@@ -389,7 +390,25 @@
     "tba": "TBA",
     "unknownTitle": "Unknown title",
     "cv": "CV",
-    "roleLabel": "Role"
+    "roleLabel": "Role",
+    "notRated": "Not rated"
+  },
+  "movies": {
+    "metaTitle": "AnimeLegacy · Movies",
+    "metaDesc": "Cinematic anime films curated for your next watch night.",
+    "eyebrow": "MOVIES",
+    "title": "Cinematic anime, curated",
+    "subtitle": "The most celebrated anime films, from timeless classics to recent masterpieces.",
+    "fallbackType": "Movie",
+    "noRating": "NR",
+    "inMyList": "In my list",
+    "addToList": "Add to list",
+    "loginToAdd": "Login to add",
+    "edit": "Edit"
+  },
+  "card": {
+    "yourScore": "Your score",
+    "edit": "Edit"
   },
   "character": {
     "eyebrow": "CHARACTER PROFILE",

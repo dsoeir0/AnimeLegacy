@@ -27,7 +27,7 @@ import { formatSeasonLabel, getSeasonFromDate } from '../lib/utils/season';
 import { claimUsername, getUserProfile, upsertUserProfile } from '../lib/services/userProfile';
 import { getFirebaseClient } from '../lib/firebase/client';
 import { isAiringAnime } from '../lib/utils/anime';
-import { MAX_AVATAR_SIZE_BYTES, MAX_AVATAR_SIZE_LABEL } from '../lib/constants';
+import { FAVORITE_LIMIT, MAX_AVATAR_SIZE_BYTES, MAX_AVATAR_SIZE_LABEL } from '../lib/constants';
 import styles from './profile.module.css';
 
 const TABS = [
@@ -359,7 +359,7 @@ function ProfilePage({ t }) {
     event.preventDefault();
     if (!user?.uid) return;
     if (!editUsername.trim()) {
-      setEditError('Username is required.');
+      setEditError(t('errors.usernameRequired'));
       return;
     }
     setSaving(true);
@@ -373,7 +373,7 @@ function ProfilePage({ t }) {
           'Username check',
         );
         if (!claim.ok) {
-          setEditError('Username is already taken.');
+          setEditError(t('errors.usernameTaken'));
           setSaving(false);
           return;
         }
@@ -382,14 +382,14 @@ function ProfilePage({ t }) {
       if (removeAvatar) resolvedAvatar = '';
       if (editAvatarFile) {
         if (editAvatarFile.size > MAX_AVATAR_SIZE_BYTES) {
-          setEditError(`Avatar must be under ${MAX_AVATAR_SIZE_LABEL}.`);
+          setEditError(t('errors.avatarTooBig', { size: MAX_AVATAR_SIZE_LABEL }));
           setSaving(false);
           return;
         }
         const reader = new FileReader();
         resolvedAvatar = await new Promise((resolve, reject) => {
           reader.onload = () => resolve(reader.result);
-          reader.onerror = () => reject(new Error('Failed to read image file.'));
+          reader.onerror = () => reject(new Error(t('errors.avatarReadFailed')));
           reader.readAsDataURL(editAvatarFile);
         });
       }
@@ -411,7 +411,7 @@ function ProfilePage({ t }) {
       );
       setIsEditing(false);
     } catch (err) {
-      setEditError(err?.message || 'Unable to save profile.');
+      setEditError(err?.message || t('errors.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -676,8 +676,8 @@ function ProfilePage({ t }) {
                         />
                         <defs>
                           <linearGradient id="al-ring-grad" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0" stopColor="#6f83ff" />
-                            <stop offset="1" stopColor="#84d9ff" />
+                            <stop offset="0" stopColor="var(--al-primary-1)" />
+                            <stop offset="1" stopColor="var(--al-primary-2)" />
                           </linearGradient>
                         </defs>
                       </svg>
@@ -800,7 +800,7 @@ function ProfilePage({ t }) {
                             <span className={styles.kicker}>
                               {t('profile.favoritesRankedKicker', {
                                 n: favorites.length,
-                                limit: 10,
+                                limit: FAVORITE_LIMIT,
                               })}
                             </span>
                           </div>
@@ -854,7 +854,7 @@ function ProfilePage({ t }) {
                               <span className={styles.kicker}>
                                 {t('profile.favoritesCount', {
                                   n: favoriteCharacters.length,
-                                  limit: 10,
+                                  limit: FAVORITE_LIMIT,
                                 })}
                               </span>
                             </div>
@@ -900,7 +900,7 @@ function ProfilePage({ t }) {
                             <span className={styles.kicker}>
                               {t('profile.favoritesCount', {
                                 n: favorites.length,
-                                limit: 10,
+                                limit: FAVORITE_LIMIT,
                               })}
                             </span>
                           </div>
@@ -917,7 +917,7 @@ function ProfilePage({ t }) {
                             <span className={styles.kicker}>
                               {t('profile.favoritesCount', {
                                 n: favoriteCharacters.length,
-                                limit: 10,
+                                limit: FAVORITE_LIMIT,
                               })}
                             </span>
                           </div>

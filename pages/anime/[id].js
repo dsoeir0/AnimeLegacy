@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Plus, Check, Heart, BookOpen, ArrowLeft, ArrowRight, Pencil, Star } from 'lucide-react';
-import { translate } from 'react-switch-lang';
+import { translate, getLanguage } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import StatusBadge, { STATUS_META } from '../../components/ui/StatusBadge';
@@ -16,7 +16,9 @@ import { getAnimeById, getAnimeCharacters } from '../../lib/services/jikan';
 import { isHentaiAnime, isAiringAnime, normalizeAnime } from '../../lib/utils/anime';
 import { formatSeasonLabel } from '../../lib/utils/season';
 import { getAnimeBannerUrl, getAnimeImageUrl, getCharacterAvatarUrl } from '../../lib/utils/media';
+import { cleanSynopsis } from '../../lib/utils/synopsis';
 import useMyList from '../../hooks/useMyList';
+import useTranslatedSynopsis from '../../hooks/useTranslatedSynopsis';
 
 function AnimeDetail({ animeResposta, charactersResposta, t }) {
   const router = useRouter();
@@ -37,9 +39,24 @@ function AnimeDetail({ animeResposta, charactersResposta, t }) {
   const characters = Array.isArray(charactersResposta?.data) ? charactersResposta.data : [];
   const rank = data?.rank || null;
   const episodesCount = data?.episodes || 0;
-  const synopsisText = data.synopsis || t('anime.synopsisMissing');
-  const backgroundText = data?.background || '';
-  const ratingLabel = data?.rating || 'Not Rated';
+  const cleanedSynopsis = useMemo(() => cleanSynopsis(data.synopsis || ''), [data.synopsis]);
+  const cleanedBackground = useMemo(() => cleanSynopsis(data?.background || ''), [data?.background]);
+  const currentLang =
+    typeof getLanguage === 'function' ? getLanguage() : 'en';
+  const { text: translatedSynopsis } = useTranslatedSynopsis({
+    animeId: data?.mal_id,
+    sourceText: cleanedSynopsis,
+    lang: currentLang,
+  });
+  const { text: translatedBackground } = useTranslatedSynopsis({
+    animeId: data?.mal_id,
+    sourceText: cleanedBackground,
+    lang: currentLang,
+    cacheField: 'backgroundByLang',
+  });
+  const synopsisText = translatedSynopsis || t('anime.synopsisMissing');
+  const backgroundText = translatedBackground;
+  const ratingLabel = data?.rating || t('anime.notRated');
   const durationLabel = data?.duration || '—';
   const [showAllCharacters, setShowAllCharacters] = useState(false);
   const normalized = useMemo(() => normalizeAnime(data), [data]);

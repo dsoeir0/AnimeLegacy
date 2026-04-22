@@ -29,13 +29,18 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   padding: 14px;
-  animation: marquee 80s linear infinite;
+  animation: marquee 90s linear infinite;
   will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes marquee {
-  from { transform: translateY(0); }
-  to { transform: translateY(-50%); }
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -50%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .posterMarquee { animation: none; }
 }
 
 .posterTile {
@@ -44,11 +49,9 @@
   overflow: hidden;
   border: 1px solid var(--al-border);
   box-shadow: var(--shadow-md);
-  background: var(--al-ink-3);
-}
-
-.posterTileOffset {
-  transform: translateY(20px);
+  background:
+    linear-gradient(135deg, var(--al-ink-3), var(--al-ink-4)),
+    var(--al-ink-3);
 }
 
 .posterTile img {
@@ -108,11 +111,11 @@
   letter-spacing: -0.03em;
   line-height: 1.05;
   margin: 0;
-  color: #fff;
+  color: var(--al-fg-1);
 }
 
 .headlineGradient {
-  background: linear-gradient(135deg, #6f83ff 0%, #84d9ff 100%);
+  background: var(--al-primary-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

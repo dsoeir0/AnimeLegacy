@@ -1,13 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, MoreHorizontal } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import StatusBadge from '../ui/StatusBadge';
 import RatingDisplay from '../ui/RatingDisplay';
 import IconButton from '../ui/IconButton';
 import { toCardShape } from '../../lib/utils/cardShape';
 import styles from './HorizontalRow.module.css';
 
-export default function HorizontalRow({ anime, media, entry, onClick, onEdit, href }) {
+function HorizontalRow({ anime, media, entry, onClick, onEdit, href, t }) {
   const card = toCardShape(anime, media);
   if (!card) return null;
   const total = entry?.episodesTotal ?? entry?.total ?? card.episodes ?? 0;
@@ -60,7 +61,7 @@ export default function HorizontalRow({ anime, media, entry, onClick, onEdit, hr
       <div className={styles.right}>
         {entry && score > 0 ? (
           <div className={styles.yourScore}>
-            <div className={styles.eyebrow}>Your score</div>
+            <div className={styles.eyebrow}>{t('card.yourScore')}</div>
             <div className={styles.yourScoreNum}>{score}</div>
           </div>
         ) : null}
@@ -68,7 +69,7 @@ export default function HorizontalRow({ anime, media, entry, onClick, onEdit, hr
         {onEdit ? (
           <IconButton
             icon={MoreHorizontal}
-            tooltip="Edit"
+            tooltip={t('card.edit')}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -89,3 +90,5 @@ export default function HorizontalRow({ anime, media, entry, onClick, onEdit, hr
   }
   return inner;
 }
+
+export default translate(HorizontalRow);

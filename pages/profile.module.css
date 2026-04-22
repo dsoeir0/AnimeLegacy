@@ -55,7 +55,7 @@
 }
 
 .stripAvatar span {
-  color: #060709;
+  color: var(--al-ink-0);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 26px;
@@ -140,11 +140,11 @@
 }
 
 .kpi_warm .kpiAccent {
-  background: linear-gradient(180deg, var(--al-warm), #b8834a);
+  background: var(--al-warm);
 }
 
 .kpi_green .kpiAccent {
-  background: linear-gradient(180deg, var(--al-success), #2a8a5d);
+  background: var(--al-success);
 }
 
 .kpiLabel {
@@ -985,7 +985,7 @@
 }
 
 .modalAvatarCircle span {
-  color: #060709;
+  color: var(--al-ink-0);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 30px;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import AddToListModal from '../components/modals/AddToListModal';
 import styles from './movies.module.css';
@@ -10,7 +11,7 @@ import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
 import { getTopAnimeMovies } from '../lib/services/jikan';
 import { getAnimeImageUrl } from '../lib/utils/media';
 
-export default function Movies({ moviesResposta, aniListMap }) {
+function Movies({ moviesResposta, aniListMap, t }) {
   const movieData = Array.isArray(moviesResposta?.data) ? moviesResposta.data : [];
   const { addItem, isInList, getEntry, canEdit, favoritesCount } = useMyList();
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -41,17 +42,15 @@ export default function Movies({ moviesResposta, aniListMap }) {
       showSidebar={false}
       headerVariant="dark"
       layoutVariant="dark"
-      title="AnimeLegacy - Movies"
-      description="Cinematic anime films curated for your next watch night."
+      title={t('movies.metaTitle')}
+      description={t('movies.metaDesc')}
     >
       <main className={styles.main}>
         <section className={styles.header}>
           <div>
-            <div className={styles.eyebrow}>Movies</div>
-            <h1 className={styles.title}>Cinematic anime, curated</h1>
-            <p className={styles.subtitle}>
-              The most celebrated anime films, from timeless classics to recent masterpieces.
-            </p>
+            <div className={styles.eyebrow}>{t('movies.eyebrow')}</div>
+            <h1 className={styles.title}>{t('movies.title')}</h1>
+            <p className={styles.subtitle}>{t('movies.subtitle')}</p>
           </div>
         </section>
         <section className={styles.grid}>
@@ -75,25 +74,25 @@ export default function Movies({ moviesResposta, aniListMap }) {
                         fill
                         sizes="220px"
                       />
-                      <span className={styles.score}>{movie.score || 'NR'}</span>
+                      <span className={styles.score}>{movie.score || t('movies.noRating')}</span>
                     </div>
                     <div className={styles.info}>
                       <div className={styles.cardTitle}>{movie.title}</div>
                       <div className={styles.meta}>
                         <span>{movie.year || movie.aired?.prop?.from?.year || '-'}</span>
-                        <span>{movie.duration || 'Movie'}</span>
+                        <span>{movie.duration || t('movies.fallbackType')}</span>
                       </div>
                     </div>
                   </a>
                 </Link>
                 {!canEdit ? (
                   <button className={styles.listButton} type="button" disabled>
-                    Login to Add
+                    {t('movies.loginToAdd')}
                   </button>
                 ) : normalized && isInList(normalized.id) ? (
                   <div className={styles.listActions}>
                     <Link href="/my-list" legacyBehavior>
-                      <a className={`${styles.listButton} ${styles.listLink}`}>In My List</a>
+                      <a className={`${styles.listButton} ${styles.listLink}`}>{t('movies.inMyList')}</a>
                     </Link>
                     <button
                       className={`${styles.listButton} ${styles.editButton}`}
@@ -101,7 +100,7 @@ export default function Movies({ moviesResposta, aniListMap }) {
                       onClick={() => openAddModal(normalized, getEntry(normalized.id))}
                     >
                       <i className={`bi bi-pencil ${styles.editIcon}`} aria-hidden="true" />
-                      Edit
+                      {t('movies.edit')}
                     </button>
                   </div>
                 ) : (
@@ -110,7 +109,7 @@ export default function Movies({ moviesResposta, aniListMap }) {
                     type="button"
                     onClick={() => openAddModal(normalized)}
                   >
-                    Add to List
+                    {t('movies.addToList')}
                   </button>
                 )}
               </div>
@@ -134,6 +133,8 @@ export default function Movies({ moviesResposta, aniListMap }) {
     </Layout>
   );
 }
+
+export default translate(Movies);
 
 export async function getServerSideProps() {
   const moviesResposta = await getTopAnimeMovies();

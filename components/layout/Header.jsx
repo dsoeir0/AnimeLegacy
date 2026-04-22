@@ -183,11 +183,11 @@ function Header({ variant = 'default', t }) {
                   <div className={styles.searchMeta}>
                     <div className={styles.searchTitle}>{item.title}</div>
                     <div className={styles.searchSub}>
-                      <span>{item.type || 'Anime'}</span>
+                      <span>{item.type || t('header.breadcrumb.anime')}</span>
                       <span>·</span>
                       <span>{item.year || item?.aired?.prop?.from?.year || '—'}</span>
                       <span>·</span>
-                      <span>{item.score ? `★ ${item.score}` : 'NR'}</span>
+                      <span>{item.score ? `★ ${item.score}` : t('movies.noRating')}</span>
                     </div>
                   </div>
                 </Link>

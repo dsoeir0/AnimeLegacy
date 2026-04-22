@@ -158,6 +158,7 @@
     "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
     "avatarTooBig": "L'avatar doit être inférieur à {{size}}.",
     "avatarNotImage": "L'avatar doit être un fichier image.",
+    "avatarReadFailed": "Impossible de lire le fichier image.",
     "saveFailed": "Impossible d'enregistrer le profil.",
     "signInFailed": "Connexion impossible pour le moment.",
     "notConfigured": "La connexion n'est pas configurée. Ajoutez les variables d'environnement Firebase pour l'activer.",
@@ -203,7 +204,7 @@
     "continueOngoing": "En cours",
     "continueEpisodes": "{{progress}} / {{total}} épisodes",
     "continueEpisodesUnknown": "{{progress}} / ? épisodes",
-    "editorialEyebrow": "DISPATCH · {{season}} {{year}}",
+    "editorialEyebrow": "CHRONIQUE · {{season}} {{year}}",
     "editorialTitle": "Anime lent, enjeux sérieux.",
     "editorialBody": "Une petite liste de lectures pour la saison — des titres qui échangent le spectacle contre la patience, et la retenue qui fait que le reste atterrit plus fort.",
     "curatedEyebrow": "SÉLECTION",
@@ -389,7 +390,25 @@
     "tba": "À annoncer",
     "unknownTitle": "Titre inconnu",
     "cv": "VO",
-    "roleLabel": "Rôle"
+    "roleLabel": "Rôle",
+    "notRated": "Non noté"
+  },
+  "movies": {
+    "metaTitle": "AnimeLegacy · Films",
+    "metaDesc": "Films d'anime cinématographiques pour votre prochaine soirée cinéma.",
+    "eyebrow": "FILMS",
+    "title": "Anime cinématographique, sélectionné",
+    "subtitle": "Les films d'anime les plus célèbres, des classiques intemporels aux chefs-d'œuvre récents.",
+    "fallbackType": "Film",
+    "noRating": "NN",
+    "inMyList": "Dans ma liste",
+    "addToList": "Ajouter à la liste",
+    "loginToAdd": "Connectez-vous pour ajouter",
+    "edit": "Modifier"
+  },
+  "card": {
+    "yourScore": "Votre note",
+    "edit": "Modifier"
   },
   "character": {
     "eyebrow": "PROFIL DU PERSONNAGE",
