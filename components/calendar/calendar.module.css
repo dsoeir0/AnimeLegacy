@@ -1,0 +1,58 @@
+.cell {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--al-ink-3);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: transform var(--dur-2) var(--ease-standard);
+}
+
+.cell:hover {
+  transform: translateY(-2px);
+}
+
+.cellPoster {
+  object-fit: cover;
+}
+
+.cellGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.92) 100%);
+  pointer-events: none;
+}
+
+.cellMeta {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+}
+
+.cellTime {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--al-primary-ink);
+  letter-spacing: 0.02em;
+  margin-bottom: 3px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.cellTitle {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
