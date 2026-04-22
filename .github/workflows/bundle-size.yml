@@ -1,0 +1,176 @@
+name: Bundle size
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: bundle-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    name: Report bundle size
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pull-requests: write
+      contents: read
+
+    # CI env vars copied from lint-and-build so `next build` succeeds without
+    # real Firebase credentials. These are placeholders; the build never
+    # actually talks to Firebase during static analysis.
+    env:
+      NEXT_PUBLIC_FIREBASE_API_KEY: ci-placeholder
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ci.firebaseapp.com
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ci-project
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ci.appspot.com
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '000000000000'
+      NEXT_PUBLIC_FIREBASE_APP_ID: '1:000000000000:web:placeholder'
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install (PR)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (PR)
+        run: pnpm build 2>&1 | tee /tmp/pr-build.log
+
+      - name: Parse PR sizes
+        run: node scripts/bundle-report.cjs < /tmp/pr-build.log > /tmp/pr-sizes.json
+
+      - name: Checkout base
+        run: |
+          git fetch origin ${{ github.base_ref }}:base-ref --depth=1
+          git checkout base-ref -- .
+          # Restore scripts/bundle-report.cjs from the PR — the base branch
+          # may not have it yet, and we need it to parse the base build.
+          git checkout ${{ github.sha }} -- scripts/bundle-report.cjs
+
+      - name: Install (base)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (base)
+        run: pnpm build 2>&1 | tee /tmp/base-build.log
+        continue-on-error: true
+
+      - name: Parse base sizes
+        run: node scripts/bundle-report.cjs < /tmp/base-build.log > /tmp/base-sizes.json
+        continue-on-error: true
+
+      - name: Render diff as PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            const readJson = (path) => {
+              try {
+                return JSON.parse(fs.readFileSync(path, 'utf8'));
+              } catch {
+                return {};
+              }
+            };
+
+            const pr = readJson('/tmp/pr-sizes.json');
+            const base = readJson('/tmp/base-sizes.json');
+
+            const fmt = (bytes) => {
+              if (bytes === null || bytes === undefined) return '—';
+              if (bytes === 0) return '0 B';
+              if (bytes < 1024) return `${bytes} B`;
+              const kb = bytes / 1024;
+              return kb < 10 ? `${kb.toFixed(2)} kB` : `${kb.toFixed(1)} kB`;
+            };
+
+            const delta = (cur, prev) => {
+              if (prev === undefined || prev === null) return { text: '🆕 new', bad: false };
+              if (cur === prev) return { text: '—', bad: false };
+              const diff = cur - prev;
+              const sign = diff > 0 ? '+' : '';
+              const pct = prev > 0 ? (diff / prev) * 100 : 0;
+              const pctText = `${sign}${pct.toFixed(1)}%`;
+              let emoji = '';
+              if (pct >= 10) emoji = ' 🔴';
+              else if (pct >= 2) emoji = ' 🟡';
+              else if (pct <= -2) emoji = ' 🟢';
+              return {
+                text: `${sign}${fmt(Math.abs(diff) * (diff >= 0 ? 1 : -1))} (${pctText})${emoji}`,
+                bad: pct >= 2,
+              };
+            };
+
+            const routes = Array.from(new Set([...Object.keys(pr), ...Object.keys(base)])).sort();
+            if (routes.length === 0) {
+              core.setFailed('No routes parsed from the build output — check the bundle-report.cjs parser.');
+              return;
+            }
+
+            const rows = routes.map((r) => {
+              const cur = pr[r];
+              const prev = base[r];
+              if (!cur) {
+                return `| \`${r}\` | — | — | ❌ removed |`;
+              }
+              const d = delta(cur.firstLoad, prev?.firstLoad);
+              return `| \`${r}\` | ${fmt(cur.size)} | ${fmt(cur.firstLoad)} | ${d.text} |`;
+            });
+
+            const anyBad = routes.some((r) => {
+              const cur = pr[r];
+              const prev = base[r];
+              if (!cur || !prev) return false;
+              return delta(cur.firstLoad, prev.firstLoad).bad;
+            });
+
+            const header = `<!-- bundle-size-report -->
+## 📦 Bundle size
+
+${anyBad ? '⚠️ One or more routes grew by more than 2%. Review the table below and remove heavy imports or split chunks where possible.' : '✅ No significant regressions.'}
+
+| Route | Size | First Load JS | Δ vs \`${context.payload.pull_request.base.ref}\` |
+|-------|------|---------------|----|
+${rows.join('\n')}
+
+<sub>Generated by \`.github/workflows/bundle-size.yml\`. Sizes are uncompressed. The delta column uses First Load JS as the signal — that's what the browser actually downloads for the first paint of each page.</sub>`;
+
+            // Upsert: find a previous bot comment with our marker and edit it,
+            // otherwise create a new one. Keeps the PR clean on every push.
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const marker = '<!-- bundle-size-report -->';
+            const existing = comments.find((c) => c.user?.type === 'Bot' && c.body?.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: header,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: header,
+              });
+            }
