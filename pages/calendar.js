@@ -105,21 +105,26 @@ export default translate(CalendarPage);
 
 // Reduce to the fields we actually render — keeps the SSR props payload
 // small and avoids shipping Jikan's entire schedule row to the browser.
+//
+// Every field is coalesced to `null` on miss: Next.js's SSR serialiser
+// rejects `undefined` with a 500 ("cannot be serialized as JSON"), which
+// surfaces as "Error serializing `.image`" etc. Jikan's schedule response
+// also doesn't include a top-level `image` field (only `images.*`), so we
+// drop it entirely and let getAnimeImageUrl pick from the `images.*` tree.
 const pickScheduleFields = (item) => ({
-  mal_id: item?.mal_id,
-  title: item?.title,
-  image: item?.image,
+  mal_id: item?.mal_id ?? null,
+  title: item?.title ?? null,
   images: {
     webp: {
-      image_url: item?.images?.webp?.image_url,
-      large_image_url: item?.images?.webp?.large_image_url,
+      image_url: item?.images?.webp?.image_url ?? null,
+      large_image_url: item?.images?.webp?.large_image_url ?? null,
     },
     jpg: {
-      image_url: item?.images?.jpg?.image_url,
-      large_image_url: item?.images?.jpg?.large_image_url,
+      image_url: item?.images?.jpg?.image_url ?? null,
+      large_image_url: item?.images?.jpg?.large_image_url ?? null,
     },
   },
-  broadcast: item?.broadcast ? { time: item.broadcast.time } : null,
+  broadcast: item?.broadcast?.time ? { time: item.broadcast.time } : null,
 });
 
 export async function getServerSideProps() {
