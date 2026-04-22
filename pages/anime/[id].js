@@ -12,23 +12,29 @@ import RatingDisplay from '../../components/ui/RatingDisplay';
 import AddToListModal from '../../components/modals/AddToListModal';
 import RatingReviewModal from '../../components/modals/RatingReviewModal';
 import styles from './[id].module.css';
+import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
 import { getAnimeById, getAnimeCharacters } from '../../lib/services/jikan';
 import { isHentaiAnime, isAiringAnime, normalizeAnime } from '../../lib/utils/anime';
 import { formatSeasonLabel } from '../../lib/utils/season';
 import { getAnimeBannerUrl, getAnimeImageUrl, getCharacterAvatarUrl } from '../../lib/utils/media';
 import { cleanSynopsis } from '../../lib/utils/synopsis';
 import useMyList from '../../hooks/useMyList';
-import useTranslatedSynopsis from '../../hooks/useTranslatedSynopsis';
+import useTranslatedText from '../../hooks/useTranslatedText';
 
-function AnimeDetail({ animeResposta, charactersResposta, t }) {
+function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
   const router = useRouter();
   const data = animeResposta?.data ?? {};
   const genres = Array.isArray(data.genres)
     ? data.genres.filter((genre) => genre?.name !== 'Hentai').map((g) => g.name)
     : [];
   const producers = Array.isArray(data.producers) ? data.producers : [];
-  const posterUrl = getAnimeImageUrl(data) || '/logo_no_text.png';
-  const backdropUrl = getAnimeBannerUrl(data) || posterUrl;
+  const posterUrl = getAnimeImageUrl(data, aniListMedia) || '/logo_no_text.png';
+  // AniList sometimes has a proper 1920x400 landscape banner. When it doesn't,
+  // `getAnimeBannerUrl` falls back to the vertical poster — which looks awful
+  // when stretched to fill a wide hero. Track which case we're in so the CSS
+  // can apply a heavy blur as a cinematic mask on the fallback path.
+  const hasLandscapeBanner = Boolean(aniListMedia?.bannerImage);
+  const backdropUrl = getAnimeBannerUrl(data, aniListMedia) || posterUrl;
   const trailerUrl = data?.trailer?.embed_url || '';
   const seasonLabel = formatSeasonLabel(data?.season, data?.year);
   const studioName =
@@ -43,16 +49,19 @@ function AnimeDetail({ animeResposta, charactersResposta, t }) {
   const cleanedBackground = useMemo(() => cleanSynopsis(data?.background || ''), [data?.background]);
   const currentLang =
     typeof getLanguage === 'function' ? getLanguage() : 'en';
-  const { text: translatedSynopsis } = useTranslatedSynopsis({
-    animeId: data?.mal_id,
+  const { text: translatedSynopsis } = useTranslatedText({
+    docId: data?.mal_id,
     sourceText: cleanedSynopsis,
     lang: currentLang,
+    cacheField: 'synopsisByLang',
+    cacheCollection: 'anime',
   });
-  const { text: translatedBackground } = useTranslatedSynopsis({
-    animeId: data?.mal_id,
+  const { text: translatedBackground } = useTranslatedText({
+    docId: data?.mal_id,
     sourceText: cleanedBackground,
     lang: currentLang,
     cacheField: 'backgroundByLang',
+    cacheCollection: 'anime',
   });
   const synopsisText = translatedSynopsis || t('anime.synopsisMissing');
   const backgroundText = translatedBackground;
@@ -129,9 +138,8 @@ function AnimeDetail({ animeResposta, charactersResposta, t }) {
             alt=""
             fill
             sizes="100vw"
-            className={styles.heroImage}
-            priority
-
+            className={`${styles.heroImage} ${hasLandscapeBanner ? '' : styles.heroImageBlurred}`}
+            quality={90}
           />
           <div className={styles.heroGradient} />
           <button type="button" className={styles.backBtn} onClick={() => router.back()}>
@@ -148,8 +156,10 @@ function AnimeDetail({ animeResposta, charactersResposta, t }) {
                 alt={data.title || 'Poster'}
                 width={280}
                 height={400}
+                sizes="280px"
+                quality={90}
+                priority
                 className={styles.poster}
-
               />
             </div>
 
@@ -318,8 +328,9 @@ function AnimeDetail({ animeResposta, charactersResposta, t }) {
                               alt={entry?.character?.name || 'Character'}
                               width={60}
                               height={84}
+                              sizes="60px"
+                              quality={85}
                               className={styles.castAvatar}
-
                             />
                             <div className={styles.castMeta}>
                               <div className={styles.castName}>{entry?.character?.name || t('status.unknown')}</div>
@@ -336,8 +347,9 @@ function AnimeDetail({ animeResposta, charactersResposta, t }) {
                               alt={actor.person.name}
                               width={44}
                               height={44}
+                              sizes="44px"
+                              quality={85}
                               className={styles.castVAImg}
-
                             />
                           ) : null}
                         </div>
@@ -515,5 +527,11 @@ export async function getServerSideProps(context) {
   if (isHentaiAnime(animeResposta?.data)) {
     return { notFound: true };
   }
-  return { props: { animeResposta, charactersResposta } };
+  // Pull AniList cover + banner URLs separately. AniList has proper 1920x400
+  // landscape banner images that Jikan doesn't expose — without this the hero
+  // on /anime/[id] was stretching the vertical poster to fill the wide space
+  // and looking blurry. Cached at 6h per MAL ID.
+  const aniListMap = await fetchAniListMediaByMalIds([Number(id)]);
+  const aniListMedia = aniListMap[id] || null;
+  return { props: { animeResposta, charactersResposta, aniListMedia } };
 }

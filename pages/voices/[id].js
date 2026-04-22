@@ -2,9 +2,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { translate } from 'react-switch-lang';
+import { translate, getLanguage } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
+import useTranslatedText from '../../hooks/useTranslatedText';
 import { getPersonById, getPersonAnime, getPersonVoices } from '../../lib/services/jikan';
 import styles from './[id].module.css';
 
@@ -26,6 +27,19 @@ const characterImage = (character) =>
 function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
   const [showAllAnime, setShowAllAnime] = useState(false);
   const [showAllRoles, setShowAllRoles] = useState(false);
+
+  // Hook calls before any early return — rules of hooks. We feed empty
+  // fallbacks when there's no person so the hook becomes a no-op.
+  const currentLang =
+    typeof getLanguage === 'function' ? getLanguage() : 'en';
+  const { text: translatedAbout } = useTranslatedText({
+    docId: person?.mal_id,
+    sourceText: person?.about || '',
+    lang: currentLang,
+    cacheField: 'biographyByLang',
+    cacheCollection: 'people',
+  });
+
   if (!person) {
     return (
       <Layout title="AnimeLegacy · Voice actor">
@@ -43,7 +57,7 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
   }
 
   const imageUrl = personImage(person);
-  const aboutLines = (person.about || '')
+  const aboutLines = (translatedAbout || person.about || '')
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
@@ -150,6 +164,8 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
                     alt={entry?.character?.name || 'Character'}
                     width={60}
                     height={60}
+                    sizes="60px"
+                    quality={85}
                     className={styles.roleAvatar}
                   />
                   <div className={styles.roleMeta}>

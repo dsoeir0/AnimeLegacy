@@ -14,6 +14,16 @@
   object-position: center 30%;
 }
 
+/* Cinematic fallback when no real landscape bannerImage is available —
+   the vertical poster would otherwise stretch to ~2.5x and look blurry.
+   The blur both masks the upscaling artefacts and gives the hero a
+   moody ambient quality. Scale slightly so the blurred edges don't
+   reveal the crop. */
+.heroImageBlurred {
+  filter: blur(24px) saturate(1.2) brightness(0.65);
+  transform: scale(1.08);
+}
+
 .heroGradient {
   position: absolute;
   inset: 0;

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ArrowRight } from 'lucide-react';
-import { translate } from 'react-switch-lang';
+import { translate, getLanguage } from 'react-switch-lang';
 import {
   collection,
   deleteDoc,
@@ -16,6 +16,7 @@ import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import styles from './[id].module.css';
 import useAuth from '../../hooks/useAuth';
+import useTranslatedText from '../../hooks/useTranslatedText';
 import {
   getCharacterAnime,
   getCharacterById,
@@ -75,7 +76,20 @@ function CharacterPage({
     });
   }, [voicesRaw]);
   const imageUrl = getCharacterImageUrl(character) || '/logo_no_text.png';
-  const biography = buildBio(character?.about || '');
+  // Translate the raw `about` string first (single round-trip to MyMemory
+  // regardless of how many paragraphs), then split into lines for render.
+  // Structured fields like "Gender: Male" / "Age: 24" survive translation
+  // cleanly because the labels are recognisable in any language.
+  const currentLang =
+    typeof getLanguage === 'function' ? getLanguage() : 'en';
+  const { text: translatedAbout } = useTranslatedText({
+    docId: character?.mal_id,
+    sourceText: character?.about || '',
+    lang: currentLang,
+    cacheField: 'biographyByLang',
+    cacheCollection: 'characters',
+  });
+  const biography = buildBio(translatedAbout || character?.about || '');
   const [showAllAppearances, setShowAllAppearances] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteError, setFavoriteError] = useState('');

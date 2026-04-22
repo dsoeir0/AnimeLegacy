@@ -6,6 +6,21 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // Catalogue-style caches for translated biographies. Mirror the anime/{id}
+    // pattern: anyone can read (so anonymous visitors see previously-translated
+    // text), only authenticated users can write (so they contribute to the
+    // shared cache after their first view). Used by the `useTranslatedText`
+    // hook with cacheCollection = 'characters' | 'people'.
+    match /characters/{characterId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /people/{personId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     match /characterStats/{characterId} {
       allow read: if true;
       allow write: if request.auth != null
