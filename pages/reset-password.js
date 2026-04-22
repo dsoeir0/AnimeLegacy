@@ -2,13 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import AuthShell from '../components/auth/AuthShell';
 import Button from '../components/ui/Button';
 import useAuth from '../hooks/useAuth';
 import { PASSWORD_RULES, findPasswordRuleError } from '../lib/constants';
 import styles from '../components/auth/AuthForms.module.css';
 
-export default function ResetPasswordPage() {
+function ResetPasswordPage({ t }) {
   const router = useRouter();
   const { user, loading: authLoading, verifyResetCode, confirmResetPassword } = useAuth();
   const [password, setPassword] = useState('');
@@ -24,11 +25,11 @@ export default function ResetPasswordPage() {
     return typeof router.query.oobCode === 'string' ? router.query.oobCode : '';
   }, [router.isReady, router.query.oobCode]);
 
-  const passwordError = findPasswordRuleError(password);
+  const passwordError = findPasswordRuleError(password) ? t('errors.passwordRulesFailed') : '';
   const confirmError = !confirmPassword
-    ? 'Please confirm your password.'
+    ? t('errors.confirmRequired')
     : confirmPassword !== password
-      ? 'Passwords do not match.'
+      ? t('errors.passwordsMismatch')
       : '';
   const isFormValid = !passwordError && !confirmError;
 
@@ -43,14 +44,14 @@ export default function ResetPasswordPage() {
       .catch((err) => {
         setError(
           err?.code === 'auth/invalid-action-code'
-            ? 'This reset link is invalid or has expired.'
+            ? t('errors.invalidResetLink')
             : err?.code === 'auth/not-configured'
-              ? 'Password reset is not configured. Add Firebase env vars to enable it.'
-              : 'Unable to verify reset link.',
+              ? t('errors.resetNotConfigured')
+              : t('errors.resetFailed'),
         );
         setStatus('error');
       });
-  }, [oobCode, status, verifyResetCode]);
+  }, [oobCode, status, verifyResetCode, t]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -64,12 +65,12 @@ export default function ResetPasswordPage() {
     } catch (err) {
       setError(
         err?.code === 'auth/weak-password'
-          ? 'Password is too weak.'
+          ? t('errors.weakPassword')
           : err?.code === 'auth/invalid-action-code'
-            ? 'This reset link is invalid or has expired.'
+            ? t('errors.invalidResetLink')
             : err?.code === 'auth/not-configured'
-              ? 'Password reset is not configured. Add Firebase env vars to enable it.'
-              : 'Unable to reset password.',
+              ? t('errors.resetNotConfigured')
+              : t('errors.resetFailed'),
       );
       setStatus('error');
     }
@@ -80,27 +81,27 @@ export default function ResetPasswordPage() {
       return (
         <div className={styles.signedIn}>
           <p>
-            You&apos;re already signed in as{' '}
+            {t('profile.signedInAs')}{' '}
             <strong>{user.displayName || user.email || 'AnimeLegacy User'}</strong>.
           </p>
           <Link href="/my-list">
             <Button variant="primary" size="md" fullWidth>
-              Go to my list
+              {t('actions.goToMyList')}
             </Button>
           </Link>
         </div>
       );
     }
     if (status === 'verifying') {
-      return <p className={styles.subtitle}>Verifying your reset link…</p>;
+      return <p className={styles.subtitle}>{t('errors.verifyingLink')}</p>;
     }
     if (status === 'success') {
       return (
         <>
-          <div className={styles.success}>Password updated. Redirecting to sign in…</div>
+          <div className={styles.success}>{t('auth.resetSuccess')}</div>
           <div className={styles.altLink}>
-            <span>Not redirected?</span>
-            <Link href="/sign-in">Go to sign in</Link>
+            <span>{t('auth.notRedirected')}</span>
+            <Link href="/sign-in">{t('auth.goToSignIn')}</Link>
           </div>
         </>
       );
@@ -108,12 +109,10 @@ export default function ResetPasswordPage() {
     if (status === 'error' && !oobCode) {
       return (
         <>
-          <div className={styles.error}>
-            Missing reset code. Request a new reset link below.
-          </div>
+          <div className={styles.error}>{t('errors.missingResetCode')}</div>
           <Link href="/forgot-password">
             <Button variant="primary" size="md" fullWidth>
-              Request a new link
+              {t('actions.requestNewLink')}
             </Button>
           </Link>
         </>
@@ -125,7 +124,7 @@ export default function ResetPasswordPage() {
           {error ? <div className={styles.error}>{error}</div> : null}
           <div className={styles.field}>
             <label className={styles.label} htmlFor="password">
-              New password
+              {t('forms.newPassword')}
             </label>
             <div className={styles.inputWrap}>
               <input
@@ -137,7 +136,7 @@ export default function ResetPasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onBlur={() => setTouched((p) => ({ ...p, password: true }))}
-                placeholder="At least 8 characters"
+                placeholder={t('forms.passwordPlaceholderNew')}
                 autoComplete="new-password"
                 required
               />
@@ -145,7 +144,7 @@ export default function ResetPasswordPage() {
                 type="button"
                 className={styles.inputToggle}
                 onClick={() => setShowPw((v) => !v)}
-                aria-label={showPw ? 'Hide password' : 'Show password'}
+                aria-label={showPw ? t('actions.hidePassword') : t('actions.showPassword')}
               >
                 {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -159,14 +158,14 @@ export default function ResetPasswordPage() {
                   key={rule.id}
                   className={`${styles.ruleItem} ${rule.test(password) ? styles.rulePassed : ''}`}
                 >
-                  {rule.label}
+                  {t(`passwordRules.${rule.id}`)}
                 </li>
               ))}
             </ul>
           </div>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="confirm">
-              Confirm password
+              {t('forms.confirmPassword')}
             </label>
             <input
               id="confirm"
@@ -175,7 +174,7 @@ export default function ResetPasswordPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               onBlur={() => setTouched((p) => ({ ...p, confirm: true }))}
-              placeholder="Repeat your password"
+              placeholder={t('forms.passwordPlaceholderRepeat')}
               autoComplete="new-password"
               required
             />
@@ -184,7 +183,7 @@ export default function ResetPasswordPage() {
             ) : null}
           </div>
           <Button variant="primary" size="lg" fullWidth type="submit" icon={ArrowRight} disabled={authLoading}>
-            Update password
+            {t('actions.updatePassword')}
           </Button>
         </form>
       );
@@ -196,22 +195,24 @@ export default function ResetPasswordPage() {
     <AuthShell title="AnimeLegacy · Set new password" description="Set a new password for your AnimeLegacy account.">
       <div className={styles.topBar}>
         <Link href="/sign-in" className={styles.backLink}>
-          <ArrowLeft size={14} /> Back to sign in
+          <ArrowLeft size={14} /> {t('actions.backToSignIn')}
         </Link>
       </div>
       <div className={styles.formArea}>
         <div className={styles.formWrap}>
-          <div className={styles.eyebrow}>ACCOUNT RECOVERY</div>
-          <h2 className={styles.heading}>Set a new password.</h2>
+          <div className={styles.eyebrow}>{t('auth.recoveryEyebrow')}</div>
+          <h2 className={styles.heading}>{t('auth.resetTitle')}</h2>
           <p className={styles.subtitle}>
-            {email ? `Resetting password for ${email}.` : 'Choose a new password for your account.'}
+            {email ? t('auth.resetBodyFor', { email }) : t('auth.resetBodyDefault')}
           </p>
           {renderBody()}
         </div>
       </div>
       <footer className={styles.footer}>
-        <span>© {new Date().getFullYear()} AnimeLegacy</span>
+        <span>{t('auth.footerCopy', { year: new Date().getFullYear() })}</span>
       </footer>
     </AuthShell>
   );
 }
+
+export default translate(ResetPasswordPage);

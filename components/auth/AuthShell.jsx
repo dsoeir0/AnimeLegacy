@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { translate } from 'react-switch-lang';
 import Logo from '../ui/Logo';
 import styles from './AuthShell.module.css';
 
@@ -21,7 +22,7 @@ const POSTER_URLS = [
   'https://cdn.myanimelist.net/images/anime/1422/136957.jpg',
 ];
 
-export default function AuthShell({ title = 'AnimeLegacy · Access', description = 'Sign in to AnimeLegacy.', children }) {
+function AuthShell({ title = 'AnimeLegacy · Access', description = 'Sign in to AnimeLegacy.', children, t }) {
   const posters = [...POSTER_URLS, ...POSTER_URLS];
   return (
     <>
@@ -52,14 +53,13 @@ export default function AuthShell({ title = 'AnimeLegacy · Access', description
           </header>
 
           <div className={styles.leftCopy}>
-            <div className={styles.eyebrow}>EVERY TITLE · EVERY EPISODE · EVERY SEASON</div>
+            <div className={styles.eyebrow}>{t('auth.heroEyebrow')}</div>
             <h1 className={styles.headline}>
-              Your <span className={styles.headlineGradient}>anime chronicle</span>, kept faithfully.
+              {t('auth.heroLeadStart')}{' '}
+              <span className={styles.headlineGradient}>{t('auth.heroLeadEmphasis')}</span>
+              {t('auth.heroLeadEnd')}
             </h1>
-            <p className={styles.leftBody}>
-              Track what you&apos;re watching, what you loved, and what&apos;s next — with the care
-              a serious catalogue deserves.
-            </p>
+            <p className={styles.leftBody}>{t('auth.heroBody')}</p>
           </div>
         </aside>
 
@@ -68,3 +68,5 @@ export default function AuthShell({ title = 'AnimeLegacy · Access', description
     </>
   );
 }
+
+export default translate(AuthShell);

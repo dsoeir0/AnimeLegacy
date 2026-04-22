@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import IconButton from '../../components/ui/IconButton';
 import { getTopCharacters } from '../../lib/services/jikan';
@@ -12,29 +13,27 @@ const posterFrom = (character) =>
   character?.images?.jpg?.image_url ||
   '/logo_no_text.png';
 
-export default function CharactersIndexPage({ items, pagination, page }) {
+function CharactersIndexPage({ items, pagination, page, t }) {
   const router = useRouter();
   const lastPage = pagination?.last_visible_page || 1;
   const go = (p) => router.push({ pathname: '/characters', query: { page: p } });
 
   return (
-    <Layout title="AnimeLegacy · Characters" description="Browse the most popular anime characters by fan favorites.">
+    <Layout title={t('characters.metaTitle')} description={t('characters.metaDesc')}>
       <div className={styles.page}>
         <header className={styles.head}>
-          <div className={styles.eyebrow}>CATALOGUE</div>
+          <div className={styles.eyebrow}>{t('characters.eyebrow')}</div>
           <h1 className={styles.heading}>
-            Top <span className={styles.highlight}>characters</span>
+            {t('characters.titleStart')}{' '}
+            <span className={styles.highlight}>{t('characters.titleEnd')}</span>
           </h1>
-          <p className={styles.subtitle}>
-            The most favorited characters across every anime ever catalogued. Click for bios,
-            appearances, and voice actors.
-          </p>
+          <p className={styles.subtitle}>{t('characters.subtitle')}</p>
         </header>
 
         {items.length === 0 ? (
           <div className={styles.empty}>
-            <h2>No data available</h2>
-            <p>The Jikan API is not responding. Try again in a moment.</p>
+            <h2>{t('characters.emptyTitle')}</h2>
+            <p>{t('characters.emptyBody')}</p>
           </div>
         ) : (
           <div className={styles.grid}>
@@ -51,18 +50,14 @@ export default function CharactersIndexPage({ items, pagination, page }) {
                   <div className={styles.posterGradient} />
                   {typeof c.favorites === 'number' ? (
                     <div className={styles.favBadge}>
-                      <span className={styles.favNum}>
-                        {c.favorites.toLocaleString()}
-                      </span>
-                      <span className={styles.favLabel}>fans</span>
+                      <span className={styles.favNum}>{c.favorites.toLocaleString()}</span>
+                      <span className={styles.favLabel}>{t('characters.fans')}</span>
                     </div>
                   ) : null}
                 </div>
                 <div className={styles.meta}>
-                  <div className={styles.name}>{c.name || 'Unknown'}</div>
-                  {c.name_kanji ? (
-                    <div className={styles.kanji}>{c.name_kanji}</div>
-                  ) : null}
+                  <div className={styles.name}>{c.name || t('status.unknown')}</div>
+                  {c.name_kanji ? <div className={styles.kanji}>{c.name_kanji}</div> : null}
                 </div>
               </Link>
             ))}
@@ -73,7 +68,7 @@ export default function CharactersIndexPage({ items, pagination, page }) {
           <div className={styles.pagination}>
             <IconButton
               icon={ChevronLeft}
-              tooltip="Previous page"
+              tooltip={t('actions.previousPage')}
               disabled={page === 1}
               onClick={() => go(Math.max(1, page - 1))}
             />
@@ -99,7 +94,7 @@ export default function CharactersIndexPage({ items, pagination, page }) {
             ) : null}
             <IconButton
               icon={ChevronRight}
-              tooltip="Next page"
+              tooltip={t('actions.nextPage')}
               disabled={page === lastPage}
               onClick={() => go(Math.min(lastPage, page + 1))}
             />
@@ -109,6 +104,8 @@ export default function CharactersIndexPage({ items, pagination, page }) {
     </Layout>
   );
 }
+
+export default translate(CharactersIndexPage);
 
 export async function getServerSideProps(context) {
   const page = Math.max(1, Number.parseInt(context.query?.page, 10) || 1);

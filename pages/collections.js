@@ -1,17 +1,21 @@
+import { translate } from 'react-switch-lang';
 import ComingSoon from '../components/ui/ComingSoon';
 
-export default function CollectionsPage() {
+function CollectionsPage({ t }) {
   return (
     <ComingSoon
-      eyebrow="CURATED · ROADMAP"
-      title="Collections are coming."
-      description="Hand-picked editorial lists — seasons worth revisiting, underrated gems, director retrospectives. Not auto-generated."
+      eyebrow={t('comingSoon.collections.eyebrow')}
+      title={t('comingSoon.collections.title')}
+      description={t('comingSoon.collections.body')}
       bullets={[
-        'Short themed runs of 5–15 titles',
-        'Editorial notes on why each entry belongs',
-        'Save any collection to your list in one click',
+        t('comingSoon.collections.bullet1'),
+        t('comingSoon.collections.bullet2'),
+        t('comingSoon.collections.bullet3'),
       ]}
-      metaDescription="Curated anime collections — coming soon to AnimeLegacy."
+      primaryLabel={t('comingSoon.backHome')}
+      metaDescription={t('comingSoon.collections.meta')}
     />
   );
 }
+
+export default translate(CollectionsPage);

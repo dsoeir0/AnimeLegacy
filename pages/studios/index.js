@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import IconButton from '../../components/ui/IconButton';
 import { getProducers } from '../../lib/services/jikan';
@@ -21,29 +22,26 @@ const studioInitials = (name) =>
     .map((w) => w[0]?.toUpperCase() || '')
     .join('');
 
-export default function StudiosIndexPage({ items, pagination, page }) {
+function StudiosIndexPage({ items, pagination, page, t }) {
   const router = useRouter();
   const lastPage = pagination?.last_visible_page || 1;
   const go = (p) => router.push({ pathname: '/studios', query: { page: p } });
 
   return (
-    <Layout title="AnimeLegacy · Studios" description="Browse the studios behind your favorite anime.">
+    <Layout title={t('studios.metaTitle')} description={t('studios.metaDesc')}>
       <div className={styles.page}>
         <header className={styles.head}>
-          <div className={styles.eyebrow}>CATALOGUE</div>
+          <div className={styles.eyebrow}>{t('studios.eyebrow')}</div>
           <h1 className={styles.heading}>
-            Anime <span className={styles.highlight}>studios</span>
+            {t('studios.titleStart')} <span className={styles.highlight}>{t('studios.titleEnd')}</span>
           </h1>
-          <p className={styles.subtitle}>
-            Every animation house catalogued — ranked by fan favorites. Click through for their
-            signature works.
-          </p>
+          <p className={styles.subtitle}>{t('studios.subtitle')}</p>
         </header>
 
         {items.length === 0 ? (
           <div className={styles.empty}>
-            <h2>No data available</h2>
-            <p>The Jikan API is not responding. Try again in a moment.</p>
+            <h2>{t('studios.emptyTitle')}</h2>
+            <p>{t('studios.emptyBody')}</p>
           </div>
         ) : (
           <div className={styles.grid}>
@@ -55,12 +53,18 @@ export default function StudiosIndexPage({ items, pagination, page }) {
                   <div className={styles.body}>
                     <div className={styles.name}>{name}</div>
                     <div className={styles.meta}>
-                      <span>{s.count || 0} titles</span>
+                      <span>{t('studios.titlesCount', { n: s.count || 0 })}</span>
                       <span className={styles.dot} />
-                      <span>{typeof s.favorites === 'number' ? s.favorites.toLocaleString() : 0} fans</span>
+                      <span>
+                        {t('studios.fansCount', {
+                          n: typeof s.favorites === 'number' ? s.favorites.toLocaleString() : 0,
+                        })}
+                      </span>
                     </div>
                     {s.established ? (
-                      <div className={styles.est}>Est. {new Date(s.established).getFullYear()}</div>
+                      <div className={styles.est}>
+                        {t('studios.established', { year: new Date(s.established).getFullYear() })}
+                      </div>
                     ) : null}
                   </div>
                 </Link>
@@ -73,7 +77,7 @@ export default function StudiosIndexPage({ items, pagination, page }) {
           <div className={styles.pagination}>
             <IconButton
               icon={ChevronLeft}
-              tooltip="Previous page"
+              tooltip={t('actions.previousPage')}
               disabled={page === 1}
               onClick={() => go(Math.max(1, page - 1))}
             />
@@ -99,7 +103,7 @@ export default function StudiosIndexPage({ items, pagination, page }) {
             ) : null}
             <IconButton
               icon={ChevronRight}
-              tooltip="Next page"
+              tooltip={t('actions.nextPage')}
               disabled={page === lastPage}
               onClick={() => go(Math.min(lastPage, page + 1))}
             />
@@ -109,6 +113,8 @@ export default function StudiosIndexPage({ items, pagination, page }) {
     </Layout>
   );
 }
+
+export default translate(StudiosIndexPage);
 
 export async function getServerSideProps(context) {
   const page = Math.max(1, Number.parseInt(context.query?.page, 10) || 1);

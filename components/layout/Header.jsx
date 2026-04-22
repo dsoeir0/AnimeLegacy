@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { Search, Bell, Sparkles, ArrowLeft } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import { filterOutHentai } from '../../lib/utils/anime';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
@@ -11,35 +12,30 @@ import LanguageSwitcher from './LanguageSwitcher';
 import styles from './Header.module.css';
 
 const BREADCRUMBS = [
-  { pattern: /^\/$/, label: 'Home' },
-  { pattern: /^\/seasons/, label: 'Seasons' },
-  { pattern: /^\/my-list/, label: 'My list' },
-  { pattern: /^\/profile/, label: 'Profile' },
-  { pattern: /^\/search/, label: 'Discover' },
-  { pattern: /^\/anime\//, label: 'Anime' },
-  { pattern: /^\/characters\/[^/]+/, label: 'Character' },
-  { pattern: /^\/characters$/, label: 'Characters' },
-  { pattern: /^\/voices\/[^/]+/, label: 'Voice actor' },
-  { pattern: /^\/voices$/, label: 'Voice actors' },
-  { pattern: /^\/studios\/[^/]+/, label: 'Studio' },
-  { pattern: /^\/studios$/, label: 'Studios' },
-  { pattern: /^\/calendar/, label: 'Calendar' },
-  { pattern: /^\/collections/, label: 'Collections' },
-  { pattern: /^\/compare/, label: 'Compare' },
-  { pattern: /^\/movies/, label: 'Movies' },
-  { pattern: /^\/sign-in/, label: 'Sign in' },
-  { pattern: /^\/sign-up/, label: 'Sign up' },
+  { pattern: /^\/$/, key: 'home' },
+  { pattern: /^\/seasons/, key: 'seasons' },
+  { pattern: /^\/my-list/, key: 'myList' },
+  { pattern: /^\/profile/, key: 'profile' },
+  { pattern: /^\/search/, key: 'search' },
+  { pattern: /^\/anime\//, key: 'anime' },
+  { pattern: /^\/characters\/[^/]+/, key: 'character' },
+  { pattern: /^\/characters$/, key: 'characters' },
+  { pattern: /^\/voices\/[^/]+/, key: 'voiceActor' },
+  { pattern: /^\/voices$/, key: 'voiceActors' },
+  { pattern: /^\/studios\/[^/]+/, key: 'studio' },
+  { pattern: /^\/studios$/, key: 'studios' },
+  { pattern: /^\/calendar/, key: 'calendar' },
+  { pattern: /^\/collections/, key: 'collections' },
+  { pattern: /^\/compare/, key: 'compare' },
+  { pattern: /^\/movies/, key: 'movies' },
+  { pattern: /^\/sign-in/, key: 'signIn' },
+  { pattern: /^\/sign-up/, key: 'signUp' },
 ];
-
-const getBreadcrumb = (path) => {
-  const match = BREADCRUMBS.find((b) => b.pattern.test(path));
-  return match?.label || 'AnimeLegacy';
-};
 
 const BACK_PATHS = [/^\/anime\//, /^\/characters\/[^/]+/, /^\/voices\/[^/]+/, /^\/studios\/[^/]+/];
 const shouldShowBack = (path) => BACK_PATHS.some((p) => p.test(path));
 
-export default function Header({ variant = 'default' }) {
+function Header({ variant = 'default', t }) {
   const router = useRouter();
   const path = router.asPath.split('?')[0];
   const [query, setQuery] = useState('');
@@ -119,14 +115,15 @@ export default function Header({ variant = 'default' }) {
     };
   }, [isProfileOpen]);
 
-  const breadcrumb = getBreadcrumb(path);
+  const breadcrumbMatch = BREADCRUMBS.find((b) => b.pattern.test(path));
+  const breadcrumb = breadcrumbMatch ? t(`header.breadcrumb.${breadcrumbMatch.key}`) : 'AnimeLegacy';
   const showBack = shouldShowBack(path);
 
   return (
     <header className={`${styles.header} ${variant === 'dark' ? styles.dark : ''}`}>
       <div className={styles.left}>
         {showBack ? (
-          <IconButton icon={ArrowLeft} tooltip="Back" onClick={() => router.back()} />
+          <IconButton icon={ArrowLeft} tooltip={t('header.back')} onClick={() => router.back()} />
         ) : null}
         <div className={styles.eyebrow}>{breadcrumb}</div>
       </div>
@@ -136,8 +133,8 @@ export default function Header({ variant = 'default' }) {
         <input
           className={styles.searchInput}
           type="search"
-          placeholder="Search anime, characters, studios…"
-          aria-label="Search anime"
+          placeholder={t('header.searchPlaceholder')}
+          aria-label={t('header.searchPlaceholder')}
           role="combobox"
           aria-expanded={isOpen}
           aria-controls={searchResultsId}
@@ -164,9 +161,9 @@ export default function Header({ variant = 'default' }) {
         {isOpen ? (
           <div className={styles.searchResults} role="listbox" id={searchResultsId}>
             {isLoading ? (
-              <div className={styles.searchEmpty}>Searching…</div>
+              <div className={styles.searchEmpty}>{t('header.searching')}</div>
             ) : results.length === 0 ? (
-              <div className={styles.searchEmpty}>No matches found.</div>
+              <div className={styles.searchEmpty}>{t('header.noResults')}</div>
             ) : (
               results.map((item) => (
                 <Link
@@ -203,8 +200,8 @@ export default function Header({ variant = 'default' }) {
       <div className={styles.right}>
         <LanguageSwitcher />
         <div className={styles.divider} />
-        <IconButton icon={Sparkles} tooltip="What's new" />
-        <IconButton icon={Bell} tooltip="Notifications" />
+        <IconButton icon={Sparkles} tooltip={t('header.whatsNew')} />
+        <IconButton icon={Bell} tooltip={t('header.notifications')} />
         <div className={styles.divider} />
         <div className={styles.profile} ref={profileRef}>
           <button
@@ -238,14 +235,14 @@ export default function Header({ variant = 'default' }) {
                     className={styles.profileItem}
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    Profile
+                    {t('header.menu.profile')}
                   </Link>
                   <Link
                     href="/my-list"
                     className={styles.profileItem}
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    My List
+                    {t('header.menu.myList')}
                   </Link>
                   <button
                     className={styles.profileItem}
@@ -255,7 +252,7 @@ export default function Header({ variant = 'default' }) {
                       setIsProfileOpen(false);
                     }}
                   >
-                    Sign out
+                    {t('header.menu.signOut')}
                   </button>
                 </>
               ) : (
@@ -265,14 +262,14 @@ export default function Header({ variant = 'default' }) {
                     className={styles.profileItem}
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    Sign in
+                    {t('header.menu.signIn')}
                   </Link>
                   <Link
                     href="/sign-up"
                     className={styles.profileItem}
                     onClick={() => setIsProfileOpen(false)}
                   >
-                    Sign up
+                    {t('header.menu.signUp')}
                   </Link>
                 </>
               )}
@@ -283,3 +280,5 @@ export default function Header({ variant = 'default' }) {
     </header>
   );
 }
+
+export default translate(Header);

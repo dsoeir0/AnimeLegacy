@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, ChevronDown, Minus, Plus, Star, X } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import { isAiringAnime } from '../../lib/utils/anime';
 import { getSeasonFromDate } from '../../lib/utils/season';
-import { FAVORITE_LIMIT, FAVORITE_LIMIT_MESSAGE } from '../../lib/constants';
+import { FAVORITE_LIMIT } from '../../lib/constants';
 import styles from '../../styles/add-to-list.module.css';
 
 const statusOptions = [
-  { value: 'plan', label: 'Plan to Watch' },
-  { value: 'watching', label: 'Currently Watching' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'on_hold', label: 'On Hold' },
-  { value: 'dropped', label: 'Dropped' },
+  { value: 'plan', labelKey: 'modal.addToList.statusPlan' },
+  { value: 'watching', labelKey: 'modal.addToList.statusWatching' },
+  { value: 'completed', labelKey: 'modal.addToList.statusCompleted' },
+  { value: 'on_hold', labelKey: 'modal.addToList.statusOnHold' },
+  { value: 'dropped', labelKey: 'modal.addToList.statusDropped' },
 ];
 
 const clamp = (value, min, max) => {
@@ -19,7 +20,7 @@ const clamp = (value, min, max) => {
   return Math.max(value, min);
 };
 
-export default function AddToListModal({
+function AddToListModal({
   open,
   anime,
   onClose,
@@ -30,6 +31,7 @@ export default function AddToListModal({
   initialFavorite,
   favoriteCount = 0,
   isEditing = false,
+  t,
 }) {
   const isAiring = useMemo(() => {
     if (typeof airingOverride === 'boolean') return airingOverride;
@@ -118,15 +120,21 @@ export default function AddToListModal({
       <div className={styles.modal}>
         <div className={styles.header}>
           <div className={styles.titleBlock}>
-            <div className={styles.eyebrow}>{isEditing ? 'Edit Entry' : 'Add to List'}</div>
+            <div className={styles.eyebrow}>
+              {isEditing ? t('modal.addToList.titleEdit') : t('modal.addToList.titleAdd')}
+            </div>
             <h2 className={styles.title}>{anime?.title || 'Untitled'}</h2>
             <div className={styles.metaRow}>
-              <span>{anime?.type || 'Series'}</span>
+              <span>{anime?.type || t('modal.addToList.typeFallback')}</span>
               <span>•</span>
-              <span>{totalEpisodes ? `${totalEpisodes} eps` : 'Ongoing'}</span>
+              <span>
+                {totalEpisodes
+                  ? t('modal.addToList.episodesShort', { n: totalEpisodes })
+                  : t('modal.addToList.ongoing')}
+              </span>
             </div>
           </div>
-          <button className={styles.closeButton} type="button" onClick={onClose} aria-label="Close">
+          <button className={styles.closeButton} type="button" onClick={onClose} aria-label={t('actions.close')}>
             <X size={16} aria-hidden="true" />
           </button>
         </div>
@@ -143,14 +151,17 @@ export default function AddToListModal({
             <div
               className={`${styles.badge} ${isCompleted ? styles.badgeCompleted : ''}`}
             >
-              {statusOptions.find((option) => option.value === status)?.label}
+              {(() => {
+                const opt = statusOptions.find((option) => option.value === status);
+                return opt ? t(opt.labelKey) : '';
+              })()}
             </div>
           </div>
 
           <div className={styles.fields}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="status-select">
-                Current status
+                {t('modal.addToList.currentStatus')}
               </label>
               <div className={styles.selectRoot} ref={statusRootRef}>
                 <button
@@ -161,7 +172,10 @@ export default function AddToListModal({
                   aria-expanded={statusOpen}
                   onClick={() => setStatusOpen((prev) => !prev)}
                 >
-                  {statusOptions.find((option) => option.value === status)?.label}
+                  {(() => {
+                    const opt = statusOptions.find((option) => option.value === status);
+                    return opt ? t(opt.labelKey) : '';
+                  })()}
                   <ChevronDown size={14} className={styles.selectCaretIcon} aria-hidden="true" />
                 </button>
                 {statusOpen ? (
@@ -176,9 +190,7 @@ export default function AddToListModal({
                         aria-disabled={isDisabled}
                         onClick={() => {
                           if (isDisabled) {
-                            setAiringCompletionWarning(
-                              'This title is still airing, so it cannot be marked as Completed yet.',
-                            );
+                            setAiringCompletionWarning(t('modal.addToList.airingWarning'));
                             setStatusOpen(false);
                             return;
                           }
@@ -190,7 +202,7 @@ export default function AddToListModal({
                           setStatusOpen(false);
                         }}
                       >
-                        {option.label}
+                        {t(option.labelKey)}
                       </button>
                       );
                     })}
@@ -200,10 +212,7 @@ export default function AddToListModal({
               {airingCompletionWarning || shouldWarnAiringCompletion ? (
                 <div className={styles.warning} role="status" aria-live="polite">
                   <AlertTriangle size={14} className={styles.warningIcon} aria-hidden="true" />
-                  <span>
-                    {airingCompletionWarning ||
-                      'This title is still airing, so it cannot be marked as Completed yet.'}
-                  </span>
+                  <span>{airingCompletionWarning || t('modal.addToList.airingWarning')}</span>
                 </div>
               ) : null}
             </div>
@@ -211,14 +220,14 @@ export default function AddToListModal({
             {status === 'plan' ? null : (
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="progress-input">
-                  Episodes watched
+                  {t('modal.addToList.episodesWatched')}
                 </label>
                 <div className={styles.progressRow}>
                   <button
                     type="button"
                     className={styles.stepButton}
                     onClick={() => setProgress((prev) => clamp(prev - 1, 0, maxProgress))}
-                    aria-label="Decrease episodes watched"
+                    aria-label={t('modal.addToList.decreaseEp')}
                   >
                     <Minus size={14} aria-hidden="true" />
                   </button>
@@ -238,12 +247,14 @@ export default function AddToListModal({
                     type="button"
                     className={styles.stepButton}
                     onClick={() => setProgress((prev) => clamp(prev + 1, 0, maxProgress))}
-                    aria-label="Increase episodes watched"
+                    aria-label={t('modal.addToList.increaseEp')}
                   >
                     <Plus size={14} aria-hidden="true" />
                   </button>
                   <span className={styles.progressMeta}>
-                    {totalEpisodes ? `of ${totalEpisodes}` : 'of ?'}
+                    {totalEpisodes
+                      ? t('modal.addToList.progressOf', { n: totalEpisodes })
+                      : t('modal.addToList.progressUnknown')}
                   </span>
                 </div>
                 {totalEpisodes ? (
@@ -256,14 +267,14 @@ export default function AddToListModal({
                 ) : null}
                 <p className={styles.helper}>
                   {totalEpisodes
-                    ? 'Progress is capped by total episodes.'
-                    : 'Total episodes unknown. You can update this later.'}
+                    ? t('modal.addToList.progressHelperKnown')
+                    : t('modal.addToList.progressHelperUnknown')}
                 </p>
               </div>
             )}
             {status === 'completed' ? (
               <div className={styles.field}>
-                <label className={styles.label}>Favorite</label>
+                <label className={styles.label}>{t('modal.addToList.favoriteLabel')}</label>
                 <button
                   type="button"
                   className={`${styles.favoriteToggle} ${isFavorite ? styles.favoriteToggleActive : ''}`}
@@ -278,10 +289,16 @@ export default function AddToListModal({
                     strokeWidth={1.75}
                     aria-hidden="true"
                   />
-                  <span>{isFavorite ? 'Marked as favorite' : 'Mark as favorite'}</span>
+                  <span>
+                    {isFavorite
+                      ? t('modal.addToList.favoriteMarked')
+                      : t('modal.addToList.favoriteMark')}
+                  </span>
                 </button>
                 <p className={styles.helper}>
-                  {favoriteLimitReached ? FAVORITE_LIMIT_MESSAGE : 'Favorites appear on your profile.'}
+                  {favoriteLimitReached
+                    ? t('errors.favoriteLimitAnime', { limit: FAVORITE_LIMIT })
+                    : t('modal.addToList.favoriteHint')}
                 </p>
               </div>
             ) : null}
@@ -290,7 +307,7 @@ export default function AddToListModal({
 
         <div className={styles.actions}>
           <button className={styles.secondary} type="button" onClick={onClose}>
-            Cancel
+            {t('actions.cancel')}
           </button>
           <button
             className={styles.primary}
@@ -299,9 +316,7 @@ export default function AddToListModal({
               const tryingToComplete =
                 status === 'completed' || (totalEpisodes && progressValue >= totalEpisodes);
               if (isAiring && tryingToComplete) {
-                setAiringCompletionWarning(
-                  'This title is still airing, so it cannot be marked as Completed yet.',
-                );
+                setAiringCompletionWarning(t('modal.addToList.airingWarning'));
                 return;
               }
               setAiringCompletionWarning('');
@@ -313,13 +328,15 @@ export default function AddToListModal({
               });
             }}
           >
-            {isEditing ? 'Save changes' : 'Add to List'}
+            {isEditing ? t('modal.addToList.ctaSave') : t('modal.addToList.ctaAdd')}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+export default translate(AddToListModal);
 
 
 

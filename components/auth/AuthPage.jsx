@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowRight, Eye, EyeOff, Sparkles, Plus } from 'lucide-react';
 import { deleteUser, updateProfile } from 'firebase/auth';
+import { translate } from 'react-switch-lang';
 import AuthShell from './AuthShell';
 import Button from '../ui/Button';
 import useAuth from '../../hooks/useAuth';
@@ -17,32 +18,32 @@ import {
 } from '../../lib/constants';
 import styles from './AuthForms.module.css';
 
-const formatAuthError = (err) => {
+const formatAuthError = (err, t) => {
   const code = err?.code || '';
-  if (code === 'auth/user-not-found') return 'No account found for this email.';
-  if (code === 'auth/wrong-password') return 'Incorrect password.';
-  if (code === 'auth/invalid-credential') return 'Incorrect email or password, or this account was deleted.';
-  if (code === 'auth/invalid-email') return 'Email address is invalid.';
-  if (code === 'auth/email-already-in-use') return 'An account already exists with this email.';
-  if (code === 'auth/weak-password') return 'Password is too weak.';
-  if (code === 'auth/not-configured') return 'Sign-in is not configured. Add Firebase env vars to enable login.';
-  return err?.message || 'Unable to sign in right now.';
+  if (code === 'auth/user-not-found') return t('errors.userNotFound');
+  if (code === 'auth/wrong-password') return t('errors.wrongPassword');
+  if (code === 'auth/invalid-credential') return t('errors.invalidCredential');
+  if (code === 'auth/invalid-email') return t('errors.invalidEmail');
+  if (code === 'auth/email-already-in-use') return t('errors.emailInUse');
+  if (code === 'auth/weak-password') return t('errors.weakPassword');
+  if (code === 'auth/not-configured') return t('errors.notConfigured');
+  return err?.message || t('errors.signInFailed');
 };
 
-const fileToDataUrl = (file) =>
+const fileToDataUrl = (file, t) =>
   new Promise((resolve, reject) => {
     if (!file) return resolve('');
     if (file.size > MAX_AVATAR_SIZE_BYTES) {
-      return reject(new Error(`Avatar must be under ${MAX_AVATAR_SIZE_LABEL}.`));
+      return reject(new Error(t('errors.avatarTooBig', { size: MAX_AVATAR_SIZE_LABEL })));
     }
-    if (!file.type.startsWith('image/')) return reject(new Error('Avatar must be an image file.'));
+    if (!file.type.startsWith('image/')) return reject(new Error(t('errors.avatarNotImage')));
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => reject(new Error('Failed to read image file.'));
     reader.readAsDataURL(file);
   });
 
-function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submitting, error }) {
+function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submitting, error, t }) {
   const [username, setUsername] = useState(initialUsername);
   const [bio, setBio] = useState('');
   const [avatarFile, setAvatarFile] = useState(null);
@@ -55,12 +56,12 @@ function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submi
     const file = event.target.files?.[0] || null;
     setAvatarError('');
     if (file && file.size > MAX_AVATAR_SIZE_BYTES) {
-      setAvatarError(`Avatar must be under ${MAX_AVATAR_SIZE_LABEL}.`);
+      setAvatarError(t('errors.avatarTooBig', { size: MAX_AVATAR_SIZE_LABEL }));
       setAvatarFile(null);
       return;
     }
     if (file && !file.type.startsWith('image/')) {
-      setAvatarError('Avatar must be an image file.');
+      setAvatarError(t('errors.avatarNotImage'));
       setAvatarFile(null);
       return;
     }
@@ -77,8 +78,8 @@ function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submi
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <div className={styles.modalHeader}>
-          <h2>Complete your profile</h2>
-          <p>Add a username, bio, and avatar to finish setup.</p>
+          <h2>{t('auth.completeProfileTitle')}</h2>
+          <p>{t('auth.completeProfileBody')}</p>
         </div>
         <form onSubmit={handleSubmit}>
           <div className={styles.avatarCenter}>
@@ -87,19 +88,19 @@ function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submi
             </div>
           </div>
           <div className={styles.field}>
-            <label className={styles.label}>Username</label>
+            <label className={styles.label}>{t('forms.username')}</label>
             <input
               type="text"
               className={styles.input}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="ZenithRunner"
+              placeholder={t('forms.usernamePlaceholder')}
               required
               autoFocus
             />
           </div>
           <div className={styles.field}>
-            <label className={styles.label}>Avatar</label>
+            <label className={styles.label}>{t('forms.avatar')}</label>
             <div className={styles.fileRow}>
               <input type="file" accept="image/*" className={styles.fileInput} onChange={handleFile} />
               <button
@@ -108,28 +109,28 @@ function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submi
                 onClick={() => setAvatarFile(null)}
                 disabled={!avatarFile}
               >
-                Remove
+                {t('actions.remove')}
               </button>
             </div>
           </div>
           <div className={styles.field}>
-            <label className={styles.label}>Bio</label>
+            <label className={styles.label}>{t('forms.bio')}</label>
             <textarea
               className={styles.textarea}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={3}
-              placeholder="A quick line about your anime taste."
+              placeholder={t('forms.bioPlaceholder')}
             />
           </div>
           {avatarError ? <div className={styles.error}>{avatarError}</div> : null}
           {error ? <div className={styles.error}>{error}</div> : null}
           <div className={styles.formActions}>
             <Button variant="ghost" size="md" onClick={onClose} type="button">
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button variant="primary" size="md" type="submit" disabled={submitting || !username.trim()}>
-              {submitting ? 'Saving…' : 'Save profile'}
+              {submitting ? t('actions.saving') : t('actions.saveProfile')}
             </Button>
           </div>
         </form>
@@ -138,7 +139,7 @@ function ProfileCompletionModal({ initialUsername = '', onClose, onSubmit, submi
   );
 }
 
-export default function AuthPage({ initialMode = 'signin' }) {
+function AuthPage({ initialMode = 'signin', t }) {
   const router = useRouter();
   const {
     user,
@@ -167,21 +168,21 @@ export default function AuthPage({ initialMode = 'signin' }) {
   }, [mode]);
 
   const emailError = !email
-    ? 'Email is required.'
+    ? t('errors.emailRequired')
     : !isValidEmail(email)
-      ? 'Enter a valid email address.'
+      ? t('errors.emailInvalid')
       : '';
   const passwordError =
     mode === 'signup'
-      ? findPasswordRuleError(password)
+      ? (findPasswordRuleError(password) ? t('errors.passwordRulesFailed') : '')
       : !password
-        ? 'Password is required.'
+        ? t('errors.passwordRequired')
         : '';
   const confirmError =
     mode === 'signup' && !confirmPassword
-      ? 'Please confirm your password.'
+      ? t('errors.confirmRequired')
       : mode === 'signup' && confirmPassword !== password
-        ? 'Passwords do not match.'
+        ? t('errors.passwordsMismatch')
         : '';
   const isFormValid = !emailError && !passwordError && !confirmError;
 
@@ -194,7 +195,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
   const saveProfile = async ({ username, bio, avatarFile }) => {
     const { auth } = getFirebaseClient();
     if (!auth?.currentUser) {
-      setModalError('Not signed in.');
+      setModalError(t('auth.notSignedIn'));
       return;
     }
     setModalSubmitting(true);
@@ -202,10 +203,10 @@ export default function AuthPage({ initialMode = 'signin' }) {
     try {
       const claim = await claimUsername({ uid: auth.currentUser.uid, username });
       if (!claim.ok) {
-        setModalError('Username is already taken.');
+        setModalError(t('errors.usernameTaken'));
         return;
       }
-      const avatarData = avatarFile ? await fileToDataUrl(avatarFile) : '';
+      const avatarData = avatarFile ? await fileToDataUrl(avatarFile, t) : '';
       await updateProfile(auth.currentUser, { displayName: username, photoURL: null });
       await upsertUserProfile({
         uid: auth.currentUser.uid,
@@ -218,7 +219,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
       setProfileModal(null);
       router.push('/my-list');
     } catch (err) {
-      setModalError(err?.message || 'Unable to save profile.');
+      setModalError(err?.message || t('errors.saveFailed'));
     } finally {
       setModalSubmitting(false);
     }
@@ -247,7 +248,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
       });
       router.push('/my-list');
     } catch (err) {
-      setError(formatAuthError(err));
+      setError(formatAuthError(err, t));
     }
   };
 
@@ -268,8 +269,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
         router.push('/my-list');
       }
     } catch (err) {
-      setError(formatAuthError(err));
-      // If signup created a user but we failed later, make sure we clean up session
+      setError(formatAuthError(err, t));
       if (mode === 'signup') {
         const { auth } = getFirebaseClient();
         if (auth?.currentUser) {
@@ -285,28 +285,27 @@ export default function AuthPage({ initialMode = 'signin' }) {
     }
   };
 
-  // Already signed in — show a brief CTA
   if (user && !profileModal) {
     return (
       <AuthShell title="AnimeLegacy · Welcome back">
         <div className={styles.topBar} />
         <div className={styles.formArea}>
           <div className={styles.formWrap}>
-            <div className={styles.eyebrow}>ALREADY SIGNED IN</div>
-            <h2 className={styles.heading}>Welcome back.</h2>
+            <div className={styles.eyebrow}>{t('profile.alreadySignedInEyebrow')}</div>
+            <h2 className={styles.heading}>{t('auth.welcomeBackTitle')}</h2>
             <div className={styles.signedIn}>
               <p>
-                You&apos;re signed in as{' '}
+                {t('profile.signedInAs')}{' '}
                 <strong>{user.displayName || user.email || 'AnimeLegacy User'}</strong>.
               </p>
               <Link href="/my-list">
                 <Button variant="primary" size="md" fullWidth icon={ArrowRight}>
-                  Go to my list
+                  {t('actions.goToMyList')}
                 </Button>
               </Link>
             </div>
             <div className={styles.altLink}>
-              <span>Not you?</span>
+              <span>{t('profile.notYou')}</span>
               <button
                 type="button"
                 onClick={signOutUser}
@@ -320,7 +319,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
                   padding: 0,
                 }}
               >
-                Sign out
+                {t('actions.signOut')}
               </button>
             </div>
           </div>
@@ -341,25 +340,23 @@ export default function AuthPage({ initialMode = 'signin' }) {
       >
         <div className={styles.topBar}>
           <span className={styles.topBarText}>
-            {mode === 'signin' ? 'New to AnimeLegacy?' : 'Already have an account?'}
+            {mode === 'signin' ? t('auth.newToSite') : t('auth.alreadyHave')}
           </span>
           <Button variant="secondary" size="sm" onClick={toggleMode}>
-            {mode === 'signin' ? 'Create account' : 'Sign in'}
+            {mode === 'signin' ? t('auth.createAccount') : t('actions.signIn')}
           </Button>
         </div>
 
         <div className={styles.formArea}>
           <div className={styles.formWrap}>
             <div className={styles.eyebrow}>
-              {mode === 'signin' ? 'SIGN IN · WELCOME BACK' : 'CREATE ACCOUNT · START YOUR LIST'}
+              {mode === 'signin' ? t('auth.signInEyebrow') : t('auth.signUpEyebrow')}
             </div>
             <h2 className={styles.heading}>
-              {mode === 'signin' ? 'Pick up where you left off.' : 'Start your chronicle.'}
+              {mode === 'signin' ? t('auth.signInTitle') : t('auth.signUpTitle')}
             </h2>
             <p className={styles.subtitle}>
-              {mode === 'signin'
-                ? 'Your list, progress, favorites, and ratings — synced across every device.'
-                : 'A free account gives you a personal list, rating tools, and weekly seasonal recaps.'}
+              {mode === 'signin' ? t('auth.signInBody') : t('auth.signUpBody')}
             </p>
 
             <button
@@ -386,19 +383,19 @@ export default function AuthPage({ initialMode = 'signin' }) {
                   d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                 />
               </svg>
-              Continue with Google
+              {t('actions.continueWithGoogle')}
             </button>
 
             <div className={styles.divider}>
               <span className={styles.dividerLine} />
-              <span className={styles.dividerText}>OR WITH EMAIL</span>
+              <span className={styles.dividerText}>{t('auth.dividerOrEmail')}</span>
               <span className={styles.dividerLine} />
             </div>
 
             <form onSubmit={handleSubmit} noValidate>
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="email">
-                  Email
+                  {t('forms.email')}
                 </label>
                 <input
                   id="email"
@@ -407,7 +404,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setTouched((p) => ({ ...p, email: true }))}
-                  placeholder="you@example.com"
+                  placeholder={t('forms.emailPlaceholder')}
                   autoComplete="email"
                   required
                 />
@@ -419,11 +416,11 @@ export default function AuthPage({ initialMode = 'signin' }) {
               <div className={styles.field}>
                 <div className={styles.fieldHead}>
                   <label className={styles.label} htmlFor="password">
-                    Password
+                    {t('forms.password')}
                   </label>
                   {mode === 'signin' ? (
                     <Link href="/forgot-password" className={styles.inlineLink}>
-                      Forgot?
+                      {t('actions.forgotQuestion')}
                     </Link>
                   ) : null}
                 </div>
@@ -437,7 +434,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onBlur={() => setTouched((p) => ({ ...p, password: true }))}
-                    placeholder={mode === 'signin' ? 'Enter your password' : 'At least 8 characters'}
+                    placeholder={mode === 'signin' ? t('forms.passwordPlaceholder') : t('forms.passwordPlaceholderNew')}
                     autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                     required
                   />
@@ -445,7 +442,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
                     type="button"
                     className={styles.inputToggle}
                     onClick={() => setShowPw((v) => !v)}
-                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                    aria-label={showPw ? t('actions.hidePassword') : t('actions.showPassword')}
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -460,7 +457,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
                         key={rule.id}
                         className={`${styles.ruleItem} ${rule.test(password) ? styles.rulePassed : ''}`}
                       >
-                        {rule.label}
+                        {t(`passwordRules.${rule.id}`)}
                       </li>
                     ))}
                   </ul>
@@ -470,7 +467,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
               {mode === 'signup' ? (
                 <div className={styles.field}>
                   <label className={styles.label} htmlFor="confirm">
-                    Confirm password
+                    {t('forms.confirmPassword')}
                   </label>
                   <input
                     id="confirm"
@@ -481,7 +478,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     onBlur={() => setTouched((p) => ({ ...p, confirm: true }))}
-                    placeholder="Repeat your password"
+                    placeholder={t('forms.passwordPlaceholderRepeat')}
                     autoComplete="new-password"
                     required
                   />
@@ -499,7 +496,7 @@ export default function AuthPage({ initialMode = 'signin' }) {
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                   />
-                  {mode === 'signin' ? 'Remember me for 30 days' : 'Email me about new seasons'}
+                  {mode === 'signin' ? t('forms.remember30') : t('forms.emailSeasons')}
                 </label>
               </div>
 
@@ -513,29 +510,28 @@ export default function AuthPage({ initialMode = 'signin' }) {
               >
                 {submitting
                   ? mode === 'signin'
-                    ? 'Signing in…'
-                    : 'Creating account…'
+                    ? t('auth.signingIn')
+                    : t('auth.creating')
                   : mode === 'signin'
-                    ? 'Sign in'
-                    : 'Create account'}
+                    ? t('actions.signIn')
+                    : t('auth.createAccount')}
               </Button>
 
               {error ? <div className={styles.error}>{error}</div> : null}
 
-              <div className={styles.legal}>
-                Your list, ratings, and progress are stored securely against your account.
-              </div>
+              <div className={styles.legal}>{t('auth.legal')}</div>
             </form>
           </div>
         </div>
 
         <footer className={styles.footer}>
-          <span>© {new Date().getFullYear()} AnimeLegacy</span>
+          <span>{t('auth.footerCopy', { year: new Date().getFullYear() })}</span>
         </footer>
       </AuthShell>
 
       {profileModal ? (
         <ProfileCompletionModal
+          t={t}
           initialUsername={profileModal.initialUsername}
           onClose={() => {
             setProfileModal(null);
@@ -549,3 +545,5 @@ export default function AuthPage({ initialMode = 'signin' }) {
     </>
   );
 }
+
+export default translate(AuthPage);

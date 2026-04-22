@@ -3,7 +3,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { updateProfile } from 'firebase/auth';
-import { X, Pencil, LogOut, Star } from 'lucide-react';
+import {
+  X,
+  Pencil,
+  LogOut,
+  Star,
+  Eye,
+  Check,
+  Heart,
+  PenTool,
+  ArrowRight,
+  Flame,
+} from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import Button from '../components/ui/Button';
 import IconButton from '../components/ui/IconButton';
@@ -18,7 +30,14 @@ import { isAiringAnime } from '../lib/utils/anime';
 import { MAX_AVATAR_SIZE_BYTES, MAX_AVATAR_SIZE_LABEL } from '../lib/constants';
 import styles from './profile.module.css';
 
-const TABS = ['Overview', 'Favorites', 'Reviews', 'Activity'];
+const TABS = [
+  { id: 'Overview', labelKey: 'profile.tabs.overview' },
+  { id: 'Favorites', labelKey: 'profile.tabs.favorites' },
+  { id: 'Reviews', labelKey: 'profile.tabs.reviews' },
+  { id: 'Activity', labelKey: 'profile.tabs.activity' },
+];
+
+const MONTH_ABBR = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
 const withTimeout = (promise, ms, label) =>
   Promise.race([
@@ -26,15 +45,133 @@ const withTimeout = (promise, ms, label) =>
     new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
   ]);
 
-export default function ProfilePage() {
+const toJsDate = (value) => {
+  if (!value) return null;
+  if (typeof value?.toDate === 'function') return value.toDate();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const dateKey = (date) => {
+  if (!date) return '';
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const VERB_META = {
+  watch: { iconKey: 'watch', labelKey: 'profile.verbs.watched' },
+  complete: { iconKey: 'complete', labelKey: 'profile.verbs.completed' },
+  rate: { iconKey: 'rate', labelKey: 'profile.verbs.rated' },
+  review: { iconKey: 'review', labelKey: 'profile.verbs.reviewed' },
+};
+
+const deriveVerb = (entry) => {
+  const label = String(entry?.label || '').toLowerCase();
+  if (label.includes('review')) return 'review';
+  if (label.includes('completed')) return 'complete';
+  if (label.includes('rated')) return 'rate';
+  return 'watch';
+};
+
+const VerbIcon = ({ kind, size = 14 }) => {
+  const props = { size, strokeWidth: 2 };
+  if (kind === 'complete') return <Check {...props} />;
+  if (kind === 'rate') return <Star size={size} fill="currentColor" strokeWidth={0} />;
+  if (kind === 'review') return <PenTool {...props} />;
+  return <Eye {...props} />;
+};
+
+const computeStreak = (activityAll) => {
+  if (!Array.isArray(activityAll) || activityAll.length === 0) return 0;
+  const days = new Set();
+  activityAll.forEach((entry) => {
+    const date = toJsDate(entry?.createdAt);
+    if (!date) return;
+    days.add(dateKey(date));
+  });
+  if (days.size === 0) return 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const todayKey = dateKey(today);
+  const yesterdayKey = dateKey(yesterday);
+  if (!days.has(todayKey) && !days.has(yesterdayKey)) return 0;
+  let streak = 0;
+  const cursor = new Date(days.has(todayKey) ? today : yesterday);
+  while (days.has(dateKey(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+};
+
+const buildStreakDots = (activityAll) => {
+  const days = new Set();
+  activityAll.forEach((entry) => {
+    const date = toJsDate(entry?.createdAt);
+    if (!date) return;
+    days.add(dateKey(date));
+  });
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dots = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = dateKey(d);
+    dots.push({ key, active: days.has(key), today: i === 0 });
+  }
+  return dots;
+};
+
+const groupActivityByDay = (activityAll) => {
+  const groups = new Map();
+  activityAll.forEach((entry) => {
+    const date = toJsDate(entry?.createdAt);
+    if (!date) return;
+    const key = dateKey(date);
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        day: String(date.getDate()).padStart(2, '0'),
+        mo: MONTH_ABBR[date.getMonth()],
+        items: [],
+      });
+    }
+    groups.get(key).items.push(entry);
+  });
+  return Array.from(groups.values());
+};
+
+const computeGenreBars = (animeItems) => {
+  if (!Array.isArray(animeItems)) return [];
+  const tally = new Map();
+  animeItems.forEach((item) => {
+    const progress = Number(item?.progress ?? 0);
+    if (!(progress > 0) && item?.status !== 'completed') return;
+    if (!Array.isArray(item?.genres)) return;
+    item.genres.forEach((genre) => {
+      const key = String(genre);
+      tally.set(key, (tally.get(key) || 0) + 1);
+    });
+  });
+  const ranked = Array.from(tally.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  const max = ranked.length ? ranked[0][1] : 1;
+  return ranked.map(([name, count]) => ({ name, count, pct: Math.round((count / max) * 100) }));
+};
+
+function ProfilePage({ t }) {
   const { user, loading: authLoading, signOutUser } = useAuth();
   const router = useRouter();
   const {
     stats,
-    genres,
     favorites,
     favoriteCharacters,
-    activity,
     activityAll,
     profile,
     animeItems,
@@ -43,7 +180,7 @@ export default function ProfilePage() {
   const displayName = profile?.username || user?.displayName || 'Guest';
   const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL;
   const initials = useMemo(() => displayName.slice(0, 1).toUpperCase(), [displayName]);
-  const bio = profile?.bio || 'No bio yet — tell the chronicle what you are watching.';
+  const bio = profile?.bio || t('profile.bioDefault');
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);
   const [editUsername, setEditUsername] = useState('');
@@ -94,6 +231,53 @@ export default function ProfilePage() {
     [animeItems],
   );
 
+  const watchingCount = useMemo(
+    () =>
+      (animeItems || []).filter((item) => normalizeSeasonStatus(item) === 'watching').length,
+    [animeItems],
+  );
+
+  const airingNow = useMemo(
+    () =>
+      (animeItems || []).filter(
+        (item) => isAiringAnime(item) && normalizeSeasonStatus(item) === 'watching',
+      ).length,
+    [animeItems],
+  );
+
+  const hoursWatched = useMemo(
+    () => Math.round((stats.daysSpent || 0) * 24),
+    [stats.daysSpent],
+  );
+
+  const ratedCount = useMemo(
+    () => (animeItems || []).filter((item) => typeof item?.rating === 'number').length,
+    [animeItems],
+  );
+
+  const streak = useMemo(() => computeStreak(activityAll), [activityAll]);
+  const streakDots = useMemo(() => buildStreakDots(activityAll), [activityAll]);
+
+  const genreBars = useMemo(() => computeGenreBars(animeItems), [animeItems]);
+
+  const activityGroups = useMemo(() => groupActivityByDay(activityAll), [activityAll]);
+  const recentActivityGroups = useMemo(() => activityGroups.slice(0, 4), [activityGroups]);
+
+  const joinYear = useMemo(() => {
+    const candidate =
+      profile?.createdAt ||
+      profile?.joinedAt ||
+      user?.metadata?.creationTime ||
+      null;
+    const date = toJsDate(candidate);
+    return date ? date.getFullYear() : null;
+  }, [profile?.createdAt, profile?.joinedAt, user?.metadata?.creationTime]);
+
+  const totalListEntries = (animeItems || []).length;
+
+  const seasonDash = 2 * Math.PI * 34;
+  const seasonOffset = seasonDash * (1 - seasonalProgress / 100);
+
   const editPreview = useMemo(() => {
     if (!editAvatarFile) return '';
     return URL.createObjectURL(editAvatarFile);
@@ -101,14 +285,61 @@ export default function ProfilePage() {
 
   useEffect(() => () => editPreview && URL.revokeObjectURL(editPreview), [editPreview]);
 
-  const statCards = [
-    { label: 'WATCHED', value: stats.watchedCount ?? 0, sub: 'Anime' },
-    { label: 'EPISODES', value: stats.totalEpisodes ?? 0, sub: 'Total' },
-    { label: 'DAYS', value: stats.daysSpent ? stats.daysSpent.toFixed(1) : '0.0', sub: 'Spent' },
-    { label: 'REVIEWS', value: stats.reviewCount ?? 0, sub: 'Written' },
-    { label: 'AVG MAL', value: stats.malAvgScore ? stats.malAvgScore.toFixed(1) : '—', sub: 'Community' },
-    { label: 'YOUR AVG', value: stats.myAvgScore ? stats.myAvgScore.toFixed(1) : '—', sub: 'Your mean' },
-  ];
+  const kpiCards = useMemo(
+    () => [
+      {
+        key: 'completed',
+        label: t('profile.kpi.completed'),
+        value: stats.watchedCount ?? 0,
+        sub: t('profile.kpi.sub.completed'),
+        tone: 'primary',
+      },
+      {
+        key: 'watching',
+        label: t('profile.kpi.watching'),
+        value: watchingCount,
+        sub:
+          airingNow > 0
+            ? t('profile.kpi.sub.airingNow', { n: airingNow })
+            : t('profile.kpi.sub.noAiring'),
+        tone: 'primary',
+      },
+      {
+        key: 'hours',
+        label: t('profile.kpi.hours'),
+        value: hoursWatched.toLocaleString(),
+        sub: t('profile.kpi.sub.hours'),
+        tone: 'warm',
+      },
+      {
+        key: 'episodes',
+        label: t('profile.kpi.episodes'),
+        value: (stats.totalEpisodes ?? 0).toLocaleString(),
+        sub: t('profile.kpi.sub.episodes'),
+        tone: 'primary',
+      },
+      {
+        key: 'meanScore',
+        label: t('profile.kpi.meanScore'),
+        value: stats.myAvgScore ? stats.myAvgScore.toFixed(1) : '—',
+        sub: t('profile.kpi.sub.meanScore', { n: ratedCount }),
+        tone: 'warm',
+      },
+      {
+        key: 'streak',
+        label: t('profile.kpi.streak'),
+        value: (
+          <>
+            {streak}
+            <span className={styles.kpiUnit}>{t('profile.kpi.sub.streakUnit')}</span>
+          </>
+        ),
+        sub: streak > 0 ? t('profile.kpi.sub.streakOn') : t('profile.kpi.sub.streakOff'),
+        tone: 'green',
+      },
+    ],
+    [t, stats.watchedCount, watchingCount, airingNow, hoursWatched, stats.totalEpisodes, stats.myAvgScore, ratedCount, streak],
+  );
 
   useEffect(() => {
     if (authLoading) return;
@@ -186,55 +417,210 @@ export default function ProfilePage() {
     }
   };
 
+  const renderActivityItem = (entry, i) => {
+    const kind = deriveVerb(entry);
+    const verb = VERB_META[kind];
+    const posterUrl = entry.posterUrl || '/logo_no_text.png';
+    const animeId = entry.animeId;
+    const label = entry.label || entry.type || t(verb.labelKey);
+    const inner = (
+      <>
+        <div className={`${styles.activityVerb} ${styles[`verb_${kind}`]}`}>
+          <VerbIcon kind={kind} size={14} />
+        </div>
+        <div className={styles.activityPoster}>
+          <Image src={posterUrl} alt={entry.title || 'Activity'} width={48} height={68} />
+        </div>
+        <div className={styles.activityText}>
+          <div className={styles.activityTitle}>{entry.title || 'Activity'}</div>
+          <div className={styles.activityDesc}>{label}</div>
+        </div>
+        <div className={styles.activityTime}>
+          {formatRelativeTime(entry.createdAt) || ''}
+        </div>
+      </>
+    );
+    const key = `${animeId || 'act'}-${i}`;
+    return animeId ? (
+      <Link key={key} href={`/anime/${animeId}`} className={styles.activityItem}>
+        {inner}
+      </Link>
+    ) : (
+      <div key={key} className={styles.activityItem}>
+        {inner}
+      </div>
+    );
+  };
+
+  const renderActivityGroups = (groups) => {
+    if (!groups.length) {
+      return <div className={styles.emptyInline}>{t('profile.activityEmpty')}</div>;
+    }
+    return (
+      <div className={styles.activityList}>
+        {groups.map((group) => (
+          <div key={group.key} className={styles.activityDay}>
+            <div className={styles.dayLabel}>
+              {group.mo}
+              <span className={styles.dayDate}>{group.day}</span>
+            </div>
+            <div className={styles.activityItems}>
+              {group.items.map((entry, i) => renderActivityItem(entry, i))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderFavoritesGrid = (list, limit) => {
+    const slice = typeof limit === 'number' ? list.slice(0, limit) : list;
+    if (!slice.length) {
+      return <div className={styles.emptyInline}>{t('profile.favoritesEmpty')}</div>;
+    }
+    return (
+      <div className={styles.favStrip}>
+        {slice.map((favorite, idx) => {
+          const favoriteId = favorite.animeId || favorite.id;
+          const poster = favorite.posterUrl || favorite.image || '/logo_no_text.png';
+          return (
+            <Link key={favoriteId} href={`/anime/${favoriteId}`} className={styles.favCard}>
+              <div className={styles.favPoster}>
+                <Image src={poster} alt={favorite.title || 'Favorite'} fill sizes="200px" />
+                <span className={styles.favRank}>{String(idx + 1).padStart(2, '0')}</span>
+                <span className={styles.favHeart}>
+                  <Heart size={14} fill="currentColor" strokeWidth={0} />
+                </span>
+              </div>
+              <div className={styles.favMeta}>
+                <div className={styles.favTitle}>{favorite.title || 'Untitled'}</div>
+                <div className={styles.favSub}>
+                  {(favorite.year || '—')} · {(favorite.type || 'TV').toUpperCase()}
+                </div>
+                {typeof favorite.malScore === 'number' ? (
+                  <div className={styles.favScore}>
+                    <Star size={11} fill="currentColor" strokeWidth={0} />
+                    {favorite.malScore.toFixed(1)}
+                  </div>
+                ) : null}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderReviewCard = (entry) => {
+    const targetId = entry.animeId || entry.id;
+    const poster = entry.posterUrl || entry.image || entry.coverImage || '/logo_no_text.png';
+    const rating = typeof entry.rating === 'number' ? entry.rating : null;
+    const scoreCls =
+      rating === null
+        ? styles.reviewScoreMid
+        : rating >= 4
+          ? ''
+          : rating === 3
+            ? styles.reviewScoreMid
+            : styles.reviewScoreLow;
+    return (
+      <Link key={targetId} href={`/anime/${targetId}`} className={styles.reviewCard}>
+        <div className={styles.reviewPoster}>
+          <Image src={poster} alt={entry.title || 'Anime'} width={64} height={92} />
+        </div>
+        <div className={styles.reviewBody}>
+          <div className={styles.reviewHead}>
+            <span className={styles.reviewTitle}>{entry.title || 'Untitled'}</span>
+            {rating !== null ? (
+              <span className={styles.reviewSub}>
+                {t('profile.ratingFraction', { n: rating })}
+              </span>
+            ) : null}
+          </div>
+          {entry.review ? (
+            <p className={styles.reviewExcerpt}>{entry.review}</p>
+          ) : (
+            <p className={styles.reviewExcerptMuted}>{t('profile.noRatingReview')}</p>
+          )}
+          <div className={styles.reviewFooter}>
+            {entry.updatedAt ? (
+              <span>{formatRelativeTime(entry.updatedAt)}</span>
+            ) : null}
+          </div>
+        </div>
+        <div className={`${styles.reviewScore} ${scoreCls}`}>
+          {rating !== null ? rating.toFixed(1) : '—'}
+        </div>
+      </Link>
+    );
+  };
+
   return (
-    <Layout title="AnimeLegacy · Profile" description="Your AnimeLegacy profile and activity.">
+    <Layout title={t('profile.metaTitle')} description={t('profile.metaDesc')}>
       <div className={styles.page}>
         {!user ? (
           <div className={styles.empty}>
-            <h2>Redirecting…</h2>
-            <p>Please log in to view your profile.</p>
+            <h2>{t('myList.redirecting')}</h2>
+            <p>{t('myList.loginPrompt')}</p>
           </div>
         ) : (
           <>
-            <section className={styles.hero}>
-              <div className={styles.heroRow}>
-                <div className={styles.avatarFrame}>
-                  {avatar ? (
-                    <img src={avatar} alt={displayName} className={styles.avatarImg} />
-                  ) : (
-                    <span className={styles.avatarInitial}>{initials}</span>
-                  )}
+            <section className={styles.strip}>
+              <div className={styles.stripAvatar}>
+                {avatar ? (
+                  <img src={avatar} alt={displayName} />
+                ) : (
+                  <span>{initials}</span>
+                )}
+              </div>
+              <div className={styles.stripIdent}>
+                <div className={styles.stripNameRow}>
+                  <h1 className={styles.stripName}>{displayName}</h1>
+                  <span className={styles.stripTier}>{t('profile.eyebrow')}</span>
                 </div>
-                <div className={styles.heroMeta}>
-                  <div className={styles.eyebrow}>PERSONAL CHRONICLE</div>
-                  <h1 className={styles.heading}>{displayName}</h1>
-                  <p className={styles.bio}>{bio}</p>
+                <div className={styles.stripMeta}>
+                  {profile?.username ? `@${profile.username}` : user.email}
+                  {joinYear ? ` · ${t('profile.joinedYear', { year: joinYear })}` : ''}
+                  {reviews.length > 0
+                    ? ` · ${t('profile.reviewsCount', { n: reviews.length })}`
+                    : ''}
+                  {totalListEntries > 0
+                    ? ` · ${t('profile.entriesCount', { n: totalListEntries })}`
+                    : ''}
                 </div>
-                <div className={styles.heroActions}>
-                  <Button variant="secondary" size="md" icon={Pencil} onClick={() => setIsEditing(true)}>
-                    Edit profile
-                  </Button>
-                  <Button variant="ghost" size="md" icon={LogOut} onClick={signOutUser}>
-                    Sign out
-                  </Button>
-                </div>
+                {bio ? <p className={styles.stripBio}>{bio}</p> : null}
+              </div>
+              <div className={styles.stripActions}>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  icon={Pencil}
+                  onClick={() => setIsEditing(true)}
+                >
+                  {t('actions.editProfile')}
+                </Button>
+                <Button variant="ghost" size="md" icon={LogOut} onClick={signOutUser}>
+                  {t('actions.signOut')}
+                </Button>
               </div>
             </section>
 
-            <section className={styles.statsSection}>
+            <section className={styles.kpiRow}>
               {profileLoading
-                ? statCards.map((s) => (
-                    <div key={s.label} className={styles.statCard}>
-                      <div className={styles.statLabel}>{s.label}</div>
-                      <Skeleton height={26} width="60%" style={{ margin: '4px 0 10px' }} />
+                ? kpiCards.map((k) => (
+                    <div key={k.key} className={`${styles.kpi} ${styles[`kpi_${k.tone}`]}`}>
+                      <span className={styles.kpiAccent} />
+                      <div className={styles.kpiLabel}>{k.label}</div>
+                      <Skeleton height={28} width="60%" style={{ margin: '4px 0 10px' }} />
                       <Skeleton height={10} width="40%" />
                     </div>
                   ))
-                : statCards.map((s) => (
-                    <div key={s.label} className={styles.statCard}>
-                      <div className={styles.statLabel}>{s.label}</div>
-                      <div className={styles.statValue}>{s.value}</div>
-                      <div className={styles.statSub}>{s.sub}</div>
+                : kpiCards.map((k) => (
+                    <div key={k.key} className={`${styles.kpi} ${styles[`kpi_${k.tone}`]}`}>
+                      <span className={styles.kpiAccent} />
+                      <div className={styles.kpiLabel}>{k.label}</div>
+                      <div className={styles.kpiValue}>{k.value}</div>
+                      <div className={styles.kpiDelta}>{k.sub}</div>
                     </div>
                   ))}
             </section>
@@ -242,261 +628,369 @@ export default function ProfilePage() {
             <div className={styles.layout}>
               <aside className={styles.aside}>
                 <div className={styles.asideCard}>
-                  <div className={styles.asideEyebrow}>TOP GENRES</div>
-                  <div className={styles.genreTags}>
-                    {genres.length ? (
-                      genres.map((g) => (
-                        <span key={g} className={styles.genreTag}>
-                          {g}
-                        </span>
-                      ))
-                    ) : (
-                      <span className={styles.genreEmpty}>No genre data yet.</span>
-                    )}
+                  <div className={styles.asideEyebrow}>
+                    <span>{t('profile.topGenres')}</span>
+                    <span className={styles.asideEyebrowMuted}>
+                      {t('profile.allTime')}
+                    </span>
                   </div>
+                  {genreBars.length === 0 ? (
+                    <span className={styles.genreEmpty}>{t('profile.noGenres')}</span>
+                  ) : (
+                    <div className={styles.genreBars}>
+                      {genreBars.map((g) => (
+                        <div key={g.name} className={styles.genreBar}>
+                          <span className={styles.genreName}>{g.name}</span>
+                          <span className={styles.genreCount}>{g.count}</span>
+                          <span className={styles.genreTrack}>
+                            <span className={styles.genreFill} style={{ width: `${g.pct}%` }} />
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className={styles.asideCard}>
-                  <div className={styles.asideHead}>
-                    <div className={styles.asideEyebrow}>{seasonLabel?.toUpperCase() || 'SEASON'} PROGRESS</div>
-                    <div className={styles.seasonBadge}>{seasonalProgress}%</div>
+                  <div className={styles.asideEyebrow}>
+                    <span>
+                      {t('profile.seasonTitleProgress', {
+                        season: seasonLabel || 'Season',
+                      })}
+                    </span>
                   </div>
-                  <p className={styles.seasonText}>
-                    {seasonalCompleted.length} of {seasonalPlanned.length} planned shows completed.
-                  </p>
-                  <div className={styles.seasonTrack}>
-                    <div className={styles.seasonFill} style={{ width: `${seasonalProgress}%` }} />
+                  <div className={styles.ringWrap}>
+                    <div className={styles.ring}>
+                      <svg viewBox="0 0 80 80">
+                        <circle cx="40" cy="40" r="34" fill="none" stroke="var(--al-ink-4)" strokeWidth="6" />
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r="34"
+                          fill="none"
+                          stroke="url(#al-ring-grad)"
+                          strokeWidth="6"
+                          strokeDasharray={seasonDash}
+                          strokeDashoffset={seasonOffset}
+                          strokeLinecap="round"
+                        />
+                        <defs>
+                          <linearGradient id="al-ring-grad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stopColor="#6f83ff" />
+                            <stop offset="1" stopColor="#84d9ff" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className={styles.ringPct}>{seasonalProgress}%</div>
+                    </div>
+                    <div className={styles.ringText}>
+                      <div className={styles.ringN}>
+                        {t('profile.seasonTracked', {
+                          done: seasonalCompleted.length,
+                          total: seasonalPlanned.length,
+                        })}
+                      </div>
+                      <div className={styles.ringHint}>
+                        {t('profile.seasonHintBody', { n: seasonalPlanned.length })}
+                      </div>
+                    </div>
                   </div>
                   <Link href="/my-list" className={styles.seasonLink}>
                     <Button variant="ghost" size="sm" fullWidth>
-                      Open my list
+                      {t('actions.openMyList')}
                     </Button>
                   </Link>
+                </div>
+
+                <div className={styles.asideCard}>
+                  <div className={styles.asideEyebrow}>
+                    <span>{t('profile.streakTitle')}</span>
+                    <span className={styles.asideEyebrowMuted}>
+                      <Flame size={12} />
+                    </span>
+                  </div>
+                  <div className={styles.streakNum}>
+                    {streak}
+                    <span className={styles.streakUnit}>{t('profile.streakUnit')}</span>
+                  </div>
+                  <div className={styles.streakHint}>
+                    {streak > 0
+                      ? t('profile.streakBody', { next: Math.max(streak + 7, 7) })
+                      : t('profile.streakBodyNone')}
+                  </div>
+                  <div className={styles.streakDots}>
+                    {streakDots.map((dot) => (
+                      <span
+                        key={dot.key}
+                        className={`${styles.streakDot} ${dot.today ? styles.streakDotToday : dot.active ? styles.streakDotOn : ''}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </aside>
 
               <section className={styles.content}>
                 <div className={styles.tabs} role="tablist">
-                  {TABS.map((tab) => (
-                    <button
-                      key={tab}
-                      type="button"
-                      role="tab"
-                      className={`${styles.tab} ${tab === activeTab ? styles.tabActive : ''}`}
-                      onClick={() => setActiveTab(tab)}
-                    >
-                      {tab}
-                    </button>
-                  ))}
+                  {TABS.map((tab) => {
+                    const count =
+                      tab.id === 'Favorites'
+                        ? favorites.length
+                        : tab.id === 'Reviews'
+                          ? reviews.length
+                          : null;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        role="tab"
+                        className={`${styles.tab} ${tab.id === activeTab ? styles.tabActive : ''}`}
+                        onClick={() => setActiveTab(tab.id)}
+                      >
+                        {t(tab.labelKey)}
+                        {count !== null ? (
+                          <span className={styles.tabCount}>{count}</span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {activeTab === 'Overview' ? (
-                  <>
-                    <div className={styles.card}>
-                      <div className={styles.cardHead}>
-                        <h2 className={styles.cardTitle}>Recent activity</h2>
-                      </div>
-                      <div className={styles.activityList}>
+                <div className={styles.contentBody}>
+                  {activeTab === 'Overview' ? (
+                    <>
+                      <div className={styles.section}>
+                        <div className={styles.sectionHead}>
+                          <div className={styles.titleGroup}>
+                            <h3 className={styles.sectionTitle}>{t('profile.recentActivity')}</h3>
+                            <span className={styles.kicker}>{t('profile.lastDaysKicker')}</span>
+                          </div>
+                          <button
+                            type="button"
+                            className={styles.sectionLink}
+                            onClick={() => setActiveTab('Activity')}
+                          >
+                            {t('profile.seeAll')} <ArrowRight size={14} />
+                          </button>
+                        </div>
                         {profileLoading ? (
-                          Array.from({ length: 3 }, (_, i) => (
-                            <div key={i} className={styles.activityItem}>
-                              <div className={styles.activityThumb}>
-                                <Skeleton width={44} height={60} rounded={6} />
+                          <div className={styles.activityList}>
+                            {Array.from({ length: 3 }, (_, i) => (
+                              <div key={i} className={styles.activityItem}>
+                                <div className={styles.activityVerb}>
+                                  <Skeleton width={28} height={28} rounded={8} />
+                                </div>
+                                <div className={styles.activityPoster}>
+                                  <Skeleton width={48} height={68} rounded={6} />
+                                </div>
+                                <div className={styles.activityText}>
+                                  <SkeletonText lines={2} />
+                                </div>
                               </div>
-                              <div className={styles.activityMeta}>
-                                <SkeletonText lines={2} />
-                              </div>
-                            </div>
-                          ))
-                        ) : activity.length === 0 ? (
-                          <div className={styles.emptyInline}>
-                            Add anime to your list to start tracking updates.
+                            ))}
                           </div>
                         ) : (
-                          activity.map((entry, i) => (
-                            <div key={`${entry.animeId || 'a'}-${i}`} className={styles.activityItem}>
-                              <div className={styles.activityThumb}>
-                                <Image
-                                  src={entry.posterUrl || '/logo_no_text.png'}
-                                  alt={entry.title || 'Activity'}
-                                  width={44}
-                                  height={60}
-
-                                />
-                              </div>
-                              <div className={styles.activityMeta}>
-                                <div className={styles.activityTitle}>{entry.title || 'Activity'}</div>
-                                <div className={styles.activitySub}>{entry.label || entry.type || 'Updated'}</div>
-                              </div>
-                              <div className={styles.activityTime}>
-                                {formatRelativeTime(entry.createdAt) || 'Just now'}
-                              </div>
-                            </div>
-                          ))
+                          renderActivityGroups(recentActivityGroups)
                         )}
                       </div>
-                    </div>
-                  </>
-                ) : null}
 
-                {activeTab === 'Activity' ? (
-                  <div className={styles.card}>
-                    <div className={styles.cardHead}>
-                      <h2 className={styles.cardTitle}>All activity</h2>
-                      <span className={styles.cardHint}>{activityAll.length} updates</span>
-                    </div>
-                    <div className={styles.activityList}>
-                      {activityAll.length === 0 ? (
-                        <div className={styles.emptyInline}>No activity yet.</div>
-                      ) : (
-                        activityAll.map((entry, i) => (
-                          <div key={`${entry.animeId || 'a'}-f-${i}`} className={styles.activityItem}>
-                            <div className={styles.activityThumb}>
-                              <Image
-                                src={entry.posterUrl || '/logo_no_text.png'}
-                                alt={entry.title || 'Activity'}
-                                width={44}
-                                height={60}
+                      <div className={styles.section}>
+                        <div className={styles.sectionHead}>
+                          <div className={styles.titleGroup}>
+                            <h3 className={styles.sectionTitle}>{t('profile.favoritesTitle')}</h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesRankedKicker', {
+                                n: favorites.length,
+                                limit: 10,
+                              })}
+                            </span>
+                          </div>
+                          {favorites.length > 0 ? (
+                            <button
+                              type="button"
+                              className={styles.sectionLink}
+                              onClick={() => setActiveTab('Favorites')}
+                            >
+                              {t('profile.seeAll')} <ArrowRight size={14} />
+                            </button>
+                          ) : null}
+                        </div>
+                        {renderFavoritesGrid(favorites, 6)}
+                      </div>
 
-                              />
-                            </div>
-                            <div className={styles.activityMeta}>
-                              <div className={styles.activityTitle}>{entry.title || 'Activity'}</div>
-                              <div className={styles.activitySub}>{entry.label || entry.type || 'Updated'}</div>
-                            </div>
-                            <div className={styles.activityTime}>
-                              {formatRelativeTime(entry.createdAt) || 'Just now'}
+                      <div className={styles.section}>
+                        <div className={styles.sectionHead}>
+                          <div className={styles.titleGroup}>
+                            <h3 className={styles.sectionTitle}>{t('profile.latestReviews')}</h3>
+                            <span className={styles.kicker}>
+                              {t('profile.reviewsWritten', { n: reviews.length })}
+                            </span>
+                          </div>
+                          {reviews.length > 0 ? (
+                            <button
+                              type="button"
+                              className={styles.sectionLink}
+                              onClick={() => setActiveTab('Reviews')}
+                            >
+                              {t('profile.allReviewsLink')} <ArrowRight size={14} />
+                            </button>
+                          ) : null}
+                        </div>
+                        {reviews.length === 0 ? (
+                          <div className={styles.emptyInline}>{t('profile.reviewsEmpty')}</div>
+                        ) : (
+                          <div className={styles.reviewsList}>
+                            {reviews.slice(0, 2).map(renderReviewCard)}
+                          </div>
+                        )}
+                      </div>
+
+                      {favoriteCharacters.length > 0 ? (
+                        <div className={styles.section}>
+                          <div className={styles.sectionHead}>
+                            <div className={styles.titleGroup}>
+                              <h3 className={styles.sectionTitle}>
+                                {t('profile.favoriteCharactersTitle')}
+                              </h3>
+                              <span className={styles.kicker}>
+                                {t('profile.favoritesCount', {
+                                  n: favoriteCharacters.length,
+                                  limit: 10,
+                                })}
+                              </span>
                             </div>
                           </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                ) : null}
-
-                {activeTab === 'Reviews' ? (
-                  <div className={styles.card}>
-                    <div className={styles.cardHead}>
-                      <h2 className={styles.cardTitle}>Your reviews</h2>
-                      <span className={styles.cardHint}>{reviews.length} written</span>
-                    </div>
-                    {reviews.length === 0 ? (
-                      <div className={styles.emptyInline}>
-                        Share your thoughts on finished shows to build your review shelf.
-                      </div>
-                    ) : (
-                      <div className={styles.reviewList}>
-                        {reviews.map((entry) => {
-                          const poster =
-                            entry.posterUrl || entry.image || entry.coverImage || '/logo_no_text.png';
-                          const targetId = entry.animeId || entry.id;
-                          return (
-                            <Link
-                              key={targetId}
-                              href={`/anime/${targetId}`}
-                              className={styles.reviewCard}
-                            >
-                              <div className={styles.reviewPoster}>
-                                <Image src={poster} alt={entry.title || 'Anime'} width={64} height={88}/>
-                              </div>
-                              <div className={styles.reviewMeta}>
-                                <div className={styles.reviewTitle}>{entry.title || 'Untitled'}</div>
-                                <div className={styles.reviewScore}>
-                                  {typeof entry.rating === 'number' ? (
-                                    <>
-                                      <Star size={12} fill="currentColor" strokeWidth={0} />
-                                      {entry.rating}/5
-                                    </>
-                                  ) : (
-                                    'No rating'
-                                  )}
+                          <div className={styles.favStrip}>
+                            {favoriteCharacters.slice(0, 6).map((favorite, idx) => (
+                              <Link
+                                key={favorite.id}
+                                href={`/characters/${favorite.id}`}
+                                className={styles.favCard}
+                              >
+                                <div className={styles.favPoster}>
+                                  <Image
+                                    src={favorite.imageUrl || '/logo_no_text.png'}
+                                    alt={favorite.name || 'Character'}
+                                    fill
+                                    sizes="200px"
+                                  />
+                                  <span className={styles.favRank}>
+                                    {String(idx + 1).padStart(2, '0')}
+                                  </span>
                                 </div>
-                                {entry.review ? (
-                                  <p className={styles.reviewText}>{entry.review}</p>
-                                ) : null}
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-
-                {activeTab === 'Overview' || activeTab === 'Favorites' ? (
-                  <div className={styles.card}>
-                    <div className={styles.cardHead}>
-                      <h2 className={styles.cardTitle}>All-time favorites</h2>
-                      <span className={styles.cardHint}>{favorites.length}/10</span>
-                    </div>
-                    {favorites.length === 0 ? (
-                      <div className={styles.emptyInline}>
-                        Mark a completed anime as favorite to feature it here.
-                      </div>
-                    ) : (
-                      <div className={styles.favoritesGrid}>
-                        {favorites.map((favorite) => {
-                          const favoriteId = favorite.animeId || favorite.id;
-                          const poster = favorite.posterUrl || favorite.image || '/logo_no_text.png';
-                          return (
-                            <Link
-                              key={favoriteId}
-                              href={`/anime/${favoriteId}`}
-                              className={styles.favoriteCard}
-                            >
-                              <div className={styles.favoritePoster}>
-                                <Image src={poster} alt={favorite.title || 'Favorite'} fill sizes="180px"/>
-                                <div className={styles.favoriteOverlay}>
-                                  <div className={styles.favoriteTitle}>{favorite.title || 'Untitled'}</div>
-                                  <div className={styles.favoriteMeta}>
-                                    {favorite.year || '—'} · {favorite.type || 'TV'}
-                                  </div>
-                                </div>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-
-                {activeTab === 'Overview' || activeTab === 'Favorites' ? (
-                  <div className={styles.card}>
-                    <div className={styles.cardHead}>
-                      <h2 className={styles.cardTitle}>Favorite characters</h2>
-                      <span className={styles.cardHint}>{favoriteCharacters.length}/10</span>
-                    </div>
-                    {favoriteCharacters.length === 0 ? (
-                      <div className={styles.emptyInline}>
-                        Mark a character as favorite to feature them here.
-                      </div>
-                    ) : (
-                      <div className={styles.favoritesGrid}>
-                        {favoriteCharacters.map((favorite) => {
-                          const poster = favorite.imageUrl || '/logo_no_text.png';
-                          return (
-                            <Link
-                              key={favorite.id}
-                              href={`/characters/${favorite.id}`}
-                              className={styles.favoriteCard}
-                            >
-                              <div className={styles.favoritePoster}>
-                                <Image src={poster} alt={favorite.name || 'Character'} fill sizes="180px"/>
-                                <div className={styles.favoriteOverlay}>
-                                  <div className={styles.favoriteTitle}>{favorite.name || '—'}</div>
+                                <div className={styles.favMeta}>
+                                  <div className={styles.favTitle}>{favorite.name || '—'}</div>
                                   {favorite.nameKanji ? (
-                                    <div className={styles.favoriteMeta}>{favorite.nameKanji}</div>
+                                    <div className={styles.favSub}>{favorite.nameKanji}</div>
                                   ) : null}
                                 </div>
-                              </div>
-                            </Link>
-                          );
-                        })}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : null}
+
+                  {activeTab === 'Favorites' ? (
+                    <>
+                      <div className={styles.section}>
+                        <div className={styles.sectionHead}>
+                          <div className={styles.titleGroup}>
+                            <h3 className={styles.sectionTitle}>{t('profile.favoritesTitle')}</h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', {
+                                n: favorites.length,
+                                limit: 10,
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        {renderFavoritesGrid(favorites)}
                       </div>
-                    )}
-                  </div>
-                ) : null}
+
+                      <div className={styles.section}>
+                        <div className={styles.sectionHead}>
+                          <div className={styles.titleGroup}>
+                            <h3 className={styles.sectionTitle}>
+                              {t('profile.favoriteCharactersTitle')}
+                            </h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', {
+                                n: favoriteCharacters.length,
+                                limit: 10,
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        {favoriteCharacters.length === 0 ? (
+                          <div className={styles.emptyInline}>
+                            {t('profile.favoriteCharactersEmpty')}
+                          </div>
+                        ) : (
+                          <div className={styles.favStrip}>
+                            {favoriteCharacters.map((favorite, idx) => (
+                              <Link
+                                key={favorite.id}
+                                href={`/characters/${favorite.id}`}
+                                className={styles.favCard}
+                              >
+                                <div className={styles.favPoster}>
+                                  <Image
+                                    src={favorite.imageUrl || '/logo_no_text.png'}
+                                    alt={favorite.name || 'Character'}
+                                    fill
+                                    sizes="200px"
+                                  />
+                                  <span className={styles.favRank}>
+                                    {String(idx + 1).padStart(2, '0')}
+                                  </span>
+                                </div>
+                                <div className={styles.favMeta}>
+                                  <div className={styles.favTitle}>{favorite.name || '—'}</div>
+                                  {favorite.nameKanji ? (
+                                    <div className={styles.favSub}>{favorite.nameKanji}</div>
+                                  ) : null}
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : null}
+
+                  {activeTab === 'Reviews' ? (
+                    <div className={styles.section}>
+                      <div className={styles.sectionHead}>
+                        <div className={styles.titleGroup}>
+                          <h3 className={styles.sectionTitle}>{t('profile.reviewsTitle')}</h3>
+                          <span className={styles.kicker}>
+                            {t('profile.reviewsWritten', { n: reviews.length })}
+                          </span>
+                        </div>
+                      </div>
+                      {reviews.length === 0 ? (
+                        <div className={styles.emptyInline}>{t('profile.reviewsEmpty')}</div>
+                      ) : (
+                        <div className={styles.reviewsList}>{reviews.map(renderReviewCard)}</div>
+                      )}
+                    </div>
+                  ) : null}
+
+                  {activeTab === 'Activity' ? (
+                    <div className={styles.section}>
+                      <div className={styles.sectionHead}>
+                        <div className={styles.titleGroup}>
+                          <h3 className={styles.sectionTitle}>{t('profile.allActivity')}</h3>
+                          <span className={styles.kicker}>
+                            {t('profile.activityGroupedBy', { n: activityAll.length })}
+                          </span>
+                        </div>
+                      </div>
+                      {renderActivityGroups(activityGroups)}
+                    </div>
+                  ) : null}
+                </div>
               </section>
             </div>
           </>
@@ -513,10 +1007,10 @@ export default function ProfilePage() {
           >
             <div className={styles.modalHead}>
               <div>
-                <div className={styles.modalEyebrow}>SETTINGS</div>
-                <h2 className={styles.modalTitle}>Edit profile</h2>
+                <div className={styles.modalEyebrow}>{t('profile.modalSettings')}</div>
+                <h2 className={styles.modalTitle}>{t('profile.modalTitle')}</h2>
               </div>
-              <IconButton icon={X} tooltip="Close" onClick={() => setIsEditing(false)} />
+              <IconButton icon={X} tooltip={t('actions.close')} onClick={() => setIsEditing(false)} />
             </div>
             <form className={styles.modalForm} onSubmit={handleSaveProfile}>
               <div className={styles.modalAvatarRow}>
@@ -548,13 +1042,13 @@ export default function ProfilePage() {
                     }}
                     disabled={!avatar && !editPreview}
                   >
-                    Remove photo
+                    {t('actions.removePhoto')}
                   </button>
                 </div>
               </div>
 
               <label className={styles.modalLabel}>
-                Username
+                {t('forms.username')}
                 <input
                   className={styles.modalInput}
                   type="text"
@@ -564,7 +1058,7 @@ export default function ProfilePage() {
                 />
               </label>
               <label className={styles.modalLabel}>
-                Bio
+                {t('forms.bio')}
                 <textarea
                   className={styles.modalTextarea}
                   value={editBio}
@@ -577,13 +1071,12 @@ export default function ProfilePage() {
 
               <div className={styles.modalActions}>
                 <Button variant="ghost" size="md" onClick={() => setIsEditing(false)}>
-                  Cancel
+                  {t('actions.cancel')}
                 </Button>
                 <Button variant="primary" size="md" type="submit" disabled={saving}>
-                  {saving ? 'Saving…' : 'Save changes'}
+                  {saving ? t('actions.saving') : t('actions.saveChanges')}
                 </Button>
               </div>
-
             </form>
           </div>
         </div>
@@ -591,3 +1084,5 @@ export default function ProfilePage() {
     </Layout>
   );
 }
+
+export default translate(ProfilePage);

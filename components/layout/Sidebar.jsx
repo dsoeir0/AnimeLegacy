@@ -16,6 +16,7 @@ import {
   PanelLeftClose,
   PanelLeft,
 } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Logo from '../ui/Logo';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
@@ -24,26 +25,26 @@ import styles from './Sidebar.module.css';
 const STORAGE_KEY = 'animeLegacy.sidebar.collapsed';
 
 const exploreItems = [
-  { id: 'home', label: 'Home', href: '/', icon: Home, match: (p) => p === '/' },
-  { id: 'calendar', label: 'Calendar', href: '/calendar', icon: Calendar, match: (p) => p.startsWith('/calendar') },
-  { id: 'seasons', label: 'Seasons', href: '/seasons', icon: Film, match: (p) => p.startsWith('/seasons') },
-  { id: 'characters', label: 'Characters', href: '/characters', icon: Users, match: (p) => p.startsWith('/characters') },
-  { id: 'voices', label: 'Voice actors', href: '/voices', icon: Mic, match: (p) => p.startsWith('/voices') },
-  { id: 'studios', label: 'Studios', href: '/studios', icon: Building2, match: (p) => p.startsWith('/studios') },
-  { id: 'collections', label: 'Collections', href: '/collections', icon: Bookmark, match: (p) => p.startsWith('/collections') },
+  { id: 'home', labelKey: 'nav.home', href: '/', icon: Home, match: (p) => p === '/' },
+  { id: 'calendar', labelKey: 'nav.calendar', href: '/calendar', icon: Calendar, match: (p) => p.startsWith('/calendar') },
+  { id: 'seasons', labelKey: 'nav.seasons', href: '/seasons', icon: Film, match: (p) => p.startsWith('/seasons') },
+  { id: 'characters', labelKey: 'nav.characters', href: '/characters', icon: Users, match: (p) => p.startsWith('/characters') },
+  { id: 'voices', labelKey: 'nav.voiceActors', href: '/voices', icon: Mic, match: (p) => p.startsWith('/voices') },
+  { id: 'studios', labelKey: 'nav.studios', href: '/studios', icon: Building2, match: (p) => p.startsWith('/studios') },
+  { id: 'collections', labelKey: 'nav.collections', href: '/collections', icon: Bookmark, match: (p) => p.startsWith('/collections') },
 ];
 
 const libraryItems = [
-  { id: 'mylist', label: 'My list', href: '/my-list', icon: List, match: (p) => p.startsWith('/my-list') },
-  { id: 'profile', label: 'Profile', href: '/profile', icon: User, match: (p) => p.startsWith('/profile') },
-  { id: 'compare', label: 'Compare', href: '/compare', icon: GitBranch, match: (p) => p.startsWith('/compare') },
+  { id: 'mylist', labelKey: 'nav.myList', href: '/my-list', icon: List, match: (p) => p.startsWith('/my-list') },
+  { id: 'profile', labelKey: 'nav.profile', href: '/profile', icon: User, match: (p) => p.startsWith('/profile') },
+  { id: 'compare', labelKey: 'nav.compare', href: '/compare', icon: GitBranch, match: (p) => p.startsWith('/compare') },
 ];
 
 const accountItems = [
-  { id: 'search', label: 'Discover', href: '/search', icon: Compass, match: (p) => p.startsWith('/search') },
+  { id: 'search', labelKey: 'nav.discover', href: '/search', icon: Compass, match: (p) => p.startsWith('/search') },
 ];
 
-function NavItem({ item, collapsed, active }) {
+function NavItem({ item, collapsed, active, t }) {
   const Icon = item.icon;
   return (
     <Link
@@ -53,12 +54,12 @@ function NavItem({ item, collapsed, active }) {
     >
       {active && !collapsed ? <span className={styles.activeBar} /> : null}
       <Icon size={17} strokeWidth={active ? 2 : 1.75} />
-      {!collapsed ? <span>{item.label}</span> : null}
+      {!collapsed ? <span>{t(item.labelKey)}</span> : null}
     </Link>
   );
 }
 
-export default function Sidebar() {
+function Sidebar({ t }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
@@ -91,28 +92,28 @@ export default function Sidebar() {
           type="button"
           onClick={toggle}
           className={styles.collapseBtn}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
         >
           {collapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
         </button>
       </div>
 
       <nav className={styles.nav}>
-        {!collapsed ? <div className={styles.groupLabel}>Explore</div> : null}
+        {!collapsed ? <div className={styles.groupLabel}>{t('nav.explore')}</div> : null}
         {exploreItems.map((it) => (
-          <NavItem key={it.id} item={it} collapsed={collapsed} active={isActive(it)} />
+          <NavItem key={it.id} item={it} collapsed={collapsed} active={isActive(it)} t={t} />
         ))}
 
         <div className={styles.separator} />
-        {!collapsed ? <div className={styles.groupLabel}>Your library</div> : null}
+        {!collapsed ? <div className={styles.groupLabel}>{t('nav.yourLibrary')}</div> : null}
         {libraryItems.map((it) => (
-          <NavItem key={it.id} item={it} collapsed={collapsed} active={isActive(it)} />
+          <NavItem key={it.id} item={it} collapsed={collapsed} active={isActive(it)} t={t} />
         ))}
 
         <div className={styles.separator} />
-        {!collapsed ? <div className={styles.groupLabel}>Account</div> : null}
+        {!collapsed ? <div className={styles.groupLabel}>{t('nav.account')}</div> : null}
         {accountItems.map((it) => (
-          <NavItem key={it.id} item={it} collapsed={collapsed} active={isActive(it)} />
+          <NavItem key={it.id} item={it} collapsed={collapsed} active={isActive(it)} t={t} />
         ))}
       </nav>
 
@@ -137,3 +138,5 @@ export default function Sidebar() {
     </aside>
   );
 }
+
+export default translate(Sidebar);

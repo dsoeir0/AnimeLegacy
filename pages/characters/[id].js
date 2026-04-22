@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ArrowRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import {
   collection,
   deleteDoc,
@@ -50,10 +51,11 @@ const inferGenderFromAbout = (about = '') => {
   return '';
 };
 
-export default function CharacterPage({
+function CharacterPage({
   characterResposta,
   characterAnimeResposta,
   characterVoicesResposta,
+  t,
 }) {
   const character = characterResposta?.data || {};
   const anime = Array.isArray(characterAnimeResposta?.data) ? characterAnimeResposta.data : [];
@@ -121,16 +123,16 @@ export default function CharacterPage({
   const toggleFavorite = async () => {
     if (!character?.mal_id || typeof window === 'undefined') return;
     if (!user?.uid) {
-      setFavoriteError('Sign in to favorite characters.');
+      setFavoriteError(t('errors.signInToFavoriteCharacters'));
       return;
     }
     if (!favoriteLoaded) {
-      setFavoriteError('Loading favorites…');
+      setFavoriteError(t('errors.loadingFavorites'));
       return;
     }
     const next = !isFavorite;
     if (next && favoriteCount >= FAVORITE_LIMIT) {
-      setFavoriteError(`You can only favorite up to ${FAVORITE_LIMIT} characters.`);
+      setFavoriteError(t('errors.favoriteLimitCharacters', { limit: FAVORITE_LIMIT }));
       return;
     }
     setFavoriteError('');
@@ -149,7 +151,7 @@ export default function CharacterPage({
             favoriteRef,
             {
               id: characterId,
-              name: character?.name || 'Unknown Character',
+              name: character?.name || t('status.unknown'),
               nameKanji: character?.name_kanji || '',
               imageUrl: imageUrl || '',
               updatedAt: serverTimestamp(),
@@ -160,7 +162,7 @@ export default function CharacterPage({
           await deleteDoc(favoriteRef);
         }
       } catch {
-        setFavoriteError('Global favorites unavailable right now.');
+        setFavoriteError(t('errors.globalFavoritesUnavailable'));
       }
     }
   };
@@ -177,10 +179,10 @@ export default function CharacterPage({
   );
 
   const stats = [
-    { label: 'FAVORITES', value: toStatValue(favoriteTotal, '0') },
-    { label: 'AGE', value: toStatValue(ageValue) },
-    { label: 'HEIGHT', value: toStatValue(heightValue) },
-    { label: 'GENDER', value: toStatValue(genderValue) },
+    { label: t('character.stats.favorites'), value: toStatValue(favoriteTotal, '0') },
+    { label: t('character.stats.age'), value: toStatValue(ageValue) },
+    { label: t('character.stats.height'), value: toStatValue(heightValue) },
+    { label: t('character.stats.gender'), value: toStatValue(genderValue) },
   ];
 
   const nicknameTags = Array.isArray(character?.nicknames) ? character.nicknames : [];
@@ -204,8 +206,8 @@ export default function CharacterPage({
             />
           </div>
           <div className={styles.heroBody}>
-            <div className={styles.eyebrow}>CHARACTER PROFILE</div>
-            <h1 className={styles.title}>{character?.name || 'Unknown'}</h1>
+            <div className={styles.eyebrow}>{t('character.eyebrow')}</div>
+            <h1 className={styles.title}>{character?.name || t('status.unknown')}</h1>
             {character?.name_kanji ? (
               <div className={styles.subTitle}>{character.name_kanji}</div>
             ) : null}
@@ -230,11 +232,11 @@ export default function CharacterPage({
 
             <div className={styles.favoriteCard}>
               <div className={styles.favoriteLeft}>
-                <div className={styles.favoriteTitle}>Favorite character</div>
+                <div className={styles.favoriteTitle}>{t('character.favoriteTitle')}</div>
                 <div className={styles.favoriteHint}>
                   {isFavorite
-                    ? 'Showcased on your profile.'
-                    : 'Mark to feature on your profile.'}
+                    ? t('character.favoriteHintOn')
+                    : t('character.favoriteHintOff')}
                   {favoriteError ? <span className={styles.favoriteError}> {favoriteError}</span> : null}
                 </div>
               </div>
@@ -245,12 +247,12 @@ export default function CharacterPage({
                 onClick={toggleFavorite}
                 disabled={!user?.uid || !favoriteLoaded}
               >
-                {isFavorite ? 'Favorited' : 'Favorite'}
+                {isFavorite ? t('actions.favorited') : t('actions.favorite')}
               </Button>
             </div>
 
             <div className={styles.bioCard}>
-              <div className={styles.sectionEyebrow}>BIOGRAPHY</div>
+              <div className={styles.sectionEyebrow}>{t('character.biographyEyebrow')}</div>
               {biography.length ? (
                 biography.map((p, i) => (
                   <p key={`${p}-${i}`} className={styles.bioText}>
@@ -258,7 +260,7 @@ export default function CharacterPage({
                   </p>
                 ))
               ) : (
-                <p className={styles.bioText}>Biography unavailable.</p>
+                <p className={styles.bioText}>{t('character.biographyMissing')}</p>
               )}
             </div>
           </div>
@@ -267,8 +269,8 @@ export default function CharacterPage({
         <section className={styles.section}>
           <div className={styles.sectionHeadRow}>
             <div>
-              <div className={styles.sectionEyebrow}>APPEARANCES</div>
-              <h2 className={styles.sectionTitle}>Major appearances</h2>
+              <div className={styles.sectionEyebrow}>{t('character.appearancesEyebrow')}</div>
+              <h2 className={styles.sectionTitle}>{t('character.appearancesTitle')}</h2>
             </div>
             {anime.length > 6 ? (
               <Button
@@ -277,14 +279,14 @@ export default function CharacterPage({
                 iconRight={ArrowRight}
                 onClick={() => setShowAllAppearances((p) => !p)}
               >
-                {showAllAppearances ? 'Show less' : 'View all'}
+                {showAllAppearances ? t('actions.showLess') : t('actions.viewAll')}
               </Button>
             ) : null}
           </div>
           <div className={styles.appearanceGrid}>
             {visibleAppearances.length ? (
               visibleAppearances.map((entry) => {
-                const title = entry?.anime?.title || 'Unknown anime';
+                const title = entry?.anime?.title || t('anime.unknownTitle');
                 const image = getAnimeImageUrl(entry?.anime) || '/logo_no_text.png';
                 const animeId = entry?.anime?.mal_id;
                 return (
@@ -307,13 +309,13 @@ export default function CharacterPage({
                     </div>
                     <div className={styles.appearanceMeta}>
                       <div className={styles.appearanceTitle}>{title}</div>
-                      <div className={styles.appearanceRole}>{entry?.role || 'Role'}</div>
+                      <div className={styles.appearanceRole}>{entry?.role || t('anime.roleLabel')}</div>
                     </div>
                   </Link>
                 );
               })
             ) : (
-              <p className={styles.empty}>Appearances unavailable.</p>
+              <p className={styles.empty}>{t('character.appearancesMissing')}</p>
             )}
           </div>
         </section>
@@ -321,10 +323,10 @@ export default function CharacterPage({
         <section className={styles.section}>
           <div className={styles.sectionHeadRow}>
             <div>
-              <div className={styles.sectionEyebrow}>CAST</div>
-              <h2 className={styles.sectionTitle}>Voice actors</h2>
+              <div className={styles.sectionEyebrow}>{t('character.castEyebrow')}</div>
+              <h2 className={styles.sectionTitle}>{t('character.voiceActorsTitle')}</h2>
             </div>
-            <span className={styles.eyebrowInline}>{voices.length} LISTED</span>
+            <span className={styles.eyebrowInline}>{t('character.listedCount', { n: voices.length })}</span>
           </div>
           <div className={styles.voiceGrid}>
             {voices.length ? (
@@ -340,14 +342,14 @@ export default function CharacterPage({
                       <Image src={actorImage} alt={actor?.name || 'VA'} fill sizes="72px" className={styles.posterImg}/>
                     </div>
                     <div className={styles.voiceMeta}>
-                      <div className={styles.voiceName}>{actor?.name || 'Unknown'}</div>
+                      <div className={styles.voiceName}>{actor?.name || t('status.unknown')}</div>
                       <div className={styles.voiceLang}>{entry?.language || '—'}</div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <p className={styles.empty}>Voice actors unavailable.</p>
+              <p className={styles.empty}>{t('character.voiceActorsMissing')}</p>
             )}
           </div>
         </section>
@@ -355,6 +357,8 @@ export default function CharacterPage({
     </Layout>
   );
 }
+
+export default translate(CharacterPage);
 
 export async function getServerSideProps(context) {
   const { id } = context.query;

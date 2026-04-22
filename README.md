@@ -71,8 +71,10 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
 
-# Optional — Google Cloud Translate API key for `pnpm gen-trans`
-GOOGLE_TRANSLATE_API_KEY=
+# Optional — bucket key for `pnpm gen-trans` (MyMemory API).
+# With an email the daily quota is 50 000 words/day; anonymous is 5 000.
+# MyMemory does not validate this — it is only used as a quota bucket.
+MYMEMORY_EMAIL=
 ```
 
 ### Run locally
@@ -91,7 +93,7 @@ pnpm start                 # Start production server
 pnpm lint                  # Oxlint (project has a zero-error discipline)
 pnpm format                # Oxfmt
 pnpm seed:firestore        # Seed anime catalog (requires service-account JSON)
-pnpm gen-trans             # Regenerate pt/es/fr from lang/en.json via Google Translate
+pnpm gen-trans             # Regenerate pt/es/fr from lang/en.json via MyMemory
 ```
 
 ---

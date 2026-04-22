@@ -1,3 +1,4 @@
+import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import PosterCard from '../components/cards/PosterCard';
 import { getSchedules } from '../lib/services/jikan';
@@ -5,13 +6,13 @@ import { filterOutHentai } from '../lib/utils/anime';
 import styles from './calendar.module.css';
 
 const DAYS = [
-  { key: 'monday', label: 'Monday' },
-  { key: 'tuesday', label: 'Tuesday' },
-  { key: 'wednesday', label: 'Wednesday' },
-  { key: 'thursday', label: 'Thursday' },
-  { key: 'friday', label: 'Friday' },
-  { key: 'saturday', label: 'Saturday' },
-  { key: 'sunday', label: 'Sunday' },
+  { key: 'monday', labelKey: 'calendar.days.monday' },
+  { key: 'tuesday', labelKey: 'calendar.days.tuesday' },
+  { key: 'wednesday', labelKey: 'calendar.days.wednesday' },
+  { key: 'thursday', labelKey: 'calendar.days.thursday' },
+  { key: 'friday', labelKey: 'calendar.days.friday' },
+  { key: 'saturday', labelKey: 'calendar.days.saturday' },
+  { key: 'sunday', labelKey: 'calendar.days.sunday' },
 ];
 
 const getTodayKey = () => {
@@ -20,7 +21,7 @@ const getTodayKey = () => {
   return map[idx];
 };
 
-export default function CalendarPage({ schedulesByDay }) {
+function CalendarPage({ schedulesByDay, t }) {
   const today = getTodayKey();
   const totalCount = Object.values(schedulesByDay || {}).reduce(
     (sum, list) => sum + (Array.isArray(list) ? list.length : 0),
@@ -28,15 +29,13 @@ export default function CalendarPage({ schedulesByDay }) {
   );
 
   return (
-    <Layout title="AnimeLegacy · Calendar" description="Weekly broadcast schedule for currently airing anime.">
+    <Layout title={t('calendar.metaTitle')} description={t('calendar.metaDesc')}>
       <div className={styles.page}>
         <header className={styles.head}>
-          <div className={styles.eyebrow}>WEEKLY BROADCAST</div>
-          <h1 className={styles.heading}>Simulcast calendar</h1>
+          <div className={styles.eyebrow}>{t('calendar.eyebrow')}</div>
+          <h1 className={styles.heading}>{t('calendar.title')}</h1>
           <p className={styles.subtitle}>
-            {totalCount
-              ? `${totalCount} shows airing this week. New episodes drop on the days below — in your local timezone via Jikan.`
-              : 'Broadcast schedule is currently unavailable. Try again in a few minutes.'}
+            {totalCount ? t('calendar.countBody', { n: totalCount }) : t('calendar.unavailable')}
           </p>
         </header>
 
@@ -48,13 +47,13 @@ export default function CalendarPage({ schedulesByDay }) {
               <section key={day.key} className={`${styles.day} ${isToday ? styles.dayToday : ''}`}>
                 <div className={styles.dayHead}>
                   <div>
-                    <div className={styles.dayLabel}>{day.label}</div>
-                    {isToday ? <span className={styles.todayTag}>TODAY</span> : null}
+                    <div className={styles.dayLabel}>{t(day.labelKey)}</div>
+                    {isToday ? <span className={styles.todayTag}>{t('calendar.today')}</span> : null}
                   </div>
                   <span className={styles.dayCount}>{items.length}</span>
                 </div>
                 {items.length === 0 ? (
-                  <div className={styles.emptyDay}>No scheduled episodes.</div>
+                  <div className={styles.emptyDay}>{t('calendar.noEpisodes')}</div>
                 ) : (
                   <div className={styles.dayGrid}>
                     {items.map((item) => (
@@ -75,6 +74,8 @@ export default function CalendarPage({ schedulesByDay }) {
     </Layout>
   );
 }
+
+export default translate(CalendarPage);
 
 export async function getServerSideProps() {
   try {

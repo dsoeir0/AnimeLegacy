@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowLeft, Send } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import AuthShell from '../components/auth/AuthShell';
 import Button from '../components/ui/Button';
 import useAuth from '../hooks/useAuth';
 import { isValidEmail } from '../lib/constants';
 import styles from '../components/auth/AuthForms.module.css';
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordPage({ t }) {
   const { user, sendPasswordReset } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -18,9 +19,9 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState('');
 
   const emailError = !email
-    ? 'Email is required.'
+    ? t('errors.emailRequired')
     : !isValidEmail(email)
-      ? 'Enter a valid email address.'
+      ? t('errors.emailInvalid')
       : '';
 
   const getResetUrl = () => {
@@ -39,12 +40,12 @@ export default function ForgotPasswordPage() {
     try {
       setSubmitting(true);
       await sendPasswordReset(email, { url: getResetUrl(), handleCodeInApp: true });
-      setMessage('Password reset email sent. Check your inbox.');
+      setMessage(t('auth.emailSent'));
     } catch (err) {
       setError(
         err?.code === 'auth/not-configured'
-          ? 'Password reset is not configured. Add Firebase env vars to enable it.'
-          : err?.message || 'Unable to send reset email right now.',
+          ? t('errors.resetNotConfigured')
+          : err?.message || t('errors.unableSendReset'),
       );
     } finally {
       setSubmitting(false);
@@ -53,34 +54,32 @@ export default function ForgotPasswordPage() {
 
   useEffect(() => {
     if (!message) return;
-    const t = setTimeout(() => router.push('/sign-in'), 3000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => router.push('/sign-in'), 3000);
+    return () => clearTimeout(timer);
   }, [message, router]);
 
   return (
     <AuthShell title="AnimeLegacy · Reset password" description="Reset your AnimeLegacy password.">
       <div className={styles.topBar}>
         <Link href="/sign-in" className={styles.backLink}>
-          <ArrowLeft size={14} /> Back to sign in
+          <ArrowLeft size={14} /> {t('actions.backToSignIn')}
         </Link>
       </div>
       <div className={styles.formArea}>
         <div className={styles.formWrap}>
-          <div className={styles.eyebrow}>ACCOUNT RECOVERY</div>
-          <h2 className={styles.heading}>Reset your password.</h2>
-          <p className={styles.subtitle}>
-            Enter the email tied to your account and we will send a reset link.
-          </p>
+          <div className={styles.eyebrow}>{t('auth.recoveryEyebrow')}</div>
+          <h2 className={styles.heading}>{t('auth.forgotTitle')}</h2>
+          <p className={styles.subtitle}>{t('auth.forgotBody')}</p>
 
           {user ? (
             <div className={styles.signedIn}>
               <p>
-                You&apos;re already signed in as{' '}
+                {t('profile.signedInAs')}{' '}
                 <strong>{user.displayName || user.email || 'AnimeLegacy User'}</strong>.
               </p>
               <Link href="/my-list">
                 <Button variant="primary" size="md" fullWidth>
-                  Go to my list
+                  {t('actions.goToMyList')}
                 </Button>
               </Link>
             </div>
@@ -88,7 +87,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleReset} noValidate>
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="email">
-                  Email
+                  {t('forms.email')}
                 </label>
                 <input
                   id="email"
@@ -97,7 +96,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setTouched(true)}
-                  placeholder="you@example.com"
+                  placeholder={t('forms.emailPlaceholder')}
                   autoComplete="email"
                   required
                 />
@@ -113,23 +112,25 @@ export default function ForgotPasswordPage() {
                 icon={Send}
                 disabled={submitting}
               >
-                {submitting ? 'Sending…' : 'Send reset link'}
+                {submitting ? t('auth.sending') : t('actions.sendResetLink')}
               </Button>
 
               {error ? <div className={styles.error}>{error}</div> : null}
               {message ? <div className={styles.success}>{message}</div> : null}
 
               <div className={styles.altLink}>
-                <span>Remembered it?</span>
-                <Link href="/sign-in">Back to sign in</Link>
+                <span>{t('auth.remembered')}</span>
+                <Link href="/sign-in">{t('actions.backToSignIn')}</Link>
               </div>
             </form>
           )}
         </div>
       </div>
       <footer className={styles.footer}>
-        <span>© {new Date().getFullYear()} AnimeLegacy</span>
+        <span>{t('auth.footerCopy', { year: new Date().getFullYear() })}</span>
       </footer>
     </AuthShell>
   );
 }
+
+export default translate(ForgotPasswordPage);

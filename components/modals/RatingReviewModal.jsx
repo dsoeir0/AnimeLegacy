@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Check, Circle, Star, StarHalf, X } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import styles from '../../styles/add-to-list.module.css';
 
 const buildStarState = (rating, starIndex) => {
@@ -11,13 +12,14 @@ const buildStarState = (rating, starIndex) => {
   return 'empty';
 };
 
-export default function RatingReviewModal({
+function RatingReviewModal({
   open,
   anime,
   initialRating,
   initialReview,
   onClose,
   onSave,
+  t,
 }) {
   const [rating, setRating] = useState(null);
   const [reviewEnabled, setReviewEnabled] = useState(false);
@@ -41,15 +43,19 @@ export default function RatingReviewModal({
       <div className={styles.modal}>
         <div className={styles.header}>
           <div className={styles.titleBlock}>
-            <div className={styles.eyebrow}>Rate & Review</div>
+            <div className={styles.eyebrow}>{t('modal.rating.title')}</div>
             <h2 className={styles.title}>{anime?.title || 'Untitled'}</h2>
             <div className={styles.metaRow}>
-              <span>{anime?.type || 'Series'}</span>
+              <span>{anime?.type || t('modal.addToList.typeFallback')}</span>
               <span>•</span>
-              <span>{anime?.episodes ? `${anime.episodes} eps` : 'Ongoing'}</span>
+              <span>
+                {anime?.episodes
+                  ? t('modal.addToList.episodesShort', { n: anime.episodes })
+                  : t('modal.addToList.ongoing')}
+              </span>
             </div>
           </div>
-          <button className={styles.closeButton} type="button" onClick={onClose} aria-label="Close">
+          <button className={styles.closeButton} type="button" onClick={onClose} aria-label={t('actions.close')}>
             <X size={16} aria-hidden="true" />
           </button>
         </div>
@@ -67,7 +73,7 @@ export default function RatingReviewModal({
 
           <div className={styles.fields}>
             <div className={styles.field}>
-              <label className={styles.label}>Your rating</label>
+              <label className={styles.label}>{t('modal.rating.yourRating')}</label>
               <div className={styles.reviewBlock}>
                 <div className={styles.starRow}>
                   {Array.from({ length: 5 }, (_, index) => {
@@ -86,13 +92,13 @@ export default function RatingReviewModal({
                         <button
                           type="button"
                           className={styles.starHitLeft}
-                          aria-label={`Set rating to ${starIndex - 0.5} out of 5`}
+                          aria-label={t('modal.rating.starLabel', { value: starIndex - 0.5 })}
                           onClick={() => setRating(starIndex - 0.5)}
                         />
                         <button
                           type="button"
                           className={styles.starHitRight}
-                          aria-label={`Set rating to ${starIndex} out of 5`}
+                          aria-label={t('modal.rating.starLabel', { value: starIndex })}
                           onClick={() => setRating(starIndex)}
                         />
                       </span>
@@ -103,17 +109,19 @@ export default function RatingReviewModal({
                     className={styles.clearRating}
                     onClick={() => setRating(null)}
                   >
-                    Clear
+                    {t('actions.clear')}
                   </button>
                   <span className={styles.ratingValue}>
-                    {typeof rating === 'number' ? `${rating}/5` : 'Not rated'}
+                    {typeof rating === 'number'
+                      ? t('modal.rating.ratingValue', { n: rating })
+                      : t('modal.rating.notRated')}
                   </span>
                 </div>
               </div>
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label}>Review</label>
+              <label className={styles.label}>{t('modal.rating.review')}</label>
               <div className={styles.reviewToggleRow}>
                 <button
                   type="button"
@@ -126,13 +134,15 @@ export default function RatingReviewModal({
                   ) : (
                     <Circle size={14} className={styles.reviewToggleIcon} aria-hidden="true" />
                   )}
-                  <span>{reviewEnabled ? 'Review enabled' : 'Enable review'}</span>
+                  <span>
+                    {reviewEnabled ? t('modal.rating.reviewEnabled') : t('modal.rating.enableReview')}
+                  </span>
                 </button>
               </div>
               {reviewEnabled ? (
                 <textarea
                   className={styles.reviewTextarea}
-                  placeholder="Share what you thought about the story, characters, and pacing..."
+                  placeholder={t('modal.rating.reviewPlaceholder')}
                   value={reviewText}
                   onChange={(event) => setReviewText(event.target.value)}
                 />
@@ -143,7 +153,7 @@ export default function RatingReviewModal({
 
         <div className={styles.actions}>
           <button className={styles.secondary} type="button" onClick={onClose}>
-            Cancel
+            {t('actions.cancel')}
           </button>
           <button
             className={styles.primary}
@@ -156,10 +166,12 @@ export default function RatingReviewModal({
               });
             }}
           >
-            {hasExistingData ? 'Update rating' : 'Save rating'}
+            {hasExistingData ? t('modal.rating.update') : t('modal.rating.save')}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+export default translate(RatingReviewModal);

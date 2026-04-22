@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import IconButton from '../../components/ui/IconButton';
 import { getTopPeople } from '../../lib/services/jikan';
@@ -12,29 +13,27 @@ const posterFrom = (person) =>
   person?.images?.jpg?.image_url ||
   '/logo_no_text.png';
 
-export default function VoicesIndexPage({ items, pagination, page }) {
+function VoicesIndexPage({ items, pagination, page, t }) {
   const router = useRouter();
   const lastPage = pagination?.last_visible_page || 1;
   const go = (p) => router.push({ pathname: '/voices', query: { page: p } });
 
   return (
-    <Layout title="AnimeLegacy · Voice actors" description="Most favorited voice actors and their work.">
+    <Layout title={t('voices.metaTitle')} description={t('voices.metaDesc')}>
       <div className={styles.page}>
         <header className={styles.head}>
-          <div className={styles.eyebrow}>CATALOGUE</div>
+          <div className={styles.eyebrow}>{t('voices.eyebrow')}</div>
           <h1 className={styles.heading}>
-            Top <span className={styles.highlight}>voice actors</span>
+            {t('voices.titleStart')}{' '}
+            <span className={styles.highlight}>{t('voices.titleEnd')}</span>
           </h1>
-          <p className={styles.subtitle}>
-            The most beloved seiyuu and international voice actors. Click through for their
-            filmography and roles.
-          </p>
+          <p className={styles.subtitle}>{t('voices.subtitle')}</p>
         </header>
 
         {items.length === 0 ? (
           <div className={styles.empty}>
-            <h2>No data available</h2>
-            <p>The Jikan API is not responding. Try again in a moment.</p>
+            <h2>{t('voices.emptyTitle')}</h2>
+            <p>{t('voices.emptyBody')}</p>
           </div>
         ) : (
           <div className={styles.grid}>
@@ -51,15 +50,13 @@ export default function VoicesIndexPage({ items, pagination, page }) {
                   <div className={styles.avatarGradient} />
                   {typeof p.favorites === 'number' ? (
                     <div className={styles.favBadge}>
-                      <span className={styles.favNum}>
-                        {p.favorites.toLocaleString()}
-                      </span>
-                      <span className={styles.favLabel}>fans</span>
+                      <span className={styles.favNum}>{p.favorites.toLocaleString()}</span>
+                      <span className={styles.favLabel}>{t('voices.fans')}</span>
                     </div>
                   ) : null}
                 </div>
                 <div className={styles.meta}>
-                  <div className={styles.name}>{p.name || 'Unknown'}</div>
+                  <div className={styles.name}>{p.name || t('status.unknown')}</div>
                   {p.given_name || p.family_name ? (
                     <div className={styles.sub}>
                       {[p.given_name, p.family_name].filter(Boolean).join(' ')}
@@ -75,7 +72,7 @@ export default function VoicesIndexPage({ items, pagination, page }) {
           <div className={styles.pagination}>
             <IconButton
               icon={ChevronLeft}
-              tooltip="Previous page"
+              tooltip={t('actions.previousPage')}
               disabled={page === 1}
               onClick={() => go(Math.max(1, page - 1))}
             />
@@ -101,7 +98,7 @@ export default function VoicesIndexPage({ items, pagination, page }) {
             ) : null}
             <IconButton
               icon={ChevronRight}
-              tooltip="Next page"
+              tooltip={t('actions.nextPage')}
               disabled={page === lastPage}
               onClick={() => go(Math.min(lastPage, page + 1))}
             />
@@ -111,6 +108,8 @@ export default function VoicesIndexPage({ items, pagination, page }) {
     </Layout>
   );
 }
+
+export default translate(VoicesIndexPage);
 
 export async function getServerSideProps(context) {
   const page = Math.max(1, Number.parseInt(context.query?.page, 10) || 1);

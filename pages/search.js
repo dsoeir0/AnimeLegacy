@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import HorizontalRow from '../components/cards/HorizontalRow';
 import IconButton from '../components/ui/IconButton';
@@ -12,7 +13,7 @@ import useMyList from '../hooks/useMyList';
 import { filterOutHentai, normalizeAnime } from '../lib/utils/anime';
 import { searchAnime, slimAnimeResponse } from '../lib/services/jikan';
 
-export default function Search({ query, page, results, pagination }) {
+function Search({ query, page, results, pagination, t }) {
   const router = useRouter();
   const { addItem, canEdit, favoritesCount, list } = useMyList();
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -45,31 +46,30 @@ export default function Search({ query, page, results, pagination }) {
 
   return (
     <Layout
-      title={`AnimeLegacy · Search for ${query || 'anime'}`}
-      description="Search results from AnimeLegacy."
+      title={query ? t('search.metaTitle', { query }) : t('search.metaTitleFallback')}
+      description={t('search.metaDesc')}
     >
       <div className={styles.page}>
         <header className={styles.head}>
           <div>
-            <div className={styles.eyebrow}>DISCOVER</div>
+            <div className={styles.eyebrow}>{t('search.eyebrow')}</div>
             <h1 className={styles.heading}>
               {query ? (
                 <>
-                  Results for <span className={styles.highlight}>&ldquo;{query}&rdquo;</span>
+                  {t('search.resultsFor')}{' '}
+                  <span className={styles.highlight}>&ldquo;{query}&rdquo;</span>
                 </>
               ) : (
-                'Search the archive'
+                t('search.startTitle')
               )}
             </h1>
             <p className={styles.subtitle}>
-              {query
-                ? `${total} result${total === 1 ? '' : 's'} found. Filter, sort, and add to your list in one place.`
-                : 'Type a title in the top bar above to search thousands of anime series and films.'}
+              {query ? t('search.foundBody', { n: total }) : t('search.startBody')}
             </p>
           </div>
           {query ? (
             <Button variant="ghost" size="md" onClick={() => router.back()}>
-              Back
+              {t('actions.back')}
             </Button>
           ) : null}
         </header>
@@ -77,9 +77,11 @@ export default function Search({ query, page, results, pagination }) {
         {hasResults ? (
           <>
             <div className={styles.resultsInfo}>
-              <span className={styles.eyebrowInline}>{items.length} TITLES ON THIS PAGE</span>
+              <span className={styles.eyebrowInline}>
+                {t('search.titlesOnPage', { n: items.length })}
+              </span>
               <span className={styles.pageInfo}>
-                Page {page} of {lastPage}
+                {t('search.pageOf', { current: page, total: lastPage })}
               </span>
             </div>
             <div className={styles.list}>
@@ -100,7 +102,7 @@ export default function Search({ query, page, results, pagination }) {
 
             <div className={styles.pagination}>
               <Link href={buildLink(Math.max(1, page - 1))} className={styles.pageLink}>
-                <IconButton icon={ChevronLeft} tooltip="Previous page" disabled={page === 1} />
+                <IconButton icon={ChevronLeft} tooltip={t('actions.previousPage')} disabled={page === 1} />
               </Link>
               {Array.from({ length: Math.min(5, lastPage) }, (_, i) => i + 1).map((p) => (
                 <Link key={p} href={buildLink(p)} className={styles.pageLink}>
@@ -124,18 +126,14 @@ export default function Search({ query, page, results, pagination }) {
                 </Link>
               ) : null}
               <Link href={buildLink(Math.min(lastPage, page + 1))} className={styles.pageLink}>
-                <IconButton icon={ChevronRight} tooltip="Next page" disabled={page === lastPage} />
+                <IconButton icon={ChevronRight} tooltip={t('actions.nextPage')} disabled={page === lastPage} />
               </Link>
             </div>
           </>
         ) : (
           <div className={styles.empty}>
-            <h2>{query ? 'No results yet' : 'Start searching'}</h2>
-            <p>
-              {query
-                ? 'Try a different title, or check your spelling.'
-                : 'Use the search bar in the top of the page to discover new anime.'}
-            </p>
+            <h2>{query ? t('search.emptyTitle') : t('search.startTitle')}</h2>
+            <p>{query ? t('search.emptyBody') : t('search.startBody')}</p>
           </div>
         )}
       </div>
@@ -155,6 +153,8 @@ export default function Search({ query, page, results, pagination }) {
     </Layout>
   );
 }
+
+export default translate(Search);
 
 export async function getServerSideProps(context) {
   const query = typeof context.query?.q === 'string' ? context.query.q.trim() : '';

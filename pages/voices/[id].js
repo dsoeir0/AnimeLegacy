@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import { getPersonById, getPersonAnime, getPersonVoices } from '../../lib/services/jikan';
@@ -22,7 +23,7 @@ const characterImage = (character) =>
   character?.images?.jpg?.image_url ||
   '/logo_no_text.png';
 
-export default function VoiceActorDetailPage({ person, animeEntries, voiceEntries }) {
+function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
   const [showAllAnime, setShowAllAnime] = useState(false);
   const [showAllRoles, setShowAllRoles] = useState(false);
   if (!person) {
@@ -30,10 +31,10 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
       <Layout title="AnimeLegacy · Voice actor">
         <div className={styles.page}>
           <div className={styles.empty}>
-            <h1>Not found</h1>
-            <p>This voice actor could not be loaded.</p>
+            <h1>{t('errors.notFound')}</h1>
+            <p>{t('voice.notFoundBody')}</p>
             <Link href="/voices">
-              <Button variant="primary" size="md">Back to voices</Button>
+              <Button variant="primary" size="md">{t('actions.backToVoices')}</Button>
             </Link>
           </div>
         </div>
@@ -52,7 +53,7 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
   return (
     <Layout
       title={`${person.name || 'Voice actor'} · AnimeLegacy`}
-      description={`${person.name || 'Voice actor'} profile, voice roles, and filmography.`}
+      description={t('voice.metaDesc', { name: person.name || 'Voice actor' })}
     >
       <div className={styles.page}>
         <section className={styles.hero}>
@@ -67,8 +68,8 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
             />
           </div>
           <div className={styles.heroBody}>
-            <div className={styles.eyebrow}>VOICE ACTOR</div>
-            <h1 className={styles.title}>{person.name || 'Unknown'}</h1>
+            <div className={styles.eyebrow}>{t('voice.eyebrow')}</div>
+            <h1 className={styles.title}>{person.name || t('status.unknown')}</h1>
             {person.family_name || person.given_name ? (
               <div className={styles.subTitle}>
                 {[person.family_name, person.given_name].filter(Boolean).join(' ')}
@@ -77,35 +78,35 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
 
             <div className={styles.stats}>
               <div className={styles.stat}>
-                <div className={styles.statLabel}>FAVORITES</div>
+                <div className={styles.statLabel}>{t('voice.stats.favorites')}</div>
                 <div className={styles.statValue}>
                   {typeof person.favorites === 'number' ? person.favorites.toLocaleString() : '—'}
                 </div>
               </div>
               <div className={styles.stat}>
-                <div className={styles.statLabel}>BORN</div>
+                <div className={styles.statLabel}>{t('voice.stats.born')}</div>
                 <div className={styles.statValueSmall}>
                   {person.birthday ? new Date(person.birthday).toLocaleDateString() : '—'}
                 </div>
               </div>
               <div className={styles.stat}>
-                <div className={styles.statLabel}>ROLES</div>
+                <div className={styles.statLabel}>{t('voice.stats.roles')}</div>
                 <div className={styles.statValue}>{voiceEntries.length}</div>
               </div>
               <div className={styles.stat}>
-                <div className={styles.statLabel}>APPEARANCES</div>
+                <div className={styles.statLabel}>{t('voice.stats.appearances')}</div>
                 <div className={styles.statValue}>{animeEntries.length}</div>
               </div>
             </div>
 
             <div className={styles.bioCard}>
-              <div className={styles.sectionEyebrow}>BIOGRAPHY</div>
+              <div className={styles.sectionEyebrow}>{t('voice.biographyEyebrow')}</div>
               {aboutLines.length ? (
                 aboutLines.map((line, i) => (
                   <p key={`${line}-${i}`} className={styles.bioText}>{line}</p>
                 ))
               ) : (
-                <p className={styles.bioText}>Biography unavailable.</p>
+                <p className={styles.bioText}>{t('voice.biographyMissing')}</p>
               )}
             </div>
           </div>
@@ -114,8 +115,8 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
         <section className={styles.section}>
           <div className={styles.sectionHead}>
             <div>
-              <div className={styles.sectionEyebrow}>ROLES</div>
-              <h2 className={styles.sectionTitle}>Voiced characters</h2>
+              <div className={styles.sectionEyebrow}>{t('voice.rolesEyebrow')}</div>
+              <h2 className={styles.sectionTitle}>{t('voice.rolesTitle')}</h2>
             </div>
             {voiceEntries.length > 12 ? (
               <Button
@@ -124,12 +125,12 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
                 iconRight={ArrowRight}
                 onClick={() => setShowAllRoles((p) => !p)}
               >
-                {showAllRoles ? 'Show less' : 'View all'}
+                {showAllRoles ? t('actions.showLess') : t('actions.viewAll')}
               </Button>
             ) : null}
           </div>
           {visibleRoles.length === 0 ? (
-            <p className={styles.sectionEmpty}>No voice roles available.</p>
+            <p className={styles.sectionEmpty}>{t('voice.noRoles')}</p>
           ) : (
             <div className={styles.rolesGrid}>
               {visibleRoles.map((entry, i) => (
@@ -153,7 +154,7 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
                   />
                   <div className={styles.roleMeta}>
                     <div className={styles.roleName}>
-                      {entry?.character?.name || 'Unknown'}
+                      {entry?.character?.name || t('status.unknown')}
                     </div>
                     <div className={styles.roleAnime}>
                       {entry?.anime?.title || '—'}
@@ -171,8 +172,8 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
         <section className={styles.section}>
           <div className={styles.sectionHead}>
             <div>
-              <div className={styles.sectionEyebrow}>FILMOGRAPHY</div>
-              <h2 className={styles.sectionTitle}>Anime appearances</h2>
+              <div className={styles.sectionEyebrow}>{t('voice.filmographyEyebrow')}</div>
+              <h2 className={styles.sectionTitle}>{t('voice.filmographyTitle')}</h2>
             </div>
             {animeEntries.length > 8 ? (
               <Button
@@ -181,12 +182,12 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
                 iconRight={ArrowRight}
                 onClick={() => setShowAllAnime((p) => !p)}
               >
-                {showAllAnime ? 'Show less' : 'View all'}
+                {showAllAnime ? t('actions.showLess') : t('actions.viewAll')}
               </Button>
             ) : null}
           </div>
           {visibleAnime.length === 0 ? (
-            <p className={styles.sectionEmpty}>No filmography available.</p>
+            <p className={styles.sectionEmpty}>{t('voice.noFilmography')}</p>
           ) : (
             <div className={styles.animeGrid}>
               {visibleAnime.map((entry, i) => (
@@ -220,6 +221,8 @@ export default function VoiceActorDetailPage({ person, animeEntries, voiceEntrie
     </Layout>
   );
 }
+
+export default translate(VoiceActorDetailPage);
 
 export async function getServerSideProps(context) {
   const { id } = context.query;

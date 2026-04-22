@@ -19,6 +19,7 @@ import {
   ChevronRight,
   AlertTriangle,
 } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import IconButton from '../components/ui/IconButton';
 import StatusBadge from '../components/ui/StatusBadge';
@@ -35,12 +36,12 @@ import { getSeasonFromDate } from '../lib/utils/season';
 import { FAVORITE_LIMIT, FAVORITE_LIMIT_MESSAGE } from '../lib/constants';
 
 const FILTERS = [
-  { id: 'all', label: 'All' },
-  { id: 'watching', label: 'Watching' },
-  { id: 'completed', label: 'Completed' },
-  { id: 'plan', label: 'Plan to watch' },
-  { id: 'on_hold', label: 'On hold' },
-  { id: 'dropped', label: 'Dropped' },
+  { id: 'all', labelKey: 'myList.tabs.all' },
+  { id: 'watching', labelKey: 'myList.tabs.watching' },
+  { id: 'completed', labelKey: 'myList.tabs.completed' },
+  { id: 'plan', labelKey: 'myList.tabs.plan' },
+  { id: 'on_hold', labelKey: 'myList.tabs.onHold' },
+  { id: 'dropped', labelKey: 'myList.tabs.dropped' },
 ];
 
 const STATUS_ICONS = {
@@ -52,7 +53,7 @@ const STATUS_ICONS = {
   dropped: XCircle,
 };
 
-export default function MyList() {
+function MyList({ t }) {
   const { list, removeItem, addItem, hasLoaded, favoritesCount } = useMyList();
   const { user, loading: authLoading } = useAuth();
   const { animeItems, stats } = useProfileData(user?.uid);
@@ -356,7 +357,7 @@ export default function MyList() {
           <div className={styles.rowRight}>
             {typeof detail.rating === 'number' ? (
               <div className={styles.yourScore}>
-                <div className={styles.yourScoreLabel}>Your score</div>
+                <div className={styles.yourScoreLabel}>{t('myList.yourScore')}</div>
                 <div className={styles.yourScoreNum}>{Number(detail.rating.toFixed(1))}</div>
               </div>
             ) : null}
@@ -365,13 +366,13 @@ export default function MyList() {
         <div className={styles.rowActions}>
           <IconButton
             icon={Trash2}
-            tooltip="Remove from list"
+            tooltip={t('actions.removeFromList')}
             onClick={() => removeItem(item.id)}
           />
           {status === 'completed' ? (
             <IconButton
               icon={Star}
-              tooltip={isFavorite ? 'Remove favorite' : 'Favorite'}
+              tooltip={isFavorite ? t('actions.favorited') : t('actions.favorite')}
               active={isFavorite}
               disabled={favoriteLimitReached}
               onClick={() => handleToggleFavorite(item, detail, detail.status || 'completed')}
@@ -379,14 +380,14 @@ export default function MyList() {
           ) : null}
           <IconButton
             icon={StatusIcon}
-            tooltip={status === 'completed' ? 'Rate' : 'Advance'}
+            tooltip={status === 'completed' ? t('myList.rate') : t('myList.advance')}
             onClick={() =>
               status === 'completed'
                 ? openRatingModal(item, detail)
                 : handleStatusAction(item, detail, status)
             }
           />
-          <IconButton icon={Pencil} tooltip="Edit" onClick={() => openEditModal(item, detail)} />
+          <IconButton icon={Pencil} tooltip={t('actions.edit')} onClick={() => openEditModal(item, detail)} />
         </div>
       </div>
     );
@@ -441,36 +442,36 @@ export default function MyList() {
   };
 
   return (
-    <Layout
-      title="AnimeLegacy · My list"
-      description="Your personal anime watchlist and favorites."
-    >
+    <Layout title={t('myList.metaTitle')} description={t('myList.metaDesc')}>
       <div className={styles.page}>
         {!user ? (
           <div className={styles.emptyCard}>
-            <h2 className={styles.emptyTitle}>Redirecting…</h2>
-            <p className={styles.emptySubtitle}>Please log in to view your list.</p>
+            <h2 className={styles.emptyTitle}>{t('myList.redirecting')}</h2>
+            <p className={styles.emptySubtitle}>{t('myList.loginPrompt')}</p>
           </div>
         ) : (
           <>
             <header className={styles.pageHead}>
               <div className={styles.headInfo}>
-                <div className={styles.eyebrow}>PERSONAL CHRONICLE</div>
-                <h1 className={styles.heading}>My list</h1>
+                <div className={styles.eyebrow}>{t('myList.eyebrow')}</div>
+                <h1 className={styles.heading}>{t('myList.title')}</h1>
                 <p className={styles.subtitle}>
                   {stats?.watched ? (
                     <>
-                      <strong className={styles.statsNum}>{stats.watched}</strong> completed ·{' '}
-                      <strong className={styles.statsNum}>{stats.hours || 0}h</strong> watched
+                      <strong className={styles.statsNum}>{stats.watched}</strong>{' '}
+                      {t('myList.statsCompleted')} ·{' '}
+                      <strong className={styles.statsNum}>{stats.hours || 0}h</strong>{' '}
+                      {t('myList.statsWatched')}
                       {typeof stats.meanScore === 'number' ? (
                         <>
-                          {' · '}mean score{' '}
+                          {' · '}
+                          {t('myList.statsMeanScore')}{' '}
                           <strong className={styles.statsMean}>{stats.meanScore.toFixed(2)}</strong>
                         </>
                       ) : null}
                     </>
                   ) : (
-                    'Manage and track your anime journey across all formats.'
+                    t('myList.subtitleDefault')
                   )}
                 </p>
               </div>
@@ -479,7 +480,7 @@ export default function MyList() {
                   <Search size={14} className={styles.searchIcon} />
                   <input
                     type="text"
-                    placeholder="Search your list…"
+                    placeholder={t('myList.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={styles.searchInput}
@@ -503,7 +504,7 @@ export default function MyList() {
                       setCurrentPage(1);
                     }}
                   >
-                    {f.label}
+                    {t(f.labelKey)}
                     <span className={`${styles.tabCount} ${active ? styles.tabCountActive : ''}`}>
                       {count}
                     </span>
@@ -513,18 +514,20 @@ export default function MyList() {
             </div>
 
             <div className={styles.toolbar}>
-              <div className={styles.eyebrowInline}>{orderedList.length} TITLES</div>
+              <div className={styles.eyebrowInline}>
+                {t('myList.titlesCount', { n: orderedList.length })}
+              </div>
               <div className={styles.viewSwitcher}>
                 <IconButton
                   icon={ListIcon}
-                  tooltip="List view"
+                  tooltip={t('actions.listView')}
                   active={view === 'list'}
                   size={32}
                   onClick={() => setView('list')}
                 />
                 <IconButton
                   icon={LayoutGrid}
-                  tooltip="Grid view"
+                  tooltip={t('actions.gridView')}
                   active={view === 'grid'}
                   size={32}
                   onClick={() => setView('grid')}
@@ -555,9 +558,9 @@ export default function MyList() {
               )
             ) : orderedList.length === 0 ? (
               <div className={styles.emptyCard}>
-                <h2 className={styles.emptyTitle}>No titles yet</h2>
+                <h2 className={styles.emptyTitle}>{t('myList.emptyTitle')}</h2>
                 <p className={styles.emptySubtitle}>
-                  Browse the <Link href="/">home page</Link> and add a few series or films.
+                  <Link href="/">{t('nav.home')}</Link> · {t('myList.emptyBody')}
                 </p>
               </div>
             ) : view === 'list' ? (
@@ -586,7 +589,7 @@ export default function MyList() {
               <div className={styles.pagination}>
                 <IconButton
                   icon={ChevronLeft}
-                  tooltip="Previous page"
+                  tooltip={t('actions.previousPage')}
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 />
@@ -614,7 +617,7 @@ export default function MyList() {
                 ) : null}
                 <IconButton
                   icon={ChevronRight}
-                  tooltip="Next page"
+                  tooltip={t('actions.nextPage')}
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 />
@@ -649,3 +652,5 @@ export default function MyList() {
     </Layout>
   );
 }
+
+export default translate(MyList);

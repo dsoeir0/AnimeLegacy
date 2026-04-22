@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Plus, Check, Heart, BookOpen, ArrowLeft, ArrowRight, Pencil, Star } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import StatusBadge, { STATUS_META } from '../../components/ui/StatusBadge';
@@ -17,7 +18,7 @@ import { formatSeasonLabel } from '../../lib/utils/season';
 import { getAnimeBannerUrl, getAnimeImageUrl, getCharacterAvatarUrl } from '../../lib/utils/media';
 import useMyList from '../../hooks/useMyList';
 
-export default function AnimeDetail({ animeResposta, charactersResposta }) {
+function AnimeDetail({ animeResposta, charactersResposta, t }) {
   const router = useRouter();
   const data = animeResposta?.data ?? {};
   const genres = Array.isArray(data.genres)
@@ -29,14 +30,14 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
   const trailerUrl = data?.trailer?.embed_url || '';
   const seasonLabel = formatSeasonLabel(data?.season, data?.year);
   const studioName =
-    Array.isArray(data.studios) && data.studios.length > 0 ? data.studios[0].name : 'Unknown';
+    Array.isArray(data.studios) && data.studios.length > 0 ? data.studios[0].name : t('status.unknown');
   const studioList = Array.isArray(data.studios) ? data.studios.map((s) => s.name).join(' / ') : studioName;
   const score = typeof data?.score === 'number' ? data.score : 0;
-  const statusLabel = data?.airing ? 'Airing' : data.status || 'Unknown';
+  const statusLabel = data?.airing ? t('status.airing') : data.status || t('status.unknown');
   const characters = Array.isArray(charactersResposta?.data) ? charactersResposta.data : [];
   const rank = data?.rank || null;
   const episodesCount = data?.episodes || 0;
-  const synopsisText = data.synopsis || 'Synopsis not available.';
+  const synopsisText = data.synopsis || t('anime.synopsisMissing');
   const backgroundText = data?.background || '';
   const ratingLabel = data?.rating || 'Not Rated';
   const durationLabel = data?.duration || '—';
@@ -101,8 +102,8 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
 
   return (
     <Layout
-      title={`${data.title || 'Anime'} · AnimeLegacy`}
-      description={data.synopsis || 'Anime details, characters, and highlights.'}
+      title={`${data.title || t('anime.unknownTitle')} · ${t('anime.metaTitleSuffix')}`}
+      description={data.synopsis || t('anime.metaDescFallback')}
     >
       <div className={styles.page}>
         <div className={styles.hero}>
@@ -118,7 +119,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
           <div className={styles.heroGradient} />
           <button type="button" className={styles.backBtn} onClick={() => router.back()}>
             <ArrowLeft size={14} />
-            Back
+            {t('actions.back')}
           </button>
         </div>
 
@@ -139,7 +140,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
               <div className={styles.eyebrow}>
                 {studioName} {seasonLabel ? `· ${seasonLabel}` : ''}
               </div>
-              <h1 className={styles.title}>{data.title || 'Unknown title'}</h1>
+              <h1 className={styles.title}>{data.title || t('anime.unknownTitle')}</h1>
               {data.title_japanese ? (
                 <div className={styles.subTitle}>{data.title_japanese}</div>
               ) : null}
@@ -148,7 +149,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                 {!canEdit || !normalized ? (
                   <Link href="/sign-in" className={styles.actionLink}>
                     <Button variant="secondary" size="lg" icon={Plus}>
-                      Login to add
+                      {t('actions.loginToAdd')}
                     </Button>
                   </Link>
                 ) : currentEntry ? (
@@ -158,7 +159,9 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                     icon={Check}
                     onClick={() => openAddModal(normalized, currentEntry)}
                   >
-                    In your list · {STATUS_META[currentEntry.status]?.label || 'Watching'}
+                    {t('actions.inYourListStatus', {
+                      status: t(STATUS_META[currentEntry.status]?.labelKey || 'status.watching'),
+                    })}
                   </Button>
                 ) : (
                   <Button
@@ -167,7 +170,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                     icon={Plus}
                     onClick={() => openAddModal(normalized)}
                   >
-                    Add to list
+                    {t('actions.addToList')}
                   </Button>
                 )}
                 {currentEntry ? (
@@ -177,13 +180,13 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                     icon={Heart}
                     onClick={() => openAddModal(normalized, currentEntry)}
                   >
-                    {currentEntry.isFavorite ? 'Favorited' : 'Favorite'}
+                    {currentEntry.isFavorite ? t('actions.favorited') : t('actions.favorite')}
                   </Button>
                 ) : null}
                 {trailerUrl ? (
                   <a className={styles.actionLink} href="#trailer">
                     <Button variant="ghost" size="lg" icon={BookOpen}>
-                      Watch trailer
+                      {t('actions.watchTrailer')}
                     </Button>
                   </a>
                 ) : null}
@@ -191,29 +194,31 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
 
               <div className={styles.metaStrip}>
                 <div className={styles.metaCell}>
-                  <div className={styles.metaLabel}>MAL SCORE</div>
+                  <div className={styles.metaLabel}>{t('anime.malScore')}</div>
                   <div className={styles.metaValue}>{score ? score.toFixed(2) : '—'}</div>
-                  <div className={styles.metaSub}>{rank ? `Rank #${rank}` : 'Unranked'}</div>
+                  <div className={styles.metaSub}>
+                    {rank ? t('anime.rank', { n: rank }) : t('anime.unranked')}
+                  </div>
                 </div>
                 <div className={styles.metaCell}>
-                  <div className={styles.metaLabel}>EPISODES</div>
-                  <div className={styles.metaValue}>{episodesCount || 'TBA'}</div>
+                  <div className={styles.metaLabel}>{t('anime.episodes')}</div>
+                  <div className={styles.metaValue}>{episodesCount || t('anime.tba')}</div>
                   <div className={styles.metaSub}>{data.type || 'TV'}</div>
                 </div>
                 <div className={styles.metaCell}>
-                  <div className={styles.metaLabel}>STATUS</div>
+                  <div className={styles.metaLabel}>{t('anime.statusLabel')}</div>
                   <div className={styles.metaValueSmall}>{statusLabel}</div>
                   <div className={styles.metaSub}>{seasonLabel || '—'}</div>
                 </div>
                 <div className={styles.metaCell}>
-                  <div className={styles.metaLabel}>STUDIO</div>
+                  <div className={styles.metaLabel}>{t('anime.studio')}</div>
                   <div className={styles.metaValueSmall}>{studioName}</div>
                   <div className={styles.metaSub}>
                     {studioList.includes('/') ? studioList.split(' / ').slice(1).join(' / ') : ratingLabel}
                   </div>
                 </div>
                 <div className={styles.metaCell}>
-                  <div className={styles.metaLabel}>GENRES</div>
+                  <div className={styles.metaLabel}>{t('anime.genres')}</div>
                   <div className={styles.metaValue}>{genres.length}</div>
                   <div className={styles.metaSub}>{genres.slice(0, 2).join(', ') || '—'}</div>
                 </div>
@@ -224,7 +229,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
           <div className={styles.mainGrid}>
             <div className={styles.mainColumn}>
               <section className={styles.section}>
-                <div className={styles.sectionEyebrow}>SYNOPSIS</div>
+                <div className={styles.sectionEyebrow}>{t('anime.synopsisEyebrow')}</div>
                 <p className={styles.synopsisText}>{synopsisText}</p>
                 <div className={styles.genreTags}>
                   {genres.map((g) => (
@@ -237,8 +242,8 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
 
               {trailerUrl ? (
                 <section className={styles.section} id="trailer">
-                  <div className={styles.sectionEyebrow}>OFFICIAL TRAILER</div>
-                  <h3 className={styles.sectionTitle}>Watch the trailer</h3>
+                  <div className={styles.sectionEyebrow}>{t('anime.trailerEyebrow')}</div>
+                  <h3 className={styles.sectionTitle}>{t('anime.trailerTitle')}</h3>
                   <div className={styles.videoFrame}>
                     <iframe
                       className={styles.trailerEmbed}
@@ -252,7 +257,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
 
               {backgroundText ? (
                 <section className={styles.section}>
-                  <div className={styles.sectionEyebrow}>BACKGROUND</div>
+                  <div className={styles.sectionEyebrow}>{t('anime.backgroundEyebrow')}</div>
                   <p className={styles.synopsisText}>{backgroundText}</p>
                 </section>
               ) : null}
@@ -260,8 +265,8 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
               <section className={styles.section}>
                 <div className={styles.sectionHeaderRow}>
                   <div>
-                    <div className={styles.sectionEyebrow}>CAST</div>
-                    <h3 className={styles.sectionTitle}>Main characters</h3>
+                    <div className={styles.sectionEyebrow}>{t('anime.castEyebrow')}</div>
+                    <h3 className={styles.sectionTitle}>{t('anime.castTitle')}</h3>
                   </div>
                   {orderedChars.length > 6 ? (
                     <Button
@@ -270,12 +275,12 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                       iconRight={ArrowRight}
                       onClick={() => setShowAllCharacters((p) => !p)}
                     >
-                      {showAllCharacters ? 'Show less' : 'View all'}
+                      {showAllCharacters ? t('actions.showLess') : t('actions.viewAll')}
                     </Button>
                   ) : null}
                 </div>
                 {visibleChars.length === 0 ? (
-                  <p className={styles.synopsisText}>Characters unavailable.</p>
+                  <p className={styles.synopsisText}>{t('anime.castUnavailable')}</p>
                 ) : (
                   <div className={styles.castGrid}>
                     {visibleChars.map((entry, index) => {
@@ -300,11 +305,11 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
 
                             />
                             <div className={styles.castMeta}>
-                              <div className={styles.castName}>{entry?.character?.name || 'Unknown'}</div>
-                              <div className={styles.castRole}>{entry?.role || 'Role'}</div>
+                              <div className={styles.castName}>{entry?.character?.name || t('status.unknown')}</div>
+                              <div className={styles.castRole}>{entry?.role || t('anime.roleLabel')}</div>
                               <div className={styles.castVA}>
-                                <span className={styles.castVALabel}>CV · </span>
-                                <span className={styles.castVAName}>{actor?.person?.name || 'Unknown'}</span>
+                                <span className={styles.castVALabel}>{t('anime.cv')} · </span>
+                                <span className={styles.castVAName}>{actor?.person?.name || t('status.unknown')}</span>
                               </div>
                             </div>
                           </Link>
@@ -328,7 +333,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
 
             <aside className={styles.sideColumn}>
               <div className={styles.asideCard}>
-                <div className={styles.sectionEyebrow}>YOUR PROGRESS</div>
+                <div className={styles.sectionEyebrow}>{t('anime.yourProgress')}</div>
                 {currentEntry ? (
                   <>
                     <div className={styles.asideStatus}>
@@ -343,13 +348,13 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                     </div>
                     <div className={styles.asideMetaGrid}>
                       <div>
-                        <div className={styles.miniLabel}>YOUR SCORE</div>
+                        <div className={styles.miniLabel}>{t('anime.yourScore')}</div>
                         <div className={styles.miniScore}>{currentEntry.rating || '—'}</div>
                       </div>
                       <div>
-                        <div className={styles.miniLabel}>FAVORITED</div>
+                        <div className={styles.miniLabel}>{t('anime.favorited')}</div>
                         <div className={styles.miniValue}>
-                          {currentEntry.isFavorite ? 'Yes' : 'No'}
+                          {currentEntry.isFavorite ? t('anime.favoritedYes') : t('anime.favoritedNo')}
                         </div>
                       </div>
                     </div>
@@ -361,7 +366,7 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                         icon={Pencil}
                         onClick={() => openAddModal(normalized, currentEntry)}
                       >
-                        Update entry
+                        {t('actions.updateEntry')}
                       </Button>
                       {displayStatus === 'completed' ? (
                         <Button
@@ -371,14 +376,14 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                           icon={Star}
                           onClick={openRatingModal}
                         >
-                          Rate & review
+                          {t('actions.rateReview')}
                         </Button>
                       ) : null}
                     </div>
                   </>
                 ) : (
                   <>
-                    <p className={styles.asideEmpty}>Not in your list yet.</p>
+                    <p className={styles.asideEmpty}>{t('anime.notInList')}</p>
                     {canEdit && normalized ? (
                       <Button
                         variant="primary"
@@ -387,12 +392,12 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
                         icon={Plus}
                         onClick={() => openAddModal(normalized)}
                       >
-                        Add to list
+                        {t('actions.addToList')}
                       </Button>
                     ) : (
                       <Link href="/sign-in" className={styles.actionLink}>
                         <Button variant="secondary" size="md" fullWidth>
-                          Sign in to track
+                          {t('anime.signInTrack')}
                         </Button>
                       </Link>
                     )}
@@ -401,53 +406,53 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
               </div>
 
               <div className={styles.asideCard}>
-                <div className={styles.sectionEyebrow}>COMMUNITY</div>
+                <div className={styles.sectionEyebrow}>{t('anime.communityEyebrow')}</div>
                 <div className={styles.asideStats}>
                   {score ? <RatingDisplay score={score} size="lg" /> : null}
                   <div className={styles.asideStatRow}>
-                    <span>Members</span>
+                    <span>{t('anime.members')}</span>
                     <strong>{data?.members?.toLocaleString() || '—'}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Scored by</span>
+                    <span>{t('anime.scoredBy')}</span>
                     <strong>{data?.scored_by?.toLocaleString() || '—'}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Popularity</span>
+                    <span>{t('anime.popularity')}</span>
                     <strong>{data?.popularity ? `#${data.popularity}` : '—'}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Favorites</span>
+                    <span>{t('anime.favorites')}</span>
                     <strong>{data?.favorites?.toLocaleString() || '—'}</strong>
                   </div>
                 </div>
               </div>
 
               <div className={styles.asideCard}>
-                <div className={styles.sectionEyebrow}>DETAILS</div>
+                <div className={styles.sectionEyebrow}>{t('anime.detailsEyebrow')}</div>
                 <div className={styles.asideStats}>
                   <div className={styles.asideStatRow}>
-                    <span>Source</span>
+                    <span>{t('anime.source')}</span>
                     <strong>{data?.source || '—'}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Duration</span>
+                    <span>{t('anime.duration')}</span>
                     <strong>{durationLabel}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Aired</span>
+                    <span>{t('anime.aired')}</span>
                     <strong>{data?.aired?.string || '—'}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Rating</span>
+                    <span>{t('anime.rating')}</span>
                     <strong>{ratingLabel}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Studios</span>
+                    <span>{t('anime.studios')}</span>
                     <strong>{studioName}</strong>
                   </div>
                   <div className={styles.asideStatRow}>
-                    <span>Producers</span>
+                    <span>{t('anime.producers')}</span>
                     <strong>{producers.slice(0, 2).map((p) => p.name).join(', ') || '—'}</strong>
                   </div>
                 </div>
@@ -481,6 +486,8 @@ export default function AnimeDetail({ animeResposta, charactersResposta }) {
     </Layout>
   );
 }
+
+export default translate(AnimeDetail);
 
 export async function getServerSideProps(context) {
   const { id } = context.query;

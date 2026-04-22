@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import IconButton from '../../components/ui/IconButton';
@@ -12,25 +13,26 @@ import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
 import { getSeasonByYear } from '../../lib/services/jikan';
 
 const SEASONS = [
-  { key: 'winter', label: 'Winter' },
-  { key: 'spring', label: 'Spring' },
-  { key: 'summer', label: 'Summer' },
-  { key: 'fall', label: 'Fall' },
+  { key: 'winter', labelKey: 'seasonsPage.seasons.winter' },
+  { key: 'spring', labelKey: 'seasonsPage.seasons.spring' },
+  { key: 'summer', labelKey: 'seasonsPage.seasons.summer' },
+  { key: 'fall', labelKey: 'seasonsPage.seasons.fall' },
 ];
 
 const SORT_OPTIONS = [
-  { id: 'popularity', label: 'Popularity' },
-  { id: 'rating', label: 'Rating' },
-  { id: 'recent', label: 'Recently added' },
+  { id: 'popularity', labelKey: 'seasonsPage.sort.popularity' },
+  { id: 'rating', labelKey: 'seasonsPage.sort.rating' },
+  { id: 'recent', labelKey: 'seasonsPage.sort.recent' },
 ];
 
-export default function Seasons({
+function Seasons({
   winterResposta,
   springResposta,
   summerResposta,
   fallResposta,
   aniListMap,
   year,
+  t,
 }) {
   const router = useRouter();
   const { isInList } = useMyList();
@@ -143,7 +145,9 @@ export default function Seasons({
     setCurrentPage(1);
   };
 
-  const renderDropdown = (id, current, options, onSelect, labelFn = (v) => (v === 'all' ? 'All' : v)) => (
+  const defaultLabel = (v) => (v === 'all' ? t('seasonsPage.all') : v);
+
+  const renderDropdown = (id, current, options, onSelect, labelFn = defaultLabel) => (
     <div className={styles.dropdownRoot} data-dropdown-root="true">
       <button
         className={styles.dropdownBtn}
@@ -168,7 +172,7 @@ export default function Seasons({
                 setOpenDropdown(null);
               }}
             >
-              {typeof opt === 'string' ? labelFn(opt) : opt.label}
+              {typeof opt === 'string' ? labelFn(opt) : t(opt.labelKey)}
             </button>
           ))}
         </div>
@@ -178,22 +182,20 @@ export default function Seasons({
 
   return (
     <Layout
-      title={`AnimeLegacy · Seasons ${year}`}
-      description="Every season's anime lineup by year, curated for easy discovery."
+      title={t('seasonsPage.metaTitle', { year })}
+      description={t('seasonsPage.metaDesc')}
     >
       <div className={styles.page}>
         <header className={styles.head}>
           <div>
-            <div className={styles.eyebrow}>SEASONAL ARCHIVE</div>
+            <div className={styles.eyebrow}>{t('seasonsPage.eyebrow')}</div>
             <h1 className={styles.heading}>
-              {year} <span className={styles.headingHighlight}>seasons</span>
+              {year} <span className={styles.headingHighlight}>{t('seasonsPage.titleEnd')}</span>
             </h1>
-            <p className={styles.subtitle}>
-              Browse every winter, spring, summer, and fall release with filters for genre, format, and sort.
-            </p>
+            <p className={styles.subtitle}>{t('seasonsPage.subtitle')}</p>
           </div>
           <div className={styles.yearWrap}>
-            <span className={styles.filterLabel}>YEAR</span>
+            <span className={styles.filterLabel}>{t('seasonsPage.year')}</span>
             {renderDropdown(
               'year',
               String(year),
@@ -210,7 +212,7 @@ export default function Seasons({
             className={`${styles.seasonTab} ${activeSeason === 'all' ? styles.seasonTabActive : ''}`}
             onClick={() => setActiveSeason('all')}
           >
-            All seasons
+            {t('seasonsPage.allSeasons')}
           </button>
           {SEASONS.map((s) => (
             <button
@@ -219,7 +221,7 @@ export default function Seasons({
               className={`${styles.seasonTab} ${activeSeason === s.key ? styles.seasonTabActive : ''}`}
               onClick={() => setActiveSeason(s.key)}
             >
-              {s.label}
+              {t(s.labelKey)}
               <span className={styles.seasonCount}>{seasonMap[s.key]?.length || 0}</span>
             </button>
           ))}
@@ -227,35 +229,38 @@ export default function Seasons({
 
         <div className={styles.filters}>
           <div className={styles.filterGroup}>
-            <span className={styles.filterLabel}>GENRE</span>
+            <span className={styles.filterLabel}>{t('seasonsPage.filters.genre')}</span>
             {renderDropdown('genre', genre, genres, setGenre)}
           </div>
           <div className={styles.filterGroup}>
-            <span className={styles.filterLabel}>FORMAT</span>
+            <span className={styles.filterLabel}>{t('seasonsPage.filters.format')}</span>
             {renderDropdown('format', format, formats, setFormat)}
           </div>
           <div className={styles.filterGroup}>
-            <span className={styles.filterLabel}>SORT</span>
+            <span className={styles.filterLabel}>{t('seasonsPage.filters.sort')}</span>
             {renderDropdown(
               'sort',
               sort,
               SORT_OPTIONS,
               setSort,
-              (v) => SORT_OPTIONS.find((o) => o.id === v)?.label || v,
+              (v) => {
+                const opt = SORT_OPTIONS.find((o) => o.id === v);
+                return opt ? t(opt.labelKey) : v;
+              },
             )}
           </div>
           <Button variant="ghost" size="md" onClick={resetFilters}>
-            Reset
+            {t('actions.reset')}
           </Button>
           <div className={styles.countBadge}>
-            {sortedItems.length} titles
+            {t('seasonsPage.titlesCount', { n: sortedItems.length })}
           </div>
         </div>
 
         {sortedItems.length === 0 ? (
           <div className={styles.empty}>
-            <h2>No results</h2>
-            <p>Try removing a filter or switching seasons.</p>
+            <h2>{t('seasonsPage.emptyTitle')}</h2>
+            <p>{t('seasonsPage.emptyBody')}</p>
           </div>
         ) : (
           <div className={styles.grid}>
@@ -276,7 +281,7 @@ export default function Seasons({
           <div className={styles.pagination}>
             <IconButton
               icon={ChevronLeft}
-              tooltip="Previous page"
+              tooltip={t('actions.previousPage')}
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             />
@@ -304,7 +309,7 @@ export default function Seasons({
             ) : null}
             <IconButton
               icon={ChevronRight}
-              tooltip="Next page"
+              tooltip={t('actions.nextPage')}
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             />
@@ -314,6 +319,8 @@ export default function Seasons({
     </Layout>
   );
 }
+
+export default translate(Seasons);
 
 export async function getServerSideProps(context) {
   const { year } = context.query;

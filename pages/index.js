@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Play, Plus, Check, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { translate } from 'react-switch-lang';
 import styles from './index.module.css';
 import Layout from '../components/layout/Layout';
 import Button from '../components/ui/Button';
@@ -17,12 +18,12 @@ import { getSeasonFromDate } from '../lib/utils/season';
 import { getAnimeBannerUrl } from '../lib/utils/media';
 import { toCardShape } from '../lib/utils/cardShape';
 
-function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit }) {
+function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit, t }) {
   const [idx, setIdx] = useState(0);
   useEffect(() => {
     if (slides.length <= 1) return undefined;
-    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 7000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setIdx((i) => (i + 1) % slides.length), 7000);
+    return () => clearInterval(timer);
   }, [slides.length]);
 
   if (!slides.length) return null;
@@ -52,19 +53,29 @@ function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit }) {
       })}
 
       <div className={styles.heroContent} key={current.mal_id}>
-        <div className={styles.heroEyebrow}>EDITOR'S PICK · {getSeasonFromDate()?.toUpperCase()} {new Date().getFullYear()}</div>
+        <div className={styles.heroEyebrow}>
+          {t('home.heroEyebrow', {
+            season: getSeasonFromDate()?.toUpperCase(),
+            year: new Date().getFullYear(),
+          })}
+        </div>
         <div className={styles.heroMetaTop}>
-          {card.studio} · {card.year || '—'} {card.episodes ? `· ${card.episodes} episodes` : ''}
+          {card.studio} · {card.year || '—'}{' '}
+          {card.episodes ? `· ${t('home.heroEpisodesSuffix', { n: card.episodes })}` : ''}
         </div>
         <h1 className={styles.heroTitle}>{card.title}</h1>
-        <p className={styles.heroSynopsis}>{card.synopsis || 'Discover this season\'s most-watched series.'}</p>
+        <p className={styles.heroSynopsis}>{card.synopsis || t('home.heroSynopsisFallback')}</p>
         <div className={styles.heroActions}>
           <Link href={`/anime/${current.mal_id}`} className={styles.heroLink}>
-            <Button variant="primary" size="lg" icon={Play}>View details</Button>
+            <Button variant="primary" size="lg" icon={Play}>
+              {t('actions.viewDetails')}
+            </Button>
           </Link>
           {!canEdit ? (
             <Link href="/sign-in" className={styles.heroLink}>
-              <Button variant="secondary" size="lg" icon={Plus}>Login to add</Button>
+              <Button variant="secondary" size="lg" icon={Plus}>
+                {t('actions.loginToAdd')}
+              </Button>
             </Link>
           ) : entry ? (
             <Button
@@ -73,11 +84,19 @@ function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit }) {
               icon={Check}
               onClick={() => onOpenModal(normalized, entry)}
             >
-              In your list · {entry.progress || 0}/{entry.episodesTotal || card.episodes || 0}
+              {t('actions.inYourListProgress', {
+                progress: entry.progress || 0,
+                total: entry.episodesTotal || card.episodes || 0,
+              })}
             </Button>
           ) : (
-            <Button variant="secondary" size="lg" icon={Plus} onClick={() => onOpenModal(normalized, null)}>
-              Add to list
+            <Button
+              variant="secondary"
+              size="lg"
+              icon={Plus}
+              onClick={() => onOpenModal(normalized, null)}
+            >
+              {t('actions.addToList')}
             </Button>
           )}
           <div className={styles.heroMeta}>
@@ -111,7 +130,7 @@ function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit }) {
   );
 }
 
-function ScrollRow({ title, eyebrow, cta, onCta, children, cardWidth = 200 }) {
+function ScrollRow({ title, eyebrow, cta, onCta, children, cardWidth = 200, t }) {
   const ref = useRef(null);
   const scroll = (dir) => ref.current?.scrollBy({ left: dir * (cardWidth + 16) * 3, behavior: 'smooth' });
   return (
@@ -127,8 +146,8 @@ function ScrollRow({ title, eyebrow, cta, onCta, children, cardWidth = 200 }) {
               {cta}
             </Button>
           ) : null}
-          <IconButton icon={ChevronLeft} tooltip="Scroll left" onClick={() => scroll(-1)} />
-          <IconButton icon={ChevronRight} tooltip="Scroll right" onClick={() => scroll(1)} />
+          <IconButton icon={ChevronLeft} tooltip={t('actions.scrollLeft')} onClick={() => scroll(-1)} />
+          <IconButton icon={ChevronRight} tooltip={t('actions.scrollRight')} onClick={() => scroll(1)} />
         </div>
       </div>
       <div ref={ref} className={styles.rowTrack}>
@@ -138,13 +157,13 @@ function ScrollRow({ title, eyebrow, cta, onCta, children, cardWidth = 200 }) {
   );
 }
 
-function ContinueWatching({ entries, animeById, onEditEntry }) {
+function ContinueWatching({ entries, animeById, onEditEntry, t }) {
   const watching = entries.filter((e) => e.status === 'watching');
   if (!watching.length) return null;
   return (
     <section className={styles.continue}>
-      <div className={styles.eyebrow} style={{ marginBottom: 6 }}>ONGOING · YOUR QUEUE</div>
-      <h2 className={styles.rowTitle}>Continue watching</h2>
+      <div className={styles.eyebrow} style={{ marginBottom: 6 }}>{t('home.continueEyebrow')}</div>
+      <h2 className={styles.rowTitle}>{t('home.continueTitle')}</h2>
       <div className={styles.continueGrid}>
         {watching.slice(0, 6).map((e) => {
           const anime = animeById[e.id] || e;
@@ -169,7 +188,9 @@ function ContinueWatching({ entries, animeById, onEditEntry }) {
               <div className={styles.continueBody}>
                 <div>
                   <div className={styles.eyebrow} style={{ fontSize: 10, marginBottom: 3 }}>
-                    {total > 0 ? `Next up · episode ${Math.min(next, total)}` : 'Ongoing'}
+                    {total > 0
+                      ? t('home.continueNextUp', { n: Math.min(next, total) })
+                      : t('home.continueOngoing')}
                   </div>
                   <div className={styles.continueTitle}>{anime.title}</div>
                 </div>
@@ -179,7 +200,9 @@ function ContinueWatching({ entries, animeById, onEditEntry }) {
                   </div>
                   <div className={styles.continueProgress}>
                     <span>
-                      {progress} / {total || '?'} episodes
+                      {total > 0
+                        ? t('home.continueEpisodes', { progress, total })
+                        : t('home.continueEpisodesUnknown', { progress })}
                     </span>
                     <button
                       type="button"
@@ -190,7 +213,7 @@ function ContinueWatching({ entries, animeById, onEditEntry }) {
                         onEditEntry(e);
                       }}
                     >
-                      Edit
+                      {t('actions.edit')}
                     </button>
                   </div>
                 </div>
@@ -203,23 +226,22 @@ function ContinueWatching({ entries, animeById, onEditEntry }) {
   );
 }
 
-function EditorialStrip() {
+function EditorialStrip({ t }) {
   const currentSeason = getSeasonFromDate()?.toUpperCase();
   const currentYear = new Date().getFullYear();
   return (
     <section className={styles.strip}>
       <div className={styles.stripCard}>
         <div>
-          <div className={`${styles.eyebrow} ${styles.stripEyebrow}`}>DISPATCH · {currentSeason} {currentYear}</div>
-          <h2 className={styles.rowTitle}>Slow anime, serious stakes.</h2>
-          <p className={styles.stripText}>
-            A short reading list for the season — titles that trade spectacle for patience, and the restraint
-            that lets the rest land harder.
-          </p>
+          <div className={`${styles.eyebrow} ${styles.stripEyebrow}`}>
+            {t('home.editorialEyebrow', { season: currentSeason, year: currentYear })}
+          </div>
+          <h2 className={styles.rowTitle}>{t('home.editorialTitle')}</h2>
+          <p className={styles.stripText}>{t('home.editorialBody')}</p>
         </div>
         <Link href="/seasons">
           <Button variant="secondary" size="md" iconRight={ArrowRight}>
-            Browse seasons
+            {t('actions.browseSeasons')}
           </Button>
         </Link>
       </div>
@@ -227,7 +249,7 @@ function EditorialStrip() {
   );
 }
 
-export default function Home({ currentResposta, moviesResposta, aniListMap, topMovies }) {
+function Home({ currentResposta, moviesResposta, aniListMap, topMovies, t }) {
   const currentData = Array.isArray(currentResposta?.data) ? currentResposta.data : [];
   const currentSeason = getSeasonFromDate();
   const currentYear = new Date().getFullYear();
@@ -290,7 +312,7 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
   };
 
   return (
-    <Layout title="AnimeLegacy - Seasonal Highlights" description="Curated seasonal anime, trending series, and top movies.">
+    <Layout title={t('home.metaTitle')} description={t('home.metaDesc')}>
       <div className={styles.main}>
         {heroSlides.length > 0 ? (
           <HeroCarousel
@@ -299,12 +321,14 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
             onOpenModal={openAddModal}
             getEntry={getEntry}
             canEdit={canEdit}
+            t={t}
           />
         ) : null}
 
         <ContinueWatching
           entries={list}
           animeById={animeById}
+          t={t}
           onEditEntry={(entry) => {
             const normalized = {
               id: entry.id,
@@ -325,10 +349,14 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
         />
 
         <ScrollRow
-          eyebrow={`TRENDING · ${currentSeason?.toUpperCase()} ${currentYear}`}
-          title="What's airing now"
-          cta="Browse seasons"
+          eyebrow={t('home.trendingEyebrow', {
+            season: currentSeason?.toUpperCase(),
+            year: currentYear,
+          })}
+          title={t('home.trendingTitle')}
+          cta={t('actions.browseSeasons')}
           onCta={() => {}}
+          t={t}
         >
           {trendingData.map((item) => (
             <div key={item.mal_id} style={{ flexShrink: 0 }}>
@@ -343,14 +371,15 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
           ))}
         </ScrollRow>
 
-        <EditorialStrip />
+        <EditorialStrip t={t} />
 
         <ScrollRow
-          eyebrow="CURATED"
-          title="Films, reshuffled"
-          cta="Shuffle picks"
+          eyebrow={t('home.curatedEyebrow')}
+          title={t('home.filmsTitle')}
+          cta={t('actions.shufflePicks')}
           onCta={refreshMovies}
           cardWidth={200}
+          t={t}
         >
           {moviePicks.map((item) => (
             <div key={item.mal_id} style={{ flexShrink: 0 }}>
@@ -365,7 +394,11 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
           ))}
         </ScrollRow>
 
-        <ScrollRow eyebrow="CURRENT SEASON" title="Season highlights">
+        <ScrollRow
+          eyebrow={t('home.currentSeasonEyebrow')}
+          title={t('home.seasonHighlights')}
+          t={t}
+        >
           {currentData.slice(0, 12).map((item) => (
             <div key={item.mal_id} style={{ flexShrink: 0 }}>
               <PosterCard
@@ -396,6 +429,8 @@ export default function Home({ currentResposta, moviesResposta, aniListMap, topM
     </Layout>
   );
 }
+
+export default translate(Home);
 
 export async function getServerSideProps() {
   try {
