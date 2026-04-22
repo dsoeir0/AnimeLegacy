@@ -1,100 +1,203 @@
-import { useMemo } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import CalendarCell from '../components/calendar/CalendarCell';
+import useMyList from '../hooks/useMyList';
 import { getSchedules } from '../lib/services/jikan';
 import { dedupeByMalId, filterOutHentai } from '../lib/utils/anime';
-import { formatSeasonLabel, getSeasonFromDate } from '../lib/utils/season';
+import { jstToLocalSlot } from '../lib/utils/time';
 import styles from './calendar.module.css';
 
 const DAYS = [
-  { key: 'monday', labelKey: 'calendar.days.monday', short: 'MON' },
-  { key: 'tuesday', labelKey: 'calendar.days.tuesday', short: 'TUE' },
-  { key: 'wednesday', labelKey: 'calendar.days.wednesday', short: 'WED' },
-  { key: 'thursday', labelKey: 'calendar.days.thursday', short: 'THU' },
-  { key: 'friday', labelKey: 'calendar.days.friday', short: 'FRI' },
-  { key: 'saturday', labelKey: 'calendar.days.saturday', short: 'SAT' },
-  { key: 'sunday', labelKey: 'calendar.days.sunday', short: 'SUN' },
+  { key: 'monday', labelKey: 'calendar.days.monday' },
+  { key: 'tuesday', labelKey: 'calendar.days.tuesday' },
+  { key: 'wednesday', labelKey: 'calendar.days.wednesday' },
+  { key: 'thursday', labelKey: 'calendar.days.thursday' },
+  { key: 'friday', labelKey: 'calendar.days.friday' },
+  { key: 'saturday', labelKey: 'calendar.days.saturday' },
+  { key: 'sunday', labelKey: 'calendar.days.sunday' },
 ];
 
-const getTodayKey = () => {
-  const idx = new Date().getDay();
-  const map = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  return map[idx];
+const mondayOfWeek = (today) => {
+  const d = new Date(today);
+  d.setHours(0, 0, 0, 0);
+  const js = d.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const offset = js === 0 ? -6 : 1 - js;
+  d.setDate(d.getDate() + offset);
+  return d;
 };
 
-// Items without a broadcast time go to the end. Within a time bucket we
-// preserve Jikan's original order (roughly by popularity).
-const sortByBroadcast = (items) =>
-  [...items].sort((a, b) => {
-    const at = a?.broadcast?.time;
-    const bt = b?.broadcast?.time;
-    if (!at && !bt) return 0;
-    if (!at) return 1;
-    if (!bt) return -1;
-    return at.localeCompare(bt);
+const weekDates = (today = new Date()) => {
+  const monday = mondayOfWeek(today);
+  return DAYS.map((day, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return { key: day.key, labelKey: day.labelKey, date: d };
   });
+};
+
+const isSameDay = (a, b) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+// Group raw schedules by local-day + local-hour. Returns { slots, hours,
+// countsByDay, timeByJst } where `slots` is a Map keyed by
+// `${localDayKey}:${hour}` of entries (sorted by local minute) and `hours`
+// is the sorted array of distinct hours that actually hold entries.
+const bucketize = (schedulesByDay) => {
+  const slots = new Map();
+  const countsByDay = Object.fromEntries(DAYS.map((d) => [d.key, 0]));
+  const timeByJst = new Map();
+  const hourSet = new Set();
+
+  for (let jstIdx = 0; jstIdx < DAYS.length; jstIdx += 1) {
+    const items = schedulesByDay?.[DAYS[jstIdx].key] || [];
+    for (const item of items) {
+      const jstTime = item?.broadcast?.time;
+      const slot = jstToLocalSlot(jstIdx, jstTime);
+      if (!slot) continue;
+      const localDayKey = DAYS[slot.dayIdx].key;
+      const key = `${localDayKey}:${slot.hour}`;
+      if (!slots.has(key)) slots.set(key, []);
+      slots.get(key).push({ item, minute: slot.minute, localTime: slot.display });
+      countsByDay[localDayKey] += 1;
+      hourSet.add(slot.hour);
+      if (jstTime) timeByJst.set(jstTime, slot.display);
+    }
+  }
+
+  for (const entries of slots.values()) {
+    entries.sort((a, b) => a.minute - b.minute);
+  }
+
+  const hours = Array.from(hourSet).sort((a, b) => a - b);
+  return { slots, hours, countsByDay, timeByJst };
+};
 
 function CalendarPage({ schedulesByDay, t }) {
-  const today = getTodayKey();
-  const sortedByDay = useMemo(() => {
-    const out = {};
-    for (const day of DAYS) {
-      out[day.key] = sortByBroadcast(schedulesByDay?.[day.key] || []);
-    }
-    return out;
+  const { list: userList } = useMyList();
+  const [now, setNow] = useState(() => new Date());
+  const [bucket, setBucket] = useState(null);
+
+  // SSR cannot know the viewer's timezone, so we rebucket on the client
+  // after hydration. Until then we render the timetable shell only.
+  useEffect(() => {
+    setNow(new Date());
+    setBucket(bucketize(schedulesByDay));
   }, [schedulesByDay]);
 
-  const totalCount = Object.values(sortedByDay).reduce(
-    (sum, list) => sum + list.length,
-    0,
+  const week = useMemo(() => weekDates(now), [now]);
+  const hours = bucket?.hours || [];
+  const slots = bucket?.slots || new Map();
+  const countsByDay = bucket?.countsByDay || {};
+
+  const totalCount = useMemo(
+    () =>
+      Object.values(schedulesByDay || {}).reduce(
+        (sum, list) => sum + (Array.isArray(list) ? list.length : 0),
+        0,
+      ),
+    [schedulesByDay],
   );
 
-  const currentSeasonLabel = formatSeasonLabel(getSeasonFromDate(), new Date().getFullYear());
+  const myListIds = useMemo(
+    () => new Set((userList || []).map((entry) => String(entry.id))),
+    [userList],
+  );
 
   return (
     <Layout title={t('calendar.metaTitle')} description={t('calendar.metaDesc')}>
       <div className={styles.page}>
         <header className={styles.head}>
-          <div className={styles.eyebrow}>
-            {currentSeasonLabel.toUpperCase()} · {t('calendar.eyebrow')}
-          </div>
-          <h1 className={styles.heading}>{t('calendar.title')}</h1>
+          <div className={styles.eyebrow}>{t('calendar.eyebrow')}</div>
+          <h1 className={styles.heading}>
+            {t('calendar.titleStart')}{' '}
+            <span className={styles.headingGrad}>{t('calendar.titleEnd')}</span>
+          </h1>
           <p className={styles.subtitle}>
             {totalCount ? t('calendar.countBody', { n: totalCount }) : t('calendar.unavailable')}
           </p>
         </header>
 
-        <div className={styles.grid}>
-          {DAYS.map((day) => {
-            const items = sortedByDay[day.key] || [];
-            const isToday = today === day.key;
+        <div className={styles.timetableEyebrow}>
+          {t('calendar.scheduleEyebrow', { n: totalCount })}
+        </div>
+
+        <div
+          className={styles.grid}
+          role="grid"
+          aria-label={t('calendar.title')}
+        >
+          <div className={styles.cornerCell} />
+
+          {week.map(({ key, labelKey, date }) => {
+            const isToday = isSameDay(date, now);
+            const count = countsByDay[key] || 0;
             return (
-              <section
-                key={day.key}
-                className={`${styles.column} ${isToday ? styles.columnToday : ''}`}
+              <div
+                key={key}
+                className={`${styles.dayHeader} ${isToday ? styles.dayHeaderToday : ''}`}
               >
-                <div className={styles.columnHead}>
-                  <span className={styles.columnLabel}>{t(day.labelKey)}</span>
-                  <span className={styles.columnCount}>{items.length}</span>
+                <div className={styles.dayHeaderLabel}>
+                  {t(labelKey).slice(0, 3).toUpperCase()}
                 </div>
-                {isToday ? <span className={styles.todayBadge}>{t('calendar.today')}</span> : null}
-                {items.length === 0 ? (
-                  <div className={styles.emptyDay}>{t('calendar.noEpisodes')}</div>
-                ) : (
-                  <div className={styles.columnBody}>
-                    {items.map((item) => (
-                      <CalendarCell
-                        key={item.mal_id}
-                        anime={item}
-                        broadcastTime={item?.broadcast?.time || null}
-                      />
-                    ))}
-                  </div>
-                )}
-              </section>
+                <div className={styles.dayHeaderDate}>
+                  {date.getDate()}
+                  {isToday ? <span className={styles.dayHeaderDot} /> : null}
+                </div>
+                <div className={styles.dayHeaderCount}>
+                  {t('calendar.epShort', { n: count })}
+                </div>
+              </div>
             );
           })}
+
+          {bucket && hours.length > 0
+            ? hours.map((h) => (
+                <Fragment key={h}>
+                  <div className={styles.hourLabel}>
+                    {String(h).padStart(2, '0')}:00
+                  </div>
+                  {week.map(({ key, date }) => {
+                    const isToday = isSameDay(date, now);
+                    const entries = slots.get(`${key}:${h}`) || [];
+                    return (
+                      <div
+                        key={`${h}-${key}`}
+                        className={`${styles.slot} ${
+                          entries.length ? '' : styles.slotEmpty
+                        } ${isToday ? styles.slotToday : ''}`}
+                      >
+                        {entries.map(({ item, localTime }) => (
+                          <CalendarCell
+                            key={item.mal_id}
+                            anime={item}
+                            broadcastTime={item?.broadcast?.time || null}
+                            localTime={localTime}
+                            inList={myListIds.has(String(item.mal_id))}
+                          />
+                        ))}
+                      </div>
+                    );
+                  })}
+                </Fragment>
+              ))
+            : (
+                <div className={styles.gridEmpty}>
+                  {bucket ? t('calendar.unavailable') : t('calendar.loading')}
+                </div>
+              )}
+        </div>
+
+        <div className={styles.legend}>
+          <span className={styles.legendItem}>
+            <span className={styles.legendDot} /> {t('calendar.legendMine')}
+          </span>
+          <span className={styles.legendItem}>
+            <span className={styles.legendSquare} /> {t('calendar.legendOthers')}
+          </span>
+          <span className={styles.legendNote}>{t('calendar.tzNote')}</span>
         </div>
       </div>
     </Layout>
@@ -103,14 +206,6 @@ function CalendarPage({ schedulesByDay, t }) {
 
 export default translate(CalendarPage);
 
-// Reduce to the fields we actually render — keeps the SSR props payload
-// small and avoids shipping Jikan's entire schedule row to the browser.
-//
-// Every field is coalesced to `null` on miss: Next.js's SSR serialiser
-// rejects `undefined` with a 500 ("cannot be serialized as JSON"), which
-// surfaces as "Error serializing `.image`" etc. Jikan's schedule response
-// also doesn't include a top-level `image` field (only `images.*`), so we
-// drop it entirely and let getAnimeImageUrl pick from the `images.*` tree.
 const pickScheduleFields = (item) => ({
   mal_id: item?.mal_id ?? null,
   title: item?.title ?? null,

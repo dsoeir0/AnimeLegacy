@@ -19,132 +19,213 @@
 }
 
 .heading {
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 52px);
+  font-size: clamp(44px, 5.5vw, 64px);
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1.04;
+  line-height: 1.02;
   color: var(--al-fg-1);
 }
 
+.headingGrad {
+  background: var(--al-primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 .subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--al-fg-2);
   line-height: 1.55;
   margin: 0;
   max-width: 640px;
 }
 
-/* ────────────── 7-column grid ────────────── */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 12px;
-  align-items: start;
-}
-
-.column {
-  position: relative;
-  background: var(--al-ink-2);
-  border: 1px solid var(--al-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  min-height: 180px;
-}
-
-.columnToday {
-  border-color: rgba(132, 217, 255, 0.45);
-  box-shadow: 0 0 0 1px rgba(132, 217, 255, 0.18), 0 8px 28px -12px rgba(132, 217, 255, 0.2);
-}
-
-.columnHead {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--al-border);
-  background: linear-gradient(180deg, var(--al-ink-3), var(--al-ink-2));
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.columnLabel {
+.timetableEyebrow {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-weight: 600;
   font-size: 11px;
   color: var(--al-fg-2);
+  margin-bottom: 16px;
 }
 
-.columnToday .columnLabel {
-  color: var(--al-primary-ink);
+/* ────────────── Timetable grid ────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, minmax(0, 1fr));
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
-.columnCount {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 11px;
-  color: var(--al-fg-3);
+.cornerCell {
+  border-right: 1px solid var(--al-border);
+  border-bottom: 1px solid var(--al-border);
+  background: var(--al-ink-2);
 }
 
-.todayBadge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
+.dayHeader {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--al-border);
+  border-right: 1px solid var(--al-border-subtle);
+  background: var(--al-ink-2);
+}
+
+.dayHeader:last-of-type {
+  border-right: none;
+}
+
+.dayHeaderToday {
+  background: rgba(132, 217, 255, 0.06);
+}
+
+.dayHeaderLabel {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-weight: 600;
-  font-size: 9px;
-  padding: 3px 7px;
-  border-radius: var(--radius-pill);
-  background: rgba(132, 217, 255, 0.14);
-  border: 1px solid rgba(132, 217, 255, 0.38);
-  color: var(--al-primary-ink);
-  pointer-events: none;
+  font-size: 10px;
+  color: var(--al-fg-2);
 }
 
-.columnBody {
+.dayHeaderToday .dayHeaderLabel {
+  color: var(--al-primary-ink);
+}
+
+.dayHeaderDate {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--al-fg-1);
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dayHeaderDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--al-primary-2);
+}
+
+.dayHeaderCount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  color: var(--al-fg-3);
+  margin-top: 2px;
+}
+
+/* Hours + slots */
+.hourLabel {
   padding: 10px;
+  border-right: 1px solid var(--al-border);
+  border-bottom: 1px solid var(--al-border-subtle);
+  min-height: 84px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--al-fg-3);
+}
+
+.slot {
+  padding: 8px;
+  border-right: 1px solid var(--al-border-subtle);
+  border-bottom: 1px solid var(--al-border-subtle);
+  min-height: 84px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
-.emptyDay {
-  padding: 28px 14px;
-  color: var(--al-fg-3);
-  font-size: 12px;
+.slotEmpty {
+  min-height: 44px;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 6px,
+    rgba(255, 255, 255, 0.012) 6px 12px
+  );
+}
+
+.slotToday {
+  background: rgba(132, 217, 255, 0.03);
+}
+
+.slotEmpty.slotToday {
+  background: rgba(132, 217, 255, 0.025);
+}
+
+.gridEmpty {
+  grid-column: 1 / -1;
+  padding: 48px 24px;
   text-align: center;
+  color: var(--al-fg-3);
+  font-size: 13px;
+  background: var(--al-ink-2);
+}
+
+/* ────────────── Legend ────────────── */
+.legend {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 20px;
+  font-size: 11.5px;
+  color: var(--al-fg-2);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--al-primary-2);
+}
+
+.legendSquare {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid var(--al-border-strong);
+}
+
+.legendNote {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--al-fg-3);
+  letter-spacing: 0.02em;
 }
 
 /* ────────────── Responsive ────────────── */
-@media (max-width: 1280px) {
-  .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
   .page {
     padding: 28px 20px 80px;
   }
   .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-  .columnHead {
-    padding: 10px 12px;
-  }
-  .columnBody {
-    padding: 8px;
-    gap: 8px;
+    /* Allow horizontal scroll on narrow screens instead of squeezing
+       the 7 columns to unreadable widths. */
+    overflow-x: auto;
+    grid-template-columns: 50px repeat(7, minmax(130px, 1fr));
   }
 }

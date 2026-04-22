@@ -1,58 +1,86 @@
-.cell {
+/* Compact schedule entry that sits inside a (day × hour) slot of the
+   timetable. 44px poster thumb on the left, time + title on the right,
+   optional "in your list" dot in the top-right. */
+
+.entry {
   position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 2 / 3;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 0;
   border-radius: 10px;
   overflow: hidden;
+  border: 1px solid var(--al-border);
   background: var(--al-ink-3);
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: transform var(--dur-2) var(--ease-standard);
+  transition: transform var(--dur-2) var(--ease-standard),
+    border-color var(--dur-2) var(--ease-standard);
 }
 
-.cell:hover {
-  transform: translateY(-2px);
+.entry:hover {
+  transform: translateY(-1px);
+  border-color: var(--al-border-strong);
 }
 
-.cellPoster {
+.entryInList {
+  border-color: rgba(132, 217, 255, 0.35);
+}
+
+.entryInList:hover {
+  border-color: rgba(132, 217, 255, 0.55);
+}
+
+.entryPoster {
+  position: relative;
+  width: 44px;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: var(--al-ink-4);
+}
+
+.entryImage {
   object-fit: cover;
 }
 
-.cellGradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.92) 100%);
-  pointer-events: none;
+.entryBody {
+  padding: 6px 8px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.cellMeta {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-}
-
-.cellTime {
+.entryTime {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--al-primary-ink);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--al-fg-2);
   letter-spacing: 0.02em;
-  margin-bottom: 3px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-.cellTitle {
-  font-size: 11.5px;
+.entryInList .entryTime {
+  color: var(--al-primary-ink);
+}
+
+.entryTitle {
+  font-size: 10.5px;
   font-weight: 600;
   color: var(--al-fg-1);
-  line-height: 1.25;
+  line-height: 1.15;
+  overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.entryDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--al-primary-2);
 }
