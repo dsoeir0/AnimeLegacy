@@ -178,6 +178,8 @@ function Header({ variant = 'default', t }) {
                       alt={item.title}
                       width={40}
                       height={52}
+                      sizes="40px"
+                      quality={85}
                     />
                   </div>
                   <div className={styles.searchMeta}>
