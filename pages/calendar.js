@@ -5,75 +5,16 @@ import CalendarCell from '../components/calendar/CalendarCell';
 import useMyList from '../hooks/useMyList';
 import { getSchedules } from '../lib/services/jikan';
 import { dedupeByMalId, filterOutHentai } from '../lib/utils/anime';
-import { jstToLocalSlot } from '../lib/utils/time';
+import { WEEKDAY_KEYS, isSameCalendarDay, weekdayDates } from '../lib/utils/time';
+import { bucketizeSchedule } from '../lib/utils/calendarSchedule';
 import styles from './calendar.module.css';
 
-const DAYS = [
-  { key: 'monday', labelKey: 'calendar.days.monday' },
-  { key: 'tuesday', labelKey: 'calendar.days.tuesday' },
-  { key: 'wednesday', labelKey: 'calendar.days.wednesday' },
-  { key: 'thursday', labelKey: 'calendar.days.thursday' },
-  { key: 'friday', labelKey: 'calendar.days.friday' },
-  { key: 'saturday', labelKey: 'calendar.days.saturday' },
-  { key: 'sunday', labelKey: 'calendar.days.sunday' },
-];
-
-const mondayOfWeek = (today) => {
-  const d = new Date(today);
-  d.setHours(0, 0, 0, 0);
-  const js = d.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-  const offset = js === 0 ? -6 : 1 - js;
-  d.setDate(d.getDate() + offset);
-  return d;
-};
-
-const weekDates = (today = new Date()) => {
-  const monday = mondayOfWeek(today);
-  return DAYS.map((day, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return { key: day.key, labelKey: day.labelKey, date: d };
-  });
-};
-
-const isSameDay = (a, b) =>
-  a.getFullYear() === b.getFullYear() &&
-  a.getMonth() === b.getMonth() &&
-  a.getDate() === b.getDate();
-
-// Group raw schedules by local-day + local-hour. Returns { slots, hours,
-// countsByDay, timeByJst } where `slots` is a Map keyed by
-// `${localDayKey}:${hour}` of entries (sorted by local minute) and `hours`
-// is the sorted array of distinct hours that actually hold entries.
-const bucketize = (schedulesByDay) => {
-  const slots = new Map();
-  const countsByDay = Object.fromEntries(DAYS.map((d) => [d.key, 0]));
-  const timeByJst = new Map();
-  const hourSet = new Set();
-
-  for (let jstIdx = 0; jstIdx < DAYS.length; jstIdx += 1) {
-    const items = schedulesByDay?.[DAYS[jstIdx].key] || [];
-    for (const item of items) {
-      const jstTime = item?.broadcast?.time;
-      const slot = jstToLocalSlot(jstIdx, jstTime);
-      if (!slot) continue;
-      const localDayKey = DAYS[slot.dayIdx].key;
-      const key = `${localDayKey}:${slot.hour}`;
-      if (!slots.has(key)) slots.set(key, []);
-      slots.get(key).push({ item, minute: slot.minute, localTime: slot.display });
-      countsByDay[localDayKey] += 1;
-      hourSet.add(slot.hour);
-      if (jstTime) timeByJst.set(jstTime, slot.display);
-    }
-  }
-
-  for (const entries of slots.values()) {
-    entries.sort((a, b) => a.minute - b.minute);
-  }
-
-  const hours = Array.from(hourSet).sort((a, b) => a - b);
-  return { slots, hours, countsByDay, timeByJst };
-};
+// UI-facing day list (label keys for translation). Index matches
+// `WEEKDAY_KEYS` so day arrays stay in sync with bucketizing.
+const DAY_LABELS = WEEKDAY_KEYS.map((key) => ({
+  key,
+  labelKey: `calendar.days.${key}`,
+}));
 
 function CalendarPage({ schedulesByDay, t }) {
   const { list: userList } = useMyList();
@@ -84,10 +25,13 @@ function CalendarPage({ schedulesByDay, t }) {
   // after hydration. Until then we render the timetable shell only.
   useEffect(() => {
     setNow(new Date());
-    setBucket(bucketize(schedulesByDay));
+    setBucket(bucketizeSchedule(schedulesByDay));
   }, [schedulesByDay]);
 
-  const week = useMemo(() => weekDates(now), [now]);
+  const week = useMemo(() => {
+    const dates = weekdayDates(now);
+    return dates.map((d, i) => ({ ...d, labelKey: DAY_LABELS[i].labelKey }));
+  }, [now]);
   const hours = bucket?.hours || [];
   const slots = bucket?.slots || new Map();
   const countsByDay = bucket?.countsByDay || {};
@@ -132,7 +76,7 @@ function CalendarPage({ schedulesByDay, t }) {
           <div className={styles.cornerCell} />
 
           {week.map(({ key, labelKey, date }) => {
-            const isToday = isSameDay(date, now);
+            const isToday = isSameCalendarDay(date, now);
             const count = countsByDay[key] || 0;
             return (
               <div
@@ -160,7 +104,7 @@ function CalendarPage({ schedulesByDay, t }) {
                     {String(h).padStart(2, '0')}:00
                   </div>
                   {week.map(({ key, date }) => {
-                    const isToday = isSameDay(date, now);
+                    const isToday = isSameCalendarDay(date, now);
                     const entries = slots.get(`${key}:${h}`) || [];
                     return (
                       <div
@@ -225,7 +169,7 @@ const pickScheduleFields = (item) => ({
 export async function getServerSideProps() {
   try {
     const entries = await Promise.all(
-      DAYS.map((day) => getSchedules(day.key).then((res) => [day.key, res])),
+      WEEKDAY_KEYS.map((key) => getSchedules(key).then((res) => [key, res])),
     );
     const schedulesByDay = Object.fromEntries(
       entries.map(([key, res]) => [
