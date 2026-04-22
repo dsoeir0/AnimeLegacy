@@ -1,0 +1,105 @@
+.wrap {
+  min-height: calc(100vh - 72px);
+  padding: 48px 32px 80px;
+  background: var(--al-ink-1);
+}
+
+.inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--al-primary-ink);
+  margin-bottom: 14px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: var(--al-fg-1);
+  margin: 0 0 36px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--al-fg-1);
+  margin: 0 0 12px;
+}
+
+.section p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--al-fg-2);
+  margin: 0 0 10px;
+}
+
+.list {
+  list-style: disc;
+  padding-left: 22px;
+  margin: 10px 0;
+  color: var(--al-fg-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.list li {
+  margin-bottom: 4px;
+}
+
+.contactBlock {
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 14px 0 8px;
+}
+
+.contactRow a {
+  text-decoration: none;
+}
+
+.email {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--al-fg-2);
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  user-select: all;
+}
+
+.fineprint {
+  font-size: 12.5px !important;
+  color: var(--al-fg-3) !important;
+  margin-top: 10px !important;
+}
+
+.backRow {
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-start;
+}

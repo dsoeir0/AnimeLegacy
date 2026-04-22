@@ -142,6 +142,23 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+.footerLink {
+  display: block;
+  margin-top: 10px;
+  padding: 4px 8px;
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--al-fg-3);
+  text-decoration: none;
+  transition: color var(--dur-2) var(--ease-standard);
+}
+
+.footerLink:hover {
+  color: var(--al-fg-2);
+}
+
 .userRowCollapsed {
   padding: 0;
   justify-content: center;

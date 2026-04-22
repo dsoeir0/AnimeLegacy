@@ -134,6 +134,11 @@ function Sidebar({ t }) {
             </div>
           ) : null}
         </Link>
+        {!collapsed ? (
+          <Link href="/privacy" className={styles.footerLink}>
+            {t('privacy.eyebrow')}
+          </Link>
+        ) : null}
       </div>
     </aside>
   );
