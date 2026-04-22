@@ -157,7 +157,7 @@
   background: repeating-linear-gradient(
     135deg,
     transparent 0 6px,
-    rgba(255, 255, 255, 0.012) 6px 12px
+    var(--al-border-subtle) 6px 12px
   );
 }
 
