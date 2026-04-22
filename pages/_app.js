@@ -12,7 +12,9 @@ function MyApp({ Component, pageProps }) {
   return (
     <ErrorBoundary>
       <Component {...pageProps} />
-      <Analytics />
+      {/* Analytics only mounts in production. In dev the insights script
+          404s on localhost and just clutters the console — no useful data. */}
+      {process.env.NODE_ENV === 'production' ? <Analytics /> : null}
     </ErrorBoundary>
   );
 }

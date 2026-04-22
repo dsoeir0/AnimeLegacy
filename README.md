@@ -44,6 +44,7 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 - Node.js **20+** (LTS) — pinned in `.nvmrc` / `.node-version`
 - [pnpm](https://pnpm.io) 9+ — this project uses pnpm (not npm/yarn)
 - A Firebase project (Auth + Firestore enabled)
+- **Java 17+** — only required to run the test suite (Firestore emulator). Skip if you only intend to `pnpm dev` / `pnpm build`.
 
 ### Install
 
@@ -92,6 +93,9 @@ pnpm build                 # Production build
 pnpm start                 # Start production server
 pnpm lint                  # Oxlint (project has a zero-error discipline)
 pnpm format                # Oxfmt
+pnpm test                  # Vitest against the Firestore emulator (needs Java 17+)
+pnpm test:watch            # Same, in watch mode
+pnpm analyze               # Build with @next/bundle-analyzer — opens treemap
 pnpm seed:firestore        # Seed anime catalog (requires service-account JSON)
 pnpm gen-trans             # Regenerate pt/es/fr from lang/en.json via MyMemory
 ```
@@ -124,8 +128,10 @@ AnimeLegacy/
 │   ├── search.js        # Discover
 │   └── sign-in|sign-up|forgot-password|reset-password
 ├── styles/              # Global tokens + per-page CSS modules
+├── tests/               # Vitest suite (runs against Firestore emulator)
 ├── firestore.rules      # Firestore security rules
 ├── firestore.indexes.json
+├── firebase.json        # Emulator port config
 └── next.config.js
 ```
 
@@ -144,6 +150,8 @@ AnimeLegacy/
 | `/movies` | Top rated movies |
 | `/sign-in`, `/sign-up` | Auth |
 | `/forgot-password`, `/reset-password` | Recovery flow |
+| `/privacy` | GDPR rights + account-deletion contact |
+| `/api/delete-account` | Self-service erasure endpoint (auto when Admin SDK configured, 503 fallback otherwise) |
 
 ---
 
@@ -208,6 +216,21 @@ Tokens live in [`styles/tokens.css`](styles/tokens.css). All components consume 
 - **AniList GraphQL** supplements poster/banner URLs with higher-resolution imagery. IDs are resolved by MAL ID in batches of 25.
 - **Firestore** stores per-user state with real-time `onSnapshot` listeners. Catalog docs are denormalized for offline-friendly views of each user's list.
 
+### In-memory TTL cache
+
+Both external APIs (Jikan + AniList) are wrapped by a shared cache at [`lib/services/_cache.js`](lib/services/_cache.js). Each cached getter has a TTL tuned to how often the underlying data actually changes:
+
+| Service / endpoint | TTL | Reason |
+|---|---|---|
+| Jikan — anime / character / person detail | 1h | Biographies and metadata are near-static |
+| Jikan — `/top/anime` | 15m | Popularity shifts |
+| Jikan — `/seasons/{year}/{season}` | 1h | Season lineup is fixed once published |
+| Jikan — `/schedules` | 5m | Broadcast times can change day-of |
+| Jikan — `/anime?q=` (search) | not cached | Every query is unique |
+| AniList — cover/banner per MAL ID | 6h | Cover URLs are effectively immutable |
+
+The cache lives inside each serverless function instance and survives the warm lifetime that Vercel Fluid Compute gives us (minutes–hours). It serves stale data when the origin fails, so a Jikan 429 burst doesn't blank out popular pages. When the deployment scales out horizontally enough that cross-instance coherence matters, the `cached(key, ttlMs, fetcher)` signature is a drop-in replacement slot for Upstash Redis or Vercel KV.
+
 ---
 
 ## Firestore schema (summary)
@@ -228,6 +251,74 @@ characterStats/{id}           — global character favorite counters
 Security rules live in [`firestore.rules`](firestore.rules). Key invariants:
 - A user can only read/write under their own `users/{uid}` document.
 - The favorite limit (10) is enforced in client code; rules protect against direct manipulation.
+
+### Account deletion (GDPR Article 17)
+
+`/privacy` is always available and explains how to request erasure. There are two deletion modes:
+
+- **Self-service (automated)**: requires `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, and `FIREBASE_ADMIN_PRIVATE_KEY` in Vercel. When present, the Delete account button in the profile edit modal calls `/api/delete-account`, which wipes every subcollection under `users/{uid}`, releases the username reservation, and removes the Firebase Auth user.
+- **Manual fallback (current default)**: without those env vars, the API returns `503` and the UI points users at `/privacy` to request removal via email. See [`docs/account-deletion.md`](docs/account-deletion.md) for the operator runbook — what to click, in what order, to stay GDPR-compliant without automation.
+
+---
+
+## Testing
+
+Integration tests run against the Firestore emulator, so bugs that only show up at the rule level are caught — not just client logic mistakes.
+
+```bash
+pnpm test           # one-shot run (used by CI)
+pnpm test:watch     # watch mode for local work
+```
+
+Both commands wrap the run with `firebase emulators:exec`, which starts a throwaway emulator on `127.0.0.1:8080`, runs Vitest, and shuts it down. First run downloads the emulator JAR (~50 MB, cached under `~/.cache/firebase/`).
+
+### What's covered
+
+| File | Scope |
+|------|-------|
+| `tests/cleanSynopsis.test.js` | Pure regex tests for the MAL/AniList credit stripper (`[Written by …]`, `(Source: …)`). |
+| `tests/listTransitions.test.js` | `useMyList` state machine — status normalisation for airing shows, progress clamping, favourite-limit enforcement, activity-label derivation across every transition. |
+| `tests/claimUsername.test.js` | Transactional username uniqueness — cross-case collisions, idempotent re-claim, rules-only tests that verify `firestore.rules` forbids impersonation / overwrite / delete even if client logic were buggy. |
+| `tests/upsertUserProfile.test.js` | Profile writes — `createdAt` preserved, `usernameLower` derivation, avatar merge semantics, impersonation blocked. |
+| `tests/userDataRules.test.js` | Firestore rules for all user-scoped subcollections (`anime`, `list`, `activity`, `favoriteCharacters`) + catalog (`anime/{id}`) + `characterStats/{id}` whitelist. |
+| `tests/cache.test.js` | Shared service cache helper — hit/miss behaviour, TTL expiry, stale-on-error fallback. |
+| `tests/profileStats.test.js` | Pure profile aggregators (`computeStats`, `computeGenres`). |
+| `tests/authErrors.test.js` | Firebase Auth error-code → i18n key mapping. |
+| `tests/deleteAccount.test.js` | `/api/delete-account` gatekeeping — 405 / 503 fallback / 401 auth paths. |
+
+### Adding tests
+
+- Tests live under `tests/` and follow a single `*.test.js` convention.
+- For integration against the emulator, import `newTestEnv` from `tests/helpers.js` (wraps `@firebase/rules-unit-testing`).
+- Functions that depend on Firebase use a DI pattern so tests can pass in an emulator-backed Firestore: e.g. `claimUsernameIn(db, args)` vs the public `claimUsername(args)` that pulls from `getFirebaseClient()`. Prefer extracting a pure helper when the logic doesn't actually need Firestore.
+- Test files run **sequentially** (`fileParallelism: false`) because they all share one emulator instance — running in parallel would let one file's `clearFirestore()` wipe another file's mid-test state.
+
+CI enforces the suite alongside lint and build (`.github/workflows/ci.yml`).
+
+---
+
+## Performance & bundle size
+
+There's no hard performance budget yet, but two lightweight signals are in place so regressions don't slip through unnoticed:
+
+### Local — `pnpm analyze`
+
+Runs a production build with `@next/bundle-analyzer` enabled, then opens a treemap in the browser. Good for finding surprising node_modules that snuck in via an npm upgrade.
+
+```bash
+pnpm analyze
+```
+
+### CI — bundle-size comment on PRs
+
+[`.github/workflows/bundle-size.yml`](.github/workflows/bundle-size.yml) builds both the PR and its base branch, diffs per-route **First Load JS**, and posts a sticky comment on the PR that looks like:
+
+| Route | Size | First Load JS | Δ vs main |
+|-------|------|---------------|-----------|
+| `/profile` | 10.1 kB | 249 kB | +2.3 kB (+0.9%) |
+| `/my-list` | 7.22 kB | 252 kB | +18 kB (+7.7%) 🟡 |
+
+Anything growing more than ±2% gets flagged. There are **no hard gates** — a regression doesn't block merge — but nobody can merge without having seen the number, which is enough in practice.
 
 ---
 
@@ -255,9 +346,10 @@ See [`docs/email-deliverability.md`](docs/email-deliverability.md) for deliverab
 This is a personal project, but issues and pull requests are welcome.
 
 Before opening a PR:
-- Run `pnpm lint` and `pnpm build` (CI enforces both).
+- Run `pnpm lint`, `pnpm test`, and `pnpm build` (CI enforces all three).
 - Keep CSS in modules (`styles/*.module.css`) and drive colors through the token variables — avoid inline hex values.
 - Preserve the Firebase + Jikan boundaries; don't inline external fetches inside components.
+- When touching `lib/services/*` or Firestore rules, add or update tests under `tests/` — rules-only tests are especially valuable since they prove security holds even against a buggy client.
 
 ---
 
