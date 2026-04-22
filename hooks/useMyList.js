@@ -13,8 +13,13 @@ import {
 } from 'firebase/firestore';
 import { ensureAnimeCatalog } from '../lib/services/animeCatalog';
 import { addUserActivity, upsertUserAnime, updateUserAnime } from '../lib/services/userAnime';
-import { FAVORITE_LIMIT } from '../lib/constants';
 import { isAiringAnime } from '../lib/utils/anime';
+import {
+  clampProgress,
+  deriveActivityLabel,
+  resolveFavorite,
+  resolveStatus,
+} from '../lib/utils/listTransitions';
 
 export default function useMyList() {
   const { user } = useAuth();
@@ -54,13 +59,9 @@ export default function useMyList() {
     const { db } = getFirebaseClient();
     if (db) {
       const totalEpisodes = Number.isFinite(item?.episodes) ? item.episodes : item?.episodesTotal;
-      const rawStatus = options.status || 'plan';
       const isAiring = isAiringAnime(item);
-      const status = isAiring && rawStatus === 'completed' ? 'watching' : rawStatus;
-      const progressInput = Number.isFinite(options.progress) ? options.progress : 0;
-      const maxProgress = Number.isFinite(totalEpisodes) ? totalEpisodes : undefined;
-      const progress =
-        Number.isFinite(maxProgress) && progressInput > maxProgress ? maxProgress : progressInput;
+      const status = resolveStatus(options.status, isAiring);
+      const progress = clampProgress(options.progress, totalEpisodes);
       const existingEntry = list.find((entry) => String(entry.id) === safeId) || null;
       const currentFavorites = list.filter((entry) => entry.isFavorite).length;
       const requestedFavorite =
@@ -68,8 +69,11 @@ export default function useMyList() {
       const currentFavorite = Boolean(existingEntry?.isFavorite);
       const desiredFavorite =
         typeof requestedFavorite === 'boolean' ? requestedFavorite : currentFavorite;
-      const canFavorite = !desiredFavorite || currentFavorite || currentFavorites < FAVORITE_LIMIT;
-      const isFavorite = desiredFavorite && canFavorite;
+      const isFavorite = resolveFavorite({
+        desired: desiredFavorite,
+        current: currentFavorite,
+        currentCount: currentFavorites,
+      });
       const hasRating =
         typeof options.rating === 'number' || options.rating === null;
       const ratingInput =
@@ -102,55 +106,23 @@ export default function useMyList() {
           ...(addedAtValue ? { addedAt: addedAtValue } : {}),
         },
       });
-      const statusLabelMap = {
-        plan: 'Planned to watch',
-        watching: progress > 0 ? `Watching (${progress}/${totalEpisodes || 'TBA'})` : 'Started watching',
-        completed: 'Marked as completed',
-        dropped: 'Dropped',
-        on_hold: 'On hold',
-      };
-      const previousStatusRaw = existingEntry?.status || 'plan';
-      const previousStatus =
-        isAiring && previousStatusRaw === 'completed' ? 'watching' : previousStatusRaw;
-      const previousProgress =
-        typeof existingEntry?.progress === 'number' ? existingEntry.progress : 0;
-      const previousRating =
-        typeof existingEntry?.rating === 'number' ? existingEntry.rating : null;
-      const previousReview =
-        typeof existingEntry?.review === 'string' ? existingEntry.review.trim() : '';
-      const nextReview = typeof reviewInput === 'string' ? reviewInput.trim() : previousReview;
-      const activityParts = [];
-
-      if (status !== previousStatus) {
-        activityParts.push(statusLabelMap[status] || 'Updated status');
-      } else if (progress !== previousProgress && status === 'watching') {
-        const progressLabel = totalEpisodes
-          ? `Watched ${progress}/${totalEpisodes}`
-          : `Watched ${progress} eps`;
-        activityParts.push(progressLabel);
-      }
-
-      if (hasRating && ratingInput !== previousRating) {
-        if (typeof ratingInput === 'number') {
-          activityParts.push(`Rated ${ratingInput}/5`);
-        } else if (previousRating !== null) {
-          activityParts.push('Cleared rating');
-        }
-      }
-
-      if (typeof reviewInput === 'string' && nextReview !== previousReview) {
-        if (nextReview && !previousReview) {
-          activityParts.push('Wrote a review');
-        } else if (nextReview && previousReview) {
-          activityParts.push('Updated review');
-        } else if (!nextReview && previousReview) {
-          activityParts.push('Removed review');
-        }
-      }
-
-      const activityLabel = activityParts.length
-        ? activityParts.join(' • ')
-        : statusLabelMap[status] || 'Updated status';
+      const previousStatus = resolveStatus(existingEntry?.status, isAiring);
+      const activityLabel = deriveActivityLabel({
+        prev: {
+          status: previousStatus,
+          progress: existingEntry?.progress,
+          rating: existingEntry?.rating,
+          review: existingEntry?.review,
+        },
+        next: {
+          status,
+          progress,
+          hasRating,
+          rating: ratingInput,
+          review: reviewInput,
+        },
+        totalEpisodes,
+      });
       await addUserActivity({
         uid: user.uid,
         activity: {
