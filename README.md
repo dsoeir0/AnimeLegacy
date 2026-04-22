@@ -41,21 +41,29 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 ## Quick start
 
 ### Prerequisites
-- Node.js **20+** (24.x recommended — see `package.json` engines)
+- Node.js **20+** (LTS) — pinned in `.nvmrc` / `.node-version`
+- [pnpm](https://pnpm.io) 9+ — this project uses pnpm (not npm/yarn)
 - A Firebase project (Auth + Firestore enabled)
 
 ### Install
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Configure environment
 
-Copy `.env.example` to `.env.local` (create if it doesn't exist) and fill in your Firebase credentials:
+Copy `.env.local.example` to `.env.local` and fill in your Firebase credentials. Alternatively, if the project is linked to Vercel, pull them straight from the dashboard:
 
 ```bash
-# Client (exposed to browser)
+pnpm dlx vercel link           # one-time: pick the animelegacy project
+pnpm dlx vercel env pull .env.local
+```
+
+Manual setup — `.env.local`:
+
+```bash
+# Client — public by design (ship to browser, secured by firestore.rules)
 NEXT_PUBLIC_FIREBASE_API_KEY=
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=
@@ -63,18 +71,14 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
 
-# Server (Firebase Admin SDK — used by /api/delete-account)
-FIREBASE_ADMIN_PROJECT_ID=
-FIREBASE_ADMIN_CLIENT_EMAIL=
-FIREBASE_ADMIN_PRIVATE_KEY=
+# Optional — Google Cloud Translate API key for `pnpm gen-trans`
+GOOGLE_TRANSLATE_API_KEY=
 ```
-
-> Alternatively, drop a service account JSON at `config/firebase-admin.json`.
 
 ### Run locally
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -82,11 +86,12 @@ Open [http://localhost:3000](http://localhost:3000).
 ### Other scripts
 
 ```bash
-npm run build      # Production build
-npm run start      # Start production server
-npm run lint       # Oxlint
-npm run format     # Oxfmt
-npm run seed:firestore  # Seed anime catalog (requires admin config)
+pnpm build                 # Production build
+pnpm start                 # Start production server
+pnpm lint                  # Oxlint (project has a zero-error discipline)
+pnpm format                # Oxfmt
+pnpm seed:firestore        # Seed anime catalog (requires service-account JSON)
+pnpm gen-trans             # Regenerate pt/es/fr from lang/en.json via Google Translate
 ```
 
 ---
@@ -248,7 +253,7 @@ See [`docs/email-deliverability.md`](docs/email-deliverability.md) for deliverab
 This is a personal project, but issues and pull requests are welcome.
 
 Before opening a PR:
-- Run `npm run lint` and `npm run build`.
+- Run `pnpm lint` and `pnpm build` (CI enforces both).
 - Keep CSS in modules (`styles/*.module.css`) and drive colors through the token variables — avoid inline hex values.
 - Preserve the Firebase + Jikan boundaries; don't inline external fetches inside components.
 
