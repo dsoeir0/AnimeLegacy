@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { Bookmark } from 'lucide-react';
 import { translate } from 'react-switch-lang';
@@ -106,13 +105,20 @@ function StudioCard({ studio, posters, postersLoading, t }) {
                 return (
                   <div key={p.mal_id} className={styles.posterSlot}>
                     {url ? (
-                      <Image
+                      // Plain <img> — not next/image — because these are 80px
+                      // decorative thumbs. MAL already serves 192×272 for
+                      // this URL which downscales perfectly at any DPR, and
+                      // each <Image> for these on Hobby tier burns through
+                      // the 5K/month Vercel Image transformations budget
+                      // (23 studios × 4 thumbs × multiple /studios visits).
+                      // loading="lazy" preserves below-the-fold deferral.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={url}
                         alt={p.title || ''}
-                        fill
-                        sizes="80px"
-                        quality={70}
                         className={styles.posterImage}
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : null}
                   </div>

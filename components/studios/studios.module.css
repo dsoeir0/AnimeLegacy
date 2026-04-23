@@ -495,8 +495,14 @@
   border: 1px dashed var(--al-border);
 }
 
+/* Plain <img> needs explicit fill rules (next/image fill did this for us). */
 .posterImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .cardStats {
