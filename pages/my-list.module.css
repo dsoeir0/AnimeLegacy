@@ -226,6 +226,54 @@
   text-decoration: underline;
 }
 
+.emptyCtaRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.emptyCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--al-primary-gradient);
+  color: var(--al-ink-0);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: filter var(--dur-2) var(--ease-standard);
+}
+
+.emptyCta:hover {
+  filter: brightness(1.08);
+}
+
+.importLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--al-border);
+  border-radius: 10px;
+  color: var(--al-fg-2);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--dur-2) var(--ease-standard);
+  white-space: nowrap;
+}
+
+.importLink:hover {
+  color: var(--al-fg-1);
+  border-color: var(--al-border-strong);
+  background: var(--al-ink-3);
+}
+
 /* =========================== LIST VIEW =========================== */
 .listStack {
   display: flex;

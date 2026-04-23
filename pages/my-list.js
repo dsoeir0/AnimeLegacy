@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
+  Download,
 } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
@@ -28,6 +29,7 @@ import AddToListModal from '../components/modals/AddToListModal';
 import RatingModal from '../components/modals/RatingModal';
 import styles from './my-list.module.css';
 import useMyList from '../hooks/useMyList';
+import { healMissingAddedAt } from '../lib/services/userList';
 import useAuth from '../hooks/useAuth';
 import useProfileData from '../hooks/useProfileData';
 import { getFirebaseClient } from '../lib/firebase/client';
@@ -79,6 +81,29 @@ function MyList({ t }) {
     if (authLoading) return;
     if (!user) router.replace('/sign-in');
   }, [authLoading, router, user]);
+
+  // Self-heal for the addedAt bug shipped in the first MAL import. Docs
+  // that were written without `addedAt` are invisible to the
+  // orderBy('addedAt') query in useMyList. Running this on /my-list mount
+  // guarantees recovery even for users who don't revisit /import/mal.
+  // Idempotent — only writes to docs that are actually missing the field.
+  // The onSnapshot subscription in useMyList picks up the heal in
+  // real-time, so rows appear without a page refresh.
+  useEffect(() => {
+    if (!user?.uid) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        await healMissingAddedAt(user.uid);
+        if (cancelled) return;
+      } catch {
+        // non-fatal; the list query still works for non-broken docs
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid]);
 
   const detailsById = useMemo(() => {
     const map = new Map();
@@ -486,6 +511,10 @@ function MyList({ t }) {
                     className={styles.searchInput}
                   />
                 </div>
+                <Link href="/import/mal" className={styles.importLink}>
+                  <Download size={13} aria-hidden="true" />
+                  <span>{t('myList.importFromMal')}</span>
+                </Link>
               </div>
             </header>
 
@@ -562,6 +591,12 @@ function MyList({ t }) {
                 <p className={styles.emptySubtitle}>
                   <Link href="/">{t('nav.home')}</Link> · {t('myList.emptyBody')}
                 </p>
+                <div className={styles.emptyCtaRow}>
+                  <Link href="/import/mal" className={styles.emptyCta}>
+                    <Download size={14} aria-hidden="true" />
+                    <span>{t('myList.importFromMal')}</span>
+                  </Link>
+                </div>
               </div>
             ) : view === 'list' ? (
               <div className={styles.listStack}>

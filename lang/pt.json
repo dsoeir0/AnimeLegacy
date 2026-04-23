@@ -240,7 +240,61 @@
     "emptyBody": "Navegue pela página inicial e adicione algumas séries ou filmes.",
     "yourScore": "A sua pontuação",
     "advance": "Avançar",
-    "rate": "Avaliar"
+    "rate": "Avaliar",
+    "importFromMal": "Importar do MyAnimeList"
+  },
+  "import": {
+    "mal": {
+      "metaTitle": "AnimeLegacy · Importar do MyAnimeList",
+      "metaDesc": "Traga o seu histórico do MyAnimeList para o AnimeLegacy num só passo.",
+      "eyebrow": "IMPORTAR · MYANIMELIST",
+      "titleStart": "Traga a sua",
+      "titleEnd": "lista do MAL",
+      "subtitle": "Escreva o seu username do MyAnimeList e nós tratamos de puxar a lista. O seu perfil do MAL tem de ser público para isto funcionar.",
+      "healed": "Recuperadas {n} entradas de uma importação anterior que não estavam a aparecer na sua lista.",
+      "backToList": "Voltar à minha lista",
+      "loading": "A carregar a sua lista do AnimeLegacy…",
+      "signInRequired": "Inicie sessão primeiro para importar a sua lista do MAL para a sua conta.",
+      "usernameLabel": "Username do MyAnimeList",
+      "usernameHelper": "Sem distinção entre maiúsculas e minúsculas, 2 a 16 caracteres. Encontra-o em myanimelist.net/profile/<username>.",
+      "fetchList": "Obter lista",
+      "fetching": "A obter…",
+      "previewFor": "Pré-visualização da lista de",
+      "changeUser": "Mudar username",
+      "breakdown": "Distribuição por estado",
+      "favoritesBreakdown": "Favoritos a importar",
+      "favoriteAnime": "Anime favoritos",
+      "favoriteCharacters": "Personagens favoritos",
+      "favoritesSkippedCap": "Ignorados (limite de favoritos atingido)",
+      "mergeNotice": "As entradas que já tem na sua lista do AnimeLegacy mantêm-se intactas — apenas adicionamos o que falta. Classificações, progresso e favoritos vêm do MAL (até 10 favoritos por categoria).",
+      "confirmImport": "Importar {n} entradas",
+      "importing": "A importar {done}/{total}…",
+      "stats": {
+        "total": "Encontradas no MAL",
+        "willImport": "Vão ser importadas",
+        "alreadyInList": "Já na sua lista",
+        "unsupported": "Ignoradas (não suportadas)",
+        "withRating": "com classificação"
+      },
+      "done": {
+        "title": "{n} entradas importadas",
+        "imported": "{n} entradas adicionadas à sua lista",
+        "favoriteAnime": "{n} anime marcados como favoritos",
+        "favoriteCharacters": "{n} personagens adicionados aos favoritos",
+        "skipped": "{n} entradas já existiam e ficaram intactas",
+        "unsupported": "{n} entradas tinham estado não suportado e foram ignoradas",
+        "failed": "{n} entradas falharam a importação — tente correr o importador outra vez",
+        "importAnother": "Importar outra conta",
+        "viewList": "Abrir a minha lista"
+      },
+      "errors": {
+        "invalidUsername": "Isso não parece ser um username do MyAnimeList. Use 2 a 16 letras, dígitos, hífenes ou sublinhados.",
+        "userNotFound": "O MyAnimeList não reconhece esse username.",
+        "listPrivate": "Essa lista é privada. Torne o perfil público no MyAnimeList (Definições → Privacidade) e tente de novo.",
+        "networkFailed": "Não conseguimos contactar o MyAnimeList agora. Tente dentro de um minuto.",
+        "emptyList": "O perfil existe mas a lista de anime está vazia."
+      }
+    }
   },
   "profile": {
     "metaTitle": "AnimeLegacy · Perfil",
