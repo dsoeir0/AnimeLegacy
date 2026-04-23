@@ -1,28 +1,28 @@
 import Link from 'next/link';
-import { translate } from 'react-switch-lang';
+import { translate, getLanguage } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import PosterCard from '../../components/cards/PosterCard';
+import useTranslatedText from '../../hooks/useTranslatedText';
 import { getProducerById, getAnimeByProducer } from '../../lib/services/jikan';
 import { dedupeByMalId, filterOutHentai } from '../../lib/utils/anime';
+import { pickStudioName, studioInitials } from '../../lib/utils/studio';
 import styles from './[id].module.css';
 
-const pickName = (producer) => {
-  if (!producer) return 'Unknown';
-  const titles = Array.isArray(producer.titles) ? producer.titles : [];
-  const preferred = titles.find((title) => title?.type === 'Default') || titles[0];
-  return preferred?.title || producer.name || 'Unknown';
-};
-
-const initials = (name) =>
-  String(name || '')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() || '')
-    .join('');
-
 function StudioDetailPage({ producer, works, t }) {
+  // Translate the raw `about` string via MyMemory, cached under the
+  // `studios/{mal_id}.aboutByLang.{lang}` Firestore document. Matches the
+  // pattern used by the anime synopsis and character biography flows.
+  const currentLang =
+    typeof getLanguage === 'function' ? getLanguage() : 'en';
+  const { text: translatedAbout } = useTranslatedText({
+    docId: producer?.mal_id,
+    sourceText: producer?.about || '',
+    lang: currentLang,
+    cacheField: 'aboutByLang',
+    cacheCollection: 'studios',
+  });
+
   if (!producer) {
     return (
       <Layout title="AnimeLegacy · Studio">
@@ -38,8 +38,9 @@ function StudioDetailPage({ producer, works, t }) {
       </Layout>
     );
   }
-  const name = pickName(producer);
-  const aboutLines = (producer.about || '')
+  const name = pickStudioName(producer);
+  const aboutSource = translatedAbout || producer.about || '';
+  const aboutLines = aboutSource
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
@@ -55,7 +56,7 @@ function StudioDetailPage({ producer, works, t }) {
       <div className={styles.page}>
         <header className={styles.head}>
           <div className={styles.headLeft}>
-            <div className={styles.mono}>{initials(name)}</div>
+            <div className={styles.mono}>{studioInitials(name)}</div>
             <div>
               <div className={styles.eyebrow}>{t('studio.eyebrow')}</div>
               <h1 className={styles.title}>{name}</h1>

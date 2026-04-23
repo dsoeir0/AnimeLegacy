@@ -571,15 +571,43 @@
   "studios": {
     "metaTitle": "AnimeLegacy · Studios",
     "metaDesc": "Parcourez les studios derrière vos animes favoris.",
-    "eyebrow": "CATALOGUE",
-    "titleStart": "Studios",
-    "titleEnd": "d'anime",
-    "subtitle": "Chaque studio d'animation catalogué — classé selon les favoris des fans. Cliquez pour leurs œuvres emblématiques.",
+    "eyebrow": "CHRONIQUE · STUDIOS · INDEX VIVANT",
+    "titleStart": "Les studios",
+    "titleEnd": "qui font",
+    "titleTail": "l'animation",
+    "subtitle": "Des vétérans avec cinq décennies au compteur aux nouveaux venus qui tentent la prochaine étape — chaque studio avec sa cadence, son équipe, son identité visuelle.",
     "emptyTitle": "Aucune donnée disponible",
     "emptyBody": "L'API Jikan ne répond pas. Réessayez dans un instant.",
     "titlesCount": "{n} titres",
     "fansCount": "{n} fans",
-    "established": "Fondé en {year}"
+    "established": "Fondé en {year}",
+    "stats": {
+      "studios": "STUDIOS",
+      "productions": "PRODUCTIONS"
+    },
+    "featured": {
+      "eyebrow": "STUDIO À L'HONNEUR",
+      "openCatalog": "Voir le catalogue complet",
+      "follow": "Suivre",
+      "recentWork": "ŒUVRES EMBLÉMATIQUES"
+    },
+    "filters": {
+      "all": "Tous",
+      "veteran": "Vétérans",
+      "active": "Actifs",
+      "newWave": "Nouvelle vague",
+      "showingCount": "{n} AFFICHÉS"
+    },
+    "card": {
+      "foundedShort": "Fondé en",
+      "foundedUnknown": "Année de fondation inconnue",
+      "founded": "FONDÉ",
+      "productions": "PRODUCTIONS",
+      "yearsActive": "ANNÉES ACTIVES",
+      "yearsShort": "{n} ans",
+      "scoreAvg": "NOTE ⌀",
+      "bioMissing": "Aucune biographie."
+    }
   },
   "studio": {
     "metaDescFallback": "Catalogue d'anime de {name}.",

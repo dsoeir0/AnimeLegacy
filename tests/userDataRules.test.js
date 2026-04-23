@@ -197,8 +197,8 @@ describe('anime/{id} catalog rules', () => {
   });
 });
 
-describe('characters/{id} + people/{id} translation caches', () => {
-  for (const col of ['characters', 'people']) {
+describe('characters/{id} + people/{id} + studios/{id} translation caches', () => {
+  for (const col of ['characters', 'people', 'studios']) {
     it(`anyone can read ${col}/{id}`, async () => {
       await setDoc(doc(authed('userA'), col, '42'), {
         biographyByLang: { pt: 'Biografia traduzida.' },

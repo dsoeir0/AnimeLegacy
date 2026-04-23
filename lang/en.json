@@ -571,15 +571,43 @@
   "studios": {
     "metaTitle": "AnimeLegacy · Studios",
     "metaDesc": "Browse the studios behind your favorite anime.",
-    "eyebrow": "CATALOGUE",
-    "titleStart": "Anime",
-    "titleEnd": "studios",
-    "subtitle": "Every animation house catalogued — ranked by fan favorites. Click through for their signature works.",
+    "eyebrow": "CHRONICLE · STUDIOS · LIVING INDEX",
+    "titleStart": "The studios",
+    "titleEnd": "behind",
+    "titleTail": "the animation",
+    "subtitle": "From veterans with five decades on the clock to upstarts chasing the next thing — every house with its own cadence, crew and visual identity.",
     "emptyTitle": "No data available",
     "emptyBody": "The Jikan API is not responding. Try again in a moment.",
     "titlesCount": "{n} titles",
     "fansCount": "{n} fans",
-    "established": "Est. {year}"
+    "established": "Est. {year}",
+    "stats": {
+      "studios": "STUDIOS",
+      "productions": "PRODUCTIONS"
+    },
+    "featured": {
+      "eyebrow": "STUDIO IN FOCUS",
+      "openCatalog": "Open full catalogue",
+      "follow": "Follow",
+      "recentWork": "SIGNATURE WORKS"
+    },
+    "filters": {
+      "all": "All",
+      "veteran": "Veterans",
+      "active": "Active",
+      "newWave": "New wave",
+      "showingCount": "{n} SHOWN"
+    },
+    "card": {
+      "foundedShort": "Founded",
+      "foundedUnknown": "Founding year unknown",
+      "founded": "FOUNDED",
+      "productions": "PRODUCTIONS",
+      "yearsActive": "YEARS ACTIVE",
+      "yearsShort": "{n} yrs",
+      "scoreAvg": "SCORE ⌀",
+      "bioMissing": "No bio on file."
+    }
   },
   "studio": {
     "metaDescFallback": "Anime catalogue from {name}.",

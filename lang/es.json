@@ -571,15 +571,43 @@
   "studios": {
     "metaTitle": "AnimeLegacy · Estudios",
     "metaDesc": "Explora los estudios detrás de tus animes favoritos.",
-    "eyebrow": "CATÁLOGO",
-    "titleStart": "Estudios",
-    "titleEnd": "de anime",
-    "subtitle": "Todas las casas de animación catalogadas — ordenadas por los favoritos de los fans. Haz clic para ver sus obras más emblemáticas.",
+    "eyebrow": "CRÓNICA · ESTUDIOS · ÍNDICE VIVO",
+    "titleStart": "Los estudios",
+    "titleEnd": "que hacen",
+    "titleTail": "la animación",
+    "subtitle": "Desde veteranos con cinco décadas a cabeza hasta novatos buscando el próximo éxito — cada estudio con su propia cadencia, equipo e identidad visual.",
     "emptyTitle": "Sin datos disponibles",
     "emptyBody": "La API de Jikan no está respondiendo. Inténtalo de nuevo en un momento.",
     "titlesCount": "{n} títulos",
     "fansCount": "{n} fans",
-    "established": "Fundado en {year}"
+    "established": "Fundado en {year}",
+    "stats": {
+      "studios": "ESTUDIOS",
+      "productions": "PRODUCCIONES"
+    },
+    "featured": {
+      "eyebrow": "ESTUDIO EN FOCO",
+      "openCatalog": "Ver catálogo completo",
+      "follow": "Seguir",
+      "recentWork": "OBRAS EMBLEMÁTICAS"
+    },
+    "filters": {
+      "all": "Todos",
+      "veteran": "Veteranos",
+      "active": "Activos",
+      "newWave": "Nueva ola",
+      "showingCount": "{n} VISIBLES"
+    },
+    "card": {
+      "foundedShort": "Fundado en",
+      "foundedUnknown": "Año de fundación desconocido",
+      "founded": "FUNDADO",
+      "productions": "PRODUCCIONES",
+      "yearsActive": "AÑOS ACTIVOS",
+      "yearsShort": "{n} años",
+      "scoreAvg": "PUNTUACIÓN ⌀",
+      "bioMissing": "Sin biografía disponible."
+    }
   },
   "studio": {
     "metaDescFallback": "Catálogo de anime de {name}.",
