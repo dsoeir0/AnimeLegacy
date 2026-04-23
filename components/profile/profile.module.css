@@ -822,6 +822,13 @@
   font-weight: 600;
   color: var(--al-fg-1);
   letter-spacing: -0.005em;
+  /* Keep the rating suffix on the same row even when the anime title is
+     very long (e.g. multi-clause Japanese subtitles). */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .reviewSub {
