@@ -85,7 +85,10 @@
     "editProfile": "Editar perfil",
     "editEntry": "Editar entrada",
     "updateEntry": "Actualizar entrada",
-    "rateReview": "Puntuar y comentar",
+    "rate": "Puntuar",
+    "updateRating": "Actualizar puntuación",
+    "writeReview": "Escribir reseña",
+    "editReview": "Editar reseña",
     "watchTrailer": "Ver el tráiler",
     "readReviews": "Leer reseñas",
     "viewDetails": "Ver detalles",
@@ -632,17 +635,21 @@
   },
   "modal": {
     "rating": {
-      "title": "Puntuar y comentar",
-      "yourRating": "Tu puntuación",
-      "review": "Reseña",
-      "reviewEnabled": "Reseña habilitada",
-      "enableReview": "Habilitar reseña",
-      "reviewPlaceholder": "Comparte qué te ha parecido la historia, los personajes y el ritmo…",
+      "titleOnly": "Puntuar",
       "notRated": "Sin puntuar",
       "ratingValue": "{n}/5",
+      "clearRating": "Borrar puntuación",
       "save": "Guardar puntuación",
       "update": "Actualizar puntuación",
       "starLabel": "Establecer puntuación en {value} de 5"
+    },
+    "review": {
+      "title": "Escribir una reseña",
+      "placeholder": "Comparte qué te ha parecido la historia, los personajes y el ritmo…",
+      "hint": "Tu reseña es privada en tu perfil. Evita spoilers si eso te importa.",
+      "save": "Guardar reseña",
+      "update": "Actualizar reseña",
+      "deleteReview": "Eliminar reseña"
     },
     "addToList": {
       "titleAdd": "Añadir a la lista",

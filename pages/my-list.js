@@ -25,7 +25,7 @@ import IconButton from '../components/ui/IconButton';
 import StatusBadge from '../components/ui/StatusBadge';
 import Skeleton from '../components/ui/Skeleton';
 import AddToListModal from '../components/modals/AddToListModal';
-import RatingReviewModal from '../components/modals/RatingReviewModal';
+import RatingModal from '../components/modals/RatingModal';
 import styles from './my-list.module.css';
 import useMyList from '../hooks/useMyList';
 import useAuth from '../hooks/useAuth';
@@ -247,7 +247,7 @@ function MyList({ t }) {
     await addItem(pendingAnime, { ...details, keepAddedAt: true });
     closeEditModal();
   };
-  const handleSaveRating = async ({ rating, review }) => {
+  const handleSaveRating = async ({ rating }) => {
     if (!ratingAnime) return;
     const detail = ratingEntry || {};
     await addItem(ratingAnime, {
@@ -255,7 +255,7 @@ function MyList({ t }) {
       progress: typeof detail.progress === 'number' ? detail.progress : 0,
       isFavorite: Boolean(detail.isFavorite),
       rating,
-      review,
+      review: typeof detail.review === 'string' ? detail.review : '',
       keepAddedAt: true,
     });
     closeRatingModal();
@@ -641,11 +641,10 @@ function MyList({ t }) {
         favoriteCount={favoritesCount}
         isEditing={Boolean(pendingEntry)}
       />
-      <RatingReviewModal
+      <RatingModal
         open={ratingModalOpen}
         anime={ratingAnime}
         initialRating={ratingEntry?.rating}
-        initialReview={ratingEntry?.review}
         onClose={closeRatingModal}
         onSave={handleSaveRating}
       />

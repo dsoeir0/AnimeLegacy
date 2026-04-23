@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Plus, Check, Heart, BookOpen, ArrowLeft, ArrowRight, Pencil, Star } from 'lucide-react';
+import { Plus, Check, Heart, BookOpen, ArrowLeft, ArrowRight, MessageSquare, Pencil, Star } from 'lucide-react';
 import { translate, getLanguage } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
@@ -10,7 +10,9 @@ import StatusBadge, { STATUS_META } from '../../components/ui/StatusBadge';
 import ProgressBar from '../../components/ui/ProgressBar';
 import RatingDisplay from '../../components/ui/RatingDisplay';
 import AddToListModal from '../../components/modals/AddToListModal';
-import RatingReviewModal from '../../components/modals/RatingReviewModal';
+import RatingModal from '../../components/modals/RatingModal';
+import ReviewModal from '../../components/modals/ReviewModal';
+import { canReviewStatus } from '../../lib/utils/listTransitions';
 import styles from './[id].module.css';
 import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
 import { getAnimeById, getAnimeCharacters } from '../../lib/services/jikan';
@@ -74,6 +76,7 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
   const [pendingAnime, setPendingAnime] = useState(null);
   const [pendingEntry, setPendingEntry] = useState(null);
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [ratingEntry, setRatingEntry] = useState(null);
   const currentEntry = normalized ? getEntry(normalized.id) : null;
   const displayProgress = typeof currentEntry?.progress === 'number' ? currentEntry.progress : 0;
@@ -107,18 +110,35 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
     setRatingModalOpen(false);
     setRatingEntry(null);
   };
-  const handleSaveRating = async ({ rating, review }) => {
+  const openReviewModal = () => {
+    if (!normalized) return;
+    setRatingEntry(getEntry(normalized.id) || {});
+    setReviewModalOpen(true);
+  };
+  const closeReviewModal = () => {
+    setReviewModalOpen(false);
+    setRatingEntry(null);
+  };
+  const persistPartial = async (partial) => {
     if (!normalized) return;
     const detail = ratingEntry || {};
     await addItem(normalized, {
       status: detail.status || 'completed',
       progress: typeof detail.progress === 'number' ? detail.progress : 0,
       isFavorite: Boolean(detail.isFavorite),
-      rating,
-      review,
+      rating: detail.rating ?? null,
+      review: typeof detail.review === 'string' ? detail.review : '',
+      ...partial,
       keepAddedAt: true,
     });
+  };
+  const handleSaveRating = async ({ rating }) => {
+    await persistPartial({ rating });
     closeRatingModal();
+  };
+  const handleSaveReview = async ({ review }) => {
+    await persistPartial({ review });
+    closeReviewModal();
   };
 
   const mains = characters.filter((entry) => entry?.role === 'Main');
@@ -397,16 +417,31 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
                       >
                         {t('actions.updateEntry')}
                       </Button>
-                      {displayStatus === 'completed' ? (
-                        <Button
-                          variant="ghost"
-                          size="md"
-                          fullWidth
-                          icon={Star}
-                          onClick={openRatingModal}
-                        >
-                          {t('actions.rateReview')}
-                        </Button>
+                      {canReviewStatus(displayStatus) ? (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="md"
+                            fullWidth
+                            icon={Star}
+                            onClick={openRatingModal}
+                          >
+                            {typeof currentEntry?.rating === 'number'
+                              ? t('actions.updateRating')
+                              : t('actions.rate')}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="md"
+                            fullWidth
+                            icon={MessageSquare}
+                            onClick={openReviewModal}
+                          >
+                            {currentEntry?.review && currentEntry.review.trim()
+                              ? t('actions.editReview')
+                              : t('actions.writeReview')}
+                          </Button>
+                        </>
                       ) : null}
                     </div>
                   </>
@@ -491,13 +526,19 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
         </div>
       </div>
 
-      <RatingReviewModal
+      <RatingModal
         open={ratingModalOpen}
         anime={normalized}
         initialRating={ratingEntry?.rating}
-        initialReview={ratingEntry?.review}
         onClose={closeRatingModal}
         onSave={handleSaveRating}
+      />
+      <ReviewModal
+        open={reviewModalOpen}
+        anime={normalized}
+        initialReview={ratingEntry?.review}
+        onClose={closeReviewModal}
+        onSave={handleSaveReview}
       />
       <AddToListModal
         open={addModalOpen}

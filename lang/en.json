@@ -85,7 +85,10 @@
     "editProfile": "Edit profile",
     "editEntry": "Edit entry",
     "updateEntry": "Update entry",
-    "rateReview": "Rate & review",
+    "rate": "Rate",
+    "updateRating": "Update rating",
+    "writeReview": "Write a review",
+    "editReview": "Edit review",
     "watchTrailer": "Watch trailer",
     "readReviews": "Read reviews",
     "viewDetails": "View details",
@@ -632,17 +635,21 @@
   },
   "modal": {
     "rating": {
-      "title": "Rate & Review",
-      "yourRating": "Your rating",
-      "review": "Review",
-      "reviewEnabled": "Review enabled",
-      "enableReview": "Enable review",
-      "reviewPlaceholder": "Share what you thought about the story, characters, and pacing…",
+      "titleOnly": "Rate",
       "notRated": "Not rated",
       "ratingValue": "{n}/5",
+      "clearRating": "Clear rating",
       "save": "Save rating",
       "update": "Update rating",
       "starLabel": "Set rating to {value} out of 5"
+    },
+    "review": {
+      "title": "Write a review",
+      "placeholder": "Share what you thought about the story, characters, and pacing…",
+      "hint": "Your review is private to your profile. Keep it spoiler-free if you care about that.",
+      "save": "Save review",
+      "update": "Update review",
+      "deleteReview": "Delete review"
     },
     "addToList": {
       "titleAdd": "Add to List",

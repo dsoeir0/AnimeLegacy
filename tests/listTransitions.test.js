@@ -6,8 +6,10 @@
 import { describe, expect, it } from 'vitest';
 import { FAVORITE_LIMIT } from '../lib/constants';
 import {
+  canReviewStatus,
   clampProgress,
   deriveActivityLabel,
+  REVIEWABLE_STATUSES,
   resolveFavorite,
   resolveStatus,
 } from '../lib/utils/listTransitions';
@@ -254,5 +256,20 @@ describe('deriveActivityLabel', () => {
       totalEpisodes: 12,
     });
     expect(label).toBe('Watching (3/12)');
+  });
+});
+
+describe('canReviewStatus', () => {
+  it('allows review for watching/completed/on_hold/dropped', () => {
+    for (const status of REVIEWABLE_STATUSES) {
+      expect(canReviewStatus(status)).toBe(true);
+    }
+  });
+
+  it('rejects plan (not watched yet) and any unknown status', () => {
+    expect(canReviewStatus('plan')).toBe(false);
+    expect(canReviewStatus(undefined)).toBe(false);
+    expect(canReviewStatus('')).toBe(false);
+    expect(canReviewStatus('made_up')).toBe(false);
   });
 });

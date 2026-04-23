@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, ChevronDown, Minus, Plus, Star, X } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, Minus, Plus, Star } from 'lucide-react';
 import { translate } from 'react-switch-lang';
+import Modal from './Modal';
+import modalStyles from './Modal.module.css';
 import { isAiringAnime } from '../../lib/utils/anime';
 import { getSeasonFromDate } from '../../lib/utils/season';
 import { FAVORITE_LIMIT } from '../../lib/constants';
-import styles from '../../styles/add-to-list.module.css';
+import styles from './AddToListModal.module.css';
 
 const statusOptions = [
   { value: 'plan', labelKey: 'modal.addToList.statusPlan' },
@@ -102,8 +104,6 @@ function AddToListModal({
     return () => document.removeEventListener('mousedown', handleOutside);
   }, [statusOpen]);
 
-  if (!open) return null;
-
   const maxProgress =
     isAiring && totalEpisodes ? Math.max(totalEpisodes - 1, 0) : totalEpisodes ?? undefined;
   const progressValue = clamp(progress, 0, maxProgress);
@@ -114,203 +114,22 @@ function AddToListModal({
     : null;
   const shouldWarnAiringCompletion =
     isAiring && (status === 'completed' || (totalEpisodes && progressValue >= totalEpisodes));
+  const activeOption = statusOptions.find((option) => option.value === status);
 
   return (
-    <div className={styles.backdrop} role="dialog" aria-modal="true">
-      <div className={styles.modal}>
-        <div className={styles.header}>
-          <div className={styles.titleBlock}>
-            <div className={styles.eyebrow}>
-              {isEditing ? t('modal.addToList.titleEdit') : t('modal.addToList.titleAdd')}
-            </div>
-            <h2 className={styles.title}>{anime?.title || 'Untitled'}</h2>
-            <div className={styles.metaRow}>
-              <span>{anime?.type || t('modal.addToList.typeFallback')}</span>
-              <span>•</span>
-              <span>
-                {totalEpisodes
-                  ? t('modal.addToList.episodesShort', { n: totalEpisodes })
-                  : t('modal.addToList.ongoing')}
-              </span>
-            </div>
-          </div>
-          <button className={styles.closeButton} type="button" onClick={onClose} aria-label={t('actions.close')}>
-            <X size={16} aria-hidden="true" />
-          </button>
-        </div>
-
-        <div className={styles.body}>
-          <div className={styles.posterWrap}>
-            <div className={styles.poster}>
-              {anime?.image ? (
-                <img src={anime.image} alt={anime?.title || 'Anime poster'} />
-              ) : (
-                <div className={styles.posterFallback} />
-              )}
-            </div>
-            <div
-              className={`${styles.badge} ${isCompleted ? styles.badgeCompleted : ''}`}
-            >
-              {(() => {
-                const opt = statusOptions.find((option) => option.value === status);
-                return opt ? t(opt.labelKey) : '';
-              })()}
-            </div>
-          </div>
-
-          <div className={styles.fields}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="status-select">
-                {t('modal.addToList.currentStatus')}
-              </label>
-              <div className={styles.selectRoot} ref={statusRootRef}>
-                <button
-                  id="status-select"
-                  type="button"
-                  className={styles.selectButton}
-                  aria-haspopup="listbox"
-                  aria-expanded={statusOpen}
-                  onClick={() => setStatusOpen((prev) => !prev)}
-                >
-                  {(() => {
-                    const opt = statusOptions.find((option) => option.value === status);
-                    return opt ? t(opt.labelKey) : '';
-                  })()}
-                  <ChevronDown size={14} className={styles.selectCaretIcon} aria-hidden="true" />
-                </button>
-                {statusOpen ? (
-                  <div className={styles.selectMenu} role="listbox">
-                    {statusOptions.map((option) => {
-                      const isDisabled = isAiring && option.value === 'completed';
-                      return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        className={`${styles.selectOption} ${status === option.value ? styles.selectOptionActive : ''} ${isDisabled ? styles.selectOptionDisabled : ''}`}
-                        aria-disabled={isDisabled}
-                        onClick={() => {
-                          if (isDisabled) {
-                            setAiringCompletionWarning(t('modal.addToList.airingWarning'));
-                            setStatusOpen(false);
-                            return;
-                          }
-                          setAiringCompletionWarning('');
-                          setStatus(option.value);
-                          if (option.value === 'completed' && totalEpisodes) {
-                            setProgress(totalEpisodes);
-                          }
-                          setStatusOpen(false);
-                        }}
-                      >
-                        {t(option.labelKey)}
-                      </button>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </div>
-              {airingCompletionWarning || shouldWarnAiringCompletion ? (
-                <div className={styles.warning} role="status" aria-live="polite">
-                  <AlertTriangle size={14} className={styles.warningIcon} aria-hidden="true" />
-                  <span>{airingCompletionWarning || t('modal.addToList.airingWarning')}</span>
-                </div>
-              ) : null}
-            </div>
-
-            {status === 'plan' ? null : (
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="progress-input">
-                  {t('modal.addToList.episodesWatched')}
-                </label>
-                <div className={styles.progressRow}>
-                  <button
-                    type="button"
-                    className={styles.stepButton}
-                    onClick={() => setProgress((prev) => clamp(prev - 1, 0, maxProgress))}
-                    aria-label={t('modal.addToList.decreaseEp')}
-                  >
-                    <Minus size={14} aria-hidden="true" />
-                  </button>
-                  <input
-                    id="progress-input"
-                    className={styles.progressInput}
-                    type="number"
-                    min={0}
-                    max={maxProgress}
-                    inputMode="numeric"
-                    value={progressValue}
-                    onChange={(event) =>
-                      setProgress(clamp(Number(event.target.value), 0, maxProgress))
-                    }
-                  />
-                  <button
-                    type="button"
-                    className={styles.stepButton}
-                    onClick={() => setProgress((prev) => clamp(prev + 1, 0, maxProgress))}
-                    aria-label={t('modal.addToList.increaseEp')}
-                  >
-                    <Plus size={14} aria-hidden="true" />
-                  </button>
-                  <span className={styles.progressMeta}>
-                    {totalEpisodes
-                      ? t('modal.addToList.progressOf', { n: totalEpisodes })
-                      : t('modal.addToList.progressUnknown')}
-                  </span>
-                </div>
-                {totalEpisodes ? (
-                  <div className={styles.progressBar} aria-hidden="true">
-                    <div
-                      className={styles.progressFill}
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-                ) : null}
-                <p className={styles.helper}>
-                  {totalEpisodes
-                    ? t('modal.addToList.progressHelperKnown')
-                    : t('modal.addToList.progressHelperUnknown')}
-                </p>
-              </div>
-            )}
-            {status === 'completed' ? (
-              <div className={styles.field}>
-                <label className={styles.label}>{t('modal.addToList.favoriteLabel')}</label>
-                <button
-                  type="button"
-                  className={`${styles.favoriteToggle} ${isFavorite ? styles.favoriteToggleActive : ''}`}
-                  aria-pressed={isFavorite}
-                  onClick={() => setIsFavorite((prev) => !prev)}
-                  disabled={favoriteLimitReached}
-                >
-                  <Star
-                    size={14}
-                    className={styles.favoriteIcon}
-                    fill={isFavorite ? 'currentColor' : 'none'}
-                    strokeWidth={1.75}
-                    aria-hidden="true"
-                  />
-                  <span>
-                    {isFavorite
-                      ? t('modal.addToList.favoriteMarked')
-                      : t('modal.addToList.favoriteMark')}
-                  </span>
-                </button>
-                <p className={styles.helper}>
-                  {favoriteLimitReached
-                    ? t('errors.favoriteLimitAnime', { limit: FAVORITE_LIMIT })
-                    : t('modal.addToList.favoriteHint')}
-                </p>
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        <div className={styles.actions}>
-          <button className={styles.secondary} type="button" onClick={onClose}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      labelledBy="addtolist-modal-title"
+      backdropImage={anime?.banner || anime?.image || null}
+      closeLabel={t('actions.close')}
+      footer={
+        <>
+          <button className={modalStyles.btnSecondary} type="button" onClick={onClose}>
             {t('actions.cancel')}
           </button>
           <button
-            className={styles.primary}
+            className={modalStyles.btnPrimary}
             type="button"
             onClick={() => {
               const tryingToComplete =
@@ -330,14 +149,197 @@ function AddToListModal({
           >
             {isEditing ? t('modal.addToList.ctaSave') : t('modal.addToList.ctaAdd')}
           </button>
+        </>
+      }
+    >
+      <div className={styles.head}>
+        <div className={styles.eyebrow}>
+          {isEditing ? t('modal.addToList.titleEdit') : t('modal.addToList.titleAdd')}
+        </div>
+        <h2 id="addtolist-modal-title" className={styles.title}>
+          {anime?.title || 'Untitled'}
+        </h2>
+        <div className={styles.metaRow}>
+          <span>{anime?.type || t('modal.addToList.typeFallback')}</span>
+          <span className={styles.metaDot} aria-hidden="true">·</span>
+          <span>
+            {totalEpisodes
+              ? t('modal.addToList.episodesShort', { n: totalEpisodes })
+              : t('modal.addToList.ongoing')}
+          </span>
         </div>
       </div>
-    </div>
+
+      <div className={styles.body}>
+        <div className={styles.posterWrap}>
+          {anime?.image ? (
+            <img
+              src={anime.image}
+              alt={anime?.title || 'Anime poster'}
+              className={styles.poster}
+            />
+          ) : (
+            <div className={styles.posterFallback} />
+          )}
+          <div className={`${styles.badge} ${isCompleted ? styles.badgeCompleted : ''}`}>
+            {activeOption ? t(activeOption.labelKey) : ''}
+          </div>
+        </div>
+
+        <div className={styles.fields}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="status-select">
+              {t('modal.addToList.currentStatus')}
+            </label>
+            <div className={styles.selectRoot} ref={statusRootRef}>
+              <button
+                id="status-select"
+                type="button"
+                className={styles.selectButton}
+                aria-haspopup="listbox"
+                aria-expanded={statusOpen}
+                onClick={() => setStatusOpen((prev) => !prev)}
+              >
+                {activeOption ? t(activeOption.labelKey) : ''}
+                <ChevronDown size={14} className={styles.selectCaret} aria-hidden="true" />
+              </button>
+              {statusOpen ? (
+                <div className={styles.selectMenu} role="listbox">
+                  {statusOptions.map((option) => {
+                    const isDisabled = isAiring && option.value === 'completed';
+                    const isActive = status === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={`${styles.selectOption} ${isActive ? styles.selectOptionActive : ''} ${isDisabled ? styles.selectOptionDisabled : ''}`}
+                        aria-disabled={isDisabled}
+                        onClick={() => {
+                          if (isDisabled) {
+                            setAiringCompletionWarning(t('modal.addToList.airingWarning'));
+                            setStatusOpen(false);
+                            return;
+                          }
+                          setAiringCompletionWarning('');
+                          setStatus(option.value);
+                          if (option.value === 'completed' && totalEpisodes) {
+                            setProgress(totalEpisodes);
+                          }
+                          setStatusOpen(false);
+                        }}
+                      >
+                        <span>{t(option.labelKey)}</span>
+                        {isActive ? (
+                          <Check
+                            size={14}
+                            className={styles.selectOptionCheck}
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+            {airingCompletionWarning || shouldWarnAiringCompletion ? (
+              <div className={styles.warning} role="status" aria-live="polite">
+                <AlertTriangle size={14} className={styles.warningIcon} aria-hidden="true" />
+                <span>{airingCompletionWarning || t('modal.addToList.airingWarning')}</span>
+              </div>
+            ) : null}
+          </div>
+
+          {status === 'plan' ? null : (
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="progress-input">
+                {t('modal.addToList.episodesWatched')}
+              </label>
+              <div className={styles.progressRow}>
+                <button
+                  type="button"
+                  className={styles.stepButton}
+                  onClick={() => setProgress((prev) => clamp(prev - 1, 0, maxProgress))}
+                  aria-label={t('modal.addToList.decreaseEp')}
+                >
+                  <Minus size={14} aria-hidden="true" />
+                </button>
+                <input
+                  id="progress-input"
+                  className={styles.progressInput}
+                  type="number"
+                  min={0}
+                  max={maxProgress}
+                  inputMode="numeric"
+                  value={progressValue}
+                  onChange={(event) =>
+                    setProgress(clamp(Number(event.target.value), 0, maxProgress))
+                  }
+                />
+                <button
+                  type="button"
+                  className={styles.stepButton}
+                  onClick={() => setProgress((prev) => clamp(prev + 1, 0, maxProgress))}
+                  aria-label={t('modal.addToList.increaseEp')}
+                >
+                  <Plus size={14} aria-hidden="true" />
+                </button>
+                <span className={styles.progressMeta}>
+                  {totalEpisodes
+                    ? t('modal.addToList.progressOf', { n: totalEpisodes })
+                    : t('modal.addToList.progressUnknown')}
+                </span>
+              </div>
+              {totalEpisodes ? (
+                <div className={styles.progressBar} aria-hidden="true">
+                  <div
+                    className={styles.progressFill}
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              ) : null}
+              <p className={styles.helper}>
+                {totalEpisodes
+                  ? t('modal.addToList.progressHelperKnown')
+                  : t('modal.addToList.progressHelperUnknown')}
+              </p>
+            </div>
+          )}
+
+          {status === 'completed' ? (
+            <div className={styles.field}>
+              <label className={styles.label}>{t('modal.addToList.favoriteLabel')}</label>
+              <button
+                type="button"
+                className={`${styles.favoriteToggle} ${isFavorite ? styles.favoriteToggleActive : ''}`}
+                aria-pressed={isFavorite}
+                onClick={() => setIsFavorite((prev) => !prev)}
+                disabled={favoriteLimitReached}
+              >
+                <Star
+                  size={14}
+                  className={styles.favoriteIcon}
+                  fill={isFavorite ? 'currentColor' : 'none'}
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+                <span>
+                  {isFavorite
+                    ? t('modal.addToList.favoriteMarked')
+                    : t('modal.addToList.favoriteMark')}
+                </span>
+              </button>
+              <p className={styles.helper}>
+                {favoriteLimitReached
+                  ? t('errors.favoriteLimitAnime', { limit: FAVORITE_LIMIT })
+                  : t('modal.addToList.favoriteHint')}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </Modal>
   );
 }
 
 export default translate(AddToListModal);
-
-
-
-

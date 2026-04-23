@@ -85,7 +85,10 @@
     "editProfile": "Editar perfil",
     "editEntry": "Editar entrada",
     "updateEntry": "Atualizar entrada",
-    "rateReview": "Classificar e avaliar",
+    "rate": "Classificar",
+    "updateRating": "Actualizar classificação",
+    "writeReview": "Escrever crítica",
+    "editReview": "Editar crítica",
     "watchTrailer": "Ver trailer",
     "readReviews": "Ler avaliações",
     "viewDetails": "Ver detalhes",
@@ -632,17 +635,21 @@
   },
   "modal": {
     "rating": {
-      "title": "Classificar e avaliar",
-      "yourRating": "A sua classificação",
-      "review": "Avaliação",
-      "reviewEnabled": "Avaliação ativada",
-      "enableReview": "Ativar avaliação",
-      "reviewPlaceholder": "Partilhe o que achou da história, dos personagens e do ritmo…",
+      "titleOnly": "Classificar",
       "notRated": "Sem classificação",
       "ratingValue": "{n}/5",
+      "clearRating": "Limpar classificação",
       "save": "Guardar classificação",
       "update": "Atualizar classificação",
       "starLabel": "Definir classificação para {value} em 5"
+    },
+    "review": {
+      "title": "Escrever uma crítica",
+      "placeholder": "Partilhe o que achou da história, dos personagens e do ritmo…",
+      "hint": "A sua crítica é privada do seu perfil. Mantenha-a sem spoilers se isso lhe importa.",
+      "save": "Guardar crítica",
+      "update": "Atualizar crítica",
+      "deleteReview": "Apagar crítica"
     },
     "addToList": {
       "titleAdd": "Adicionar à lista",

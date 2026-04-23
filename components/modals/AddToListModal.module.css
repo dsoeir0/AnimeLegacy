@@ -1,116 +1,57 @@
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(6, 7, 9, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  animation: fadeIn var(--dur-3) var(--ease-out);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal {
-  width: 100%;
-  max-width: 560px;
-  background: var(--al-ink-2);
-  border: 1px solid var(--al-border-strong);
-  border-radius: 16px;
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  max-height: 92vh;
-  display: flex;
-  flex-direction: column;
-  animation: rise var(--dur-4) var(--ease-out);
-}
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 20px 24px 18px;
-  border-bottom: 1px solid var(--al-border);
-}
-
-.titleBlock {
-  min-width: 0;
-  flex: 1;
+.head {
+  padding-right: 44px;
+  margin-bottom: 22px;
 }
 
 .eyebrow {
   font-family: var(--font-display);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   font-weight: 600;
   font-size: 10px;
-  color: var(--al-primary-ink);
-  margin-bottom: 6px;
+  background: var(--al-primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
 }
 
 .title {
   margin: 0 0 6px;
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--al-fg-1);
 }
 
 .metaRow {
   display: flex;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--al-fg-3);
-  font-family: var(--font-mono);
-}
-
-.closeButton {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--al-fg-2);
-  cursor: pointer;
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  transition: all var(--dur-2) var(--ease-standard);
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--al-fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.closeButton:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--al-fg-1);
-}
-
-.icon {
-  font-size: 14px;
+.metaDot {
+  color: var(--al-fg-4);
 }
 
 .body {
   display: grid;
-  grid-template-columns: 108px 1fr;
-  gap: 20px;
-  padding: 22px 24px;
-  overflow-y: auto;
+  grid-template-columns: 120px 1fr;
+  gap: 22px;
+  align-items: start;
 }
 
 .posterWrap {
+  position: relative;
+  width: 120px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -118,29 +59,27 @@
 }
 
 .poster {
-  width: 108px;
-  height: 150px;
-  border-radius: 10px;
+  width: 120px;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
   overflow: hidden;
+  object-fit: cover;
   background: var(--al-ink-3);
   border: 1px solid var(--al-border);
-}
-
-.poster img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  box-shadow: var(--shadow-md);
   display: block;
 }
 
 .posterFallback {
-  width: 100%;
-  height: 100%;
+  width: 120px;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
   background: linear-gradient(135deg, var(--al-ink-3), var(--al-ink-4));
+  border: 1px solid var(--al-border);
 }
 
 .badge {
-  padding: 5px 10px;
+  padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid var(--al-border);
   background: var(--al-ink-3);
@@ -154,15 +93,15 @@
 }
 
 .badgeCompleted {
-  background: rgba(61, 214, 140, 0.12);
+  background: var(--al-success-soft);
   color: var(--al-success);
-  border-color: rgba(61, 214, 140, 0.3);
+  border-color: rgba(61, 214, 140, 0.32);
 }
 
 .fields {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
   min-width: 0;
 }
 
@@ -188,28 +127,29 @@
 .selectButton {
   width: 100%;
   height: 40px;
-  padding: 0 12px;
+  padding: 0 14px;
   background: var(--al-ink-1);
   border: 1px solid var(--al-border);
   border-radius: 10px;
   color: var(--al-fg-1);
   font-family: var(--font-body);
   font-size: 13.5px;
+  font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  transition: border-color var(--dur-2) var(--ease-standard);
+  transition: all var(--dur-2) var(--ease-standard);
 }
 
 .selectButton:hover {
   border-color: var(--al-border-strong);
+  background: var(--al-ink-2);
 }
 
-.selectCaretIcon {
+.selectCaret {
   color: var(--al-fg-3);
-  font-size: 14px;
 }
 
 .selectMenu {
@@ -223,12 +163,18 @@
   padding: 4px;
   box-shadow: var(--shadow-lg);
   z-index: 10;
+  animation: menuIn var(--dur-2) var(--ease-out);
+}
+
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .selectOption {
-  display: block;
+  display: flex;
   width: 100%;
-  padding: 8px 12px;
+  padding: 9px 12px;
   background: transparent;
   border: none;
   text-align: left;
@@ -236,18 +182,25 @@
   font-family: var(--font-body);
   font-size: 13px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 7px;
   transition: background-color var(--dur-1) var(--ease-standard);
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .selectOption:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--al-ink-3);
 }
 
 .selectOptionActive {
   background: rgba(132, 217, 255, 0.12);
   color: var(--al-primary-ink);
   font-weight: 600;
+}
+
+.selectOptionActive:hover {
+  background: rgba(132, 217, 255, 0.16);
 }
 
 .selectOptionDisabled {
@@ -259,14 +212,18 @@
   background: transparent;
 }
 
+.selectOptionCheck {
+  color: var(--al-primary-2);
+}
+
 .warning {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   padding: 10px 12px;
   background: var(--al-warn-soft);
-  border: 1px solid rgba(255, 182, 72, 0.3);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 182, 72, 0.32);
+  border-radius: 10px;
   color: var(--al-warn);
   font-size: 12.5px;
   line-height: 1.5;
@@ -276,7 +233,6 @@
   color: var(--al-warn);
   margin-top: 2px;
   flex-shrink: 0;
-  font-size: 13px;
 }
 
 .progressRow {
@@ -335,7 +291,7 @@
 .progressBar {
   height: 3px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--al-border-subtle);
   overflow: hidden;
 }
 
@@ -357,14 +313,14 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  height: 40px;
+  height: 38px;
   padding: 0 16px;
   background: var(--al-ink-1);
   border: 1px solid var(--al-border);
   border-radius: 10px;
   color: var(--al-fg-1);
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--dur-2) var(--ease-standard);
@@ -381,70 +337,28 @@
 }
 
 .favoriteToggleActive {
-  background: rgba(232, 180, 104, 0.14);
+  background: var(--al-warm-soft);
   border-color: rgba(232, 180, 104, 0.4);
   color: var(--al-warm-ink);
   font-weight: 600;
 }
 
 .favoriteIcon {
-  font-size: 14px;
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 16px 24px 20px;
-  border-top: 1px solid var(--al-border);
-}
-
-.secondary {
-  height: 40px;
-  padding: 0 18px;
-  background: transparent;
-  color: var(--al-fg-1);
-  border: 1px solid var(--al-border);
-  border-radius: 10px;
-  font-family: var(--font-body);
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--dur-2) var(--ease-standard);
-}
-
-.secondary:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--al-border-strong);
-}
-
-.primary {
-  height: 40px;
-  padding: 0 20px;
-  background: var(--al-primary-gradient);
-  color: #060709;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  font-family: var(--font-body);
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: filter var(--dur-2) var(--ease-standard);
-}
-
-.primary:hover {
-  filter: brightness(1.07);
+  color: inherit;
 }
 
 @media (max-width: 560px) {
   .body {
     grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 20px;
   }
-  .poster {
-    max-width: 140px;
-    margin: 0 auto;
+  .posterWrap,
+  .poster,
+  .posterFallback {
+    width: 140px;
+  }
+  .fields {
     width: 100%;
-    height: auto;
-    aspect-ratio: 2 / 3;
   }
 }

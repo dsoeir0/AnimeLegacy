@@ -85,7 +85,10 @@
     "editProfile": "Modifier le profil",
     "editEntry": "Modifier l'entrée",
     "updateEntry": "Mettre à jour",
-    "rateReview": "Noter et commenter",
+    "rate": "Noter",
+    "updateRating": "Mettre à jour la note",
+    "writeReview": "Écrire un avis",
+    "editReview": "Modifier l'avis",
     "watchTrailer": "Voir la bande-annonce",
     "readReviews": "Lire les avis",
     "viewDetails": "Voir les détails",
@@ -632,17 +635,21 @@
   },
   "modal": {
     "rating": {
-      "title": "Noter et commenter",
-      "yourRating": "Votre note",
-      "review": "Avis",
-      "reviewEnabled": "Avis activé",
-      "enableReview": "Activer l'avis",
-      "reviewPlaceholder": "Partagez ce que vous avez pensé de l'histoire, des personnages et du rythme…",
+      "titleOnly": "Noter",
       "notRated": "Non noté",
       "ratingValue": "{n}/5",
+      "clearRating": "Effacer la note",
       "save": "Enregistrer la note",
       "update": "Mettre à jour la note",
       "starLabel": "Définir la note à {value} sur 5"
+    },
+    "review": {
+      "title": "Écrire un avis",
+      "placeholder": "Partagez ce que vous avez pensé de l'histoire, des personnages et du rythme…",
+      "hint": "Votre avis est privé dans votre profil. Évitez les spoilers si cela vous importe.",
+      "save": "Enregistrer l'avis",
+      "update": "Mettre à jour l'avis",
+      "deleteReview": "Supprimer l'avis"
     },
     "addToList": {
       "titleAdd": "Ajouter à la liste",
