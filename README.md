@@ -13,8 +13,9 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 - **Seasonal discovery** — browse current & past seasons, with filters for genre, format, and sort.
 - **Personal list** — track what you're watching, planning, completed, on hold, or dropped. Real-time sync via Firestore.
 - **Smart progress** — episode counters clamp to totals; airing shows can't be marked "completed" until they finish.
-- **Ratings & reviews** — rate 1–5 stars on completed shows, write freeform reviews.
+- **Ratings & reviews** — rate 1–5 stars (half-star precision) and write freeform reviews. Split into two focused modals so rating is a 2-second action and review is a dedicated writing surface. Restricted to `watching` / `completed` / `on_hold` / `dropped` statuses.
 - **Favorites** — curate up to 10 favorite anime and 10 favorite characters, featured on your profile.
+- **MyAnimeList import** — paste your MAL username and pull your full list (every status, progress, score) plus favourite anime and favourite characters in one step. Skip-silent merge leaves existing entries intact, and the 10-per-category favourite cap is honoured.
 - **Character & voice actor pages** — biographies, appearances, and cross-linked cast.
 - **Profile** — live stats (episodes watched, days spent, mean score), top genres, seasonal progress, and activity feed.
 - **Global search** — debounced Jikan search with cover preview, keyboard navigation, and ⌘K shortcut.
