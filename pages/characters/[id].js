@@ -3,15 +3,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ArrowRight } from 'lucide-react';
 import { translate, getLanguage } from 'react-switch-lang';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
 import {
-  collection,
-  deleteDoc,
-  doc,
-  increment,
-  onSnapshot,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
+  setCharacterFavorite,
+  unsetCharacterFavorite,
+} from '../../lib/services/favoriteCharacters';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import styles from './[id].module.css';
@@ -153,31 +149,23 @@ function CharacterPage({
     setIsFavorite(next);
     const delta = next ? 1 : -1;
     setFavoriteTotal((c) => Math.max(0, (c || 0) + delta));
-    const { db } = getFirebaseClient();
-    if (db) {
-      try {
-        const characterId = String(character.mal_id);
-        const statsRef = doc(db, 'characterStats', characterId);
-        await setDoc(statsRef, { favoritesCount: increment(delta) }, { merge: true });
-        const favoriteRef = doc(db, 'users', user.uid, 'favoriteCharacters', characterId);
-        if (next) {
-          await setDoc(
-            favoriteRef,
-            {
-              id: characterId,
-              name: character?.name || t('status.unknown'),
-              nameKanji: character?.name_kanji || '',
-              imageUrl: imageUrl || '',
-              updatedAt: serverTimestamp(),
-            },
-            { merge: true },
-          );
-        } else {
-          await deleteDoc(favoriteRef);
-        }
-      } catch {
-        setFavoriteError(t('errors.globalFavoritesUnavailable'));
+    try {
+      const characterId = String(character.mal_id);
+      if (next) {
+        await setCharacterFavorite({
+          uid: user.uid,
+          character: {
+            id: characterId,
+            name: character?.name || t('status.unknown'),
+            nameKanji: character?.name_kanji || '',
+            imageUrl: imageUrl || '',
+          },
+        });
+      } else {
+        await unsetCharacterFavorite({ uid: user.uid, characterId });
       }
+    } catch {
+      setFavoriteError(t('errors.globalFavoritesUnavailable'));
     }
   };
 
