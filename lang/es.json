@@ -621,6 +621,60 @@
     "noWorks": "Sin obras catalogadas.",
     "notFoundBody": "No se ha podido cargar este estudio."
   },
+  "studioPage": {
+    "breadcrumbStudios": "Studios",
+    "hero": {
+      "eyebrow": "ESTUDIO · DESDE {year}",
+      "eyebrowNoYear": "ESTUDIO",
+      "officialSite": "Sitio oficial"
+    },
+    "kpi": {
+      "yearsActive": "Años de actividad",
+      "yearsUnit": "años",
+      "productions": "TOTAL PRODUCCIONES",
+      "productionsUnit": "de traducción",
+      "avgScore": "PUNTUACIÓN MEDIA",
+      "avgScoreUnit": "/ 10",
+      "airing": "TRANSMITIDO ACTUALMENTE",
+      "airingUnit": "programas",
+      "fans": "VENTILADORES EN MAL",
+      "fansUnit": "seguidores",
+      "best": "LOS MÁS VALORADOS",
+      "bestUnit": "/ 10"
+    },
+    "timeline": {
+      "eyebrow": "FILMOGRAFÍA · POR AÑO",
+      "heading": "La línea de tiempo",
+      "all": "Todos",
+      "tv": "Series",
+      "movie": "Películas",
+      "empty": "No hay producciones que coincidan con este filtro.",
+      "yearUnknown": "Sin fecha",
+      "epShort": "{n} ep",
+      "scoreEyebrow": "MAL"
+    },
+    "signature": {
+      "eyebrow": "LOS MEJORES GÉNEROS",
+      "heading": "Mezcla de géneros",
+      "hint": "Géneros que aparecen con más frecuencia en el catálogo de {name}."
+    },
+    "distribution": {
+      "eyebrow": "Distribución de la puntuación",
+      "median": "MEDIANA",
+      "above8": "POR ENCIMA DE 8.0",
+      "best": "MEJOR"
+    },
+    "upcoming": {
+      "eyebrow": "Anunciado",
+      "heading": "Aún no se ha emitido",
+      "status": "AÚN NO SE HA EMITIDO"
+    },
+    "related": {
+      "eyebrow": "MÁS ESTUDIOS",
+      "heading": "Otros para explorar",
+      "works": "{n} obras"
+    }
+  },
   "calendar": {
     "metaTitle": "AnimeLegacy · Calendario",
     "metaDesc": "Programación semanal de emisión para el anime en emisión.",

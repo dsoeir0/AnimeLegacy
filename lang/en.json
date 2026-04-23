@@ -621,6 +621,58 @@
     "noWorks": "No works catalogued.",
     "notFoundBody": "This studio could not be loaded."
   },
+  "studioPage": {
+    "breadcrumbStudios": "Studios",
+    "hero": {
+      "eyebrow": "STUDIO · SINCE {year}",
+      "eyebrowNoYear": "STUDIO",
+      "officialSite": "Official site"
+    },
+    "kpi": {
+      "yearsActive": "YEARS ACTIVE",
+      "yearsUnit": "years",
+      "productions": "TOTAL PRODUCTIONS",
+      "productionsUnit": "works",
+      "avgScore": "AVERAGE SCORE",
+      "avgScoreUnit": "/ 10",
+      "airing": "CURRENTLY AIRING",
+      "airingUnit": "shows",
+      "best": "TOP RATED",
+      "bestUnit": "/ 10"
+    },
+    "timeline": {
+      "eyebrow": "FILMOGRAPHY · BY YEAR",
+      "heading": "The timeline",
+      "all": "All",
+      "tv": "Series",
+      "movie": "Movies",
+      "empty": "No productions match this filter.",
+      "yearUnknown": "Undated",
+      "epShort": "{n} ep",
+      "scoreEyebrow": "MAL"
+    },
+    "signature": {
+      "eyebrow": "TOP GENRES",
+      "heading": "Genre mix",
+      "hint": "Genres that appear most often across {name}'s catalogue."
+    },
+    "distribution": {
+      "eyebrow": "SCORE DISTRIBUTION",
+      "median": "MEDIAN",
+      "above8": "ABOVE 8.0",
+      "best": "BEST"
+    },
+    "upcoming": {
+      "eyebrow": "ANNOUNCED",
+      "heading": "Not yet aired",
+      "status": "NOT YET AIRED"
+    },
+    "related": {
+      "eyebrow": "MORE STUDIOS",
+      "heading": "Others to explore",
+      "works": "{n} works"
+    }
+  },
   "calendar": {
     "metaTitle": "AnimeLegacy · Calendar",
     "metaDesc": "Weekly broadcast schedule for currently airing anime.",

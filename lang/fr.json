@@ -621,6 +621,60 @@
     "noWorks": "Aucune œuvre cataloguée.",
     "notFoundBody": "Ce studio n'a pas pu être chargé."
   },
+  "studioPage": {
+    "breadcrumbStudios": "Studios",
+    "hero": {
+      "eyebrow": "STUDIO · DEPUIS {year}",
+      "eyebrowNoYear": "CREATION",
+      "officialSite": "Site officiel"
+    },
+    "kpi": {
+      "yearsActive": "Années d'activité",
+      "yearsUnit": "ans",
+      "productions": "PRODUCTIONS TOTALES",
+      "productionsUnit": "fonctionne",
+      "avgScore": "SCORE MOYEN",
+      "avgScoreUnit": "/ 10",
+      "airing": "ACTUELLEMENT EN COURS D'AÉRATION",
+      "airingUnit": "indique***",
+      "fans": "VENTILATEURS SUR MAL",
+      "fansUnit": "abonnés",
+      "best": "MEILLEUR NOTÉ",
+      "bestUnit": "/ 10"
+    },
+    "timeline": {
+      "eyebrow": "FILMOGRAPHIE · PAR ANNÉE",
+      "heading": "Le calendrier",
+      "all": "Tous",
+      "tv": "Séries",
+      "movie": "Films",
+      "empty": "Aucune production ne correspond à ce filtre.",
+      "yearUnknown": "Non daté",
+      "epShort": "<g id=\"1\">n </g><g id=\"2\">e</g><g id=\"3\">p </g>",
+      "scoreEyebrow": "MAL"
+    },
+    "signature": {
+      "eyebrow": "LES MEILLEURS GENRES",
+      "heading": "Mélange de genres",
+      "hint": "Les genres qui apparaissent le plus souvent dans le catalogue de {name}."
+    },
+    "distribution": {
+      "eyebrow": "Repartition Score",
+      "median": "MÉDIANE",
+      "above8": "AU-DESSUS DE 8,0",
+      "best": "MEILLEUR"
+    },
+    "upcoming": {
+      "eyebrow": "annoncées",
+      "heading": "Pas encore diffusé",
+      "status": "PAS ENCORE DIFFUSÉ"
+    },
+    "related": {
+      "eyebrow": "PLUS DE STUDIOS",
+      "heading": "Autres à explorer",
+      "works": "{n} travaux"
+    }
+  },
   "calendar": {
     "metaTitle": "AnimeLegacy · Calendrier",
     "metaDesc": "Programme de diffusion hebdomadaire des animes en cours.",
