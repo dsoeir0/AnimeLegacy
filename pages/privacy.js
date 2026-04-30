@@ -5,7 +5,7 @@ import Layout from '../components/layout/Layout';
 import Button from '../components/ui/Button';
 import styles from './privacy.module.css';
 
-const CONTACT_EMAIL = 'duartesoeiro@seepmode.com';
+const CONTACT_EMAIL = 'animelegacy22@gmail.com';
 
 function PrivacyPage({ t }) {
   return (
