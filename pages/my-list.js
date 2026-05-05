@@ -33,8 +33,9 @@ import { healMissingAddedAt } from '../lib/services/userList';
 import useAuth from '../hooks/useAuth';
 import useProfileData from '../hooks/useProfileData';
 import { getFirebaseClient } from '../lib/firebase/client';
-import { isAiringAnime } from '../lib/utils/anime';
+import { isAiringWithSeasonHeuristic } from '../lib/utils/anime';
 import { getSeasonFromDate } from '../lib/utils/season';
+import { resolveStatus } from '../lib/utils/listTransitions';
 import { FAVORITE_LIMIT, FAVORITE_LIMIT_MESSAGE } from '../lib/constants';
 
 const FILTERS = [
@@ -117,21 +118,13 @@ function MyList({ t }) {
   const isAiringNow = (detail, item) => {
     const animeId = String(item?.id ?? detail?.animeId ?? '');
     const catalog = catalogById.get(animeId);
-    const seasonLabel = String(item?.season ?? detail?.season ?? '').toLowerCase();
-    const seasonHeuristic =
-      Boolean(seasonLabel) &&
-      Boolean(item?.year ?? detail?.year) &&
-      seasonLabel === currentSeason &&
-      Number(item?.year ?? detail?.year) === currentYear &&
-      String(item?.type ?? detail?.type ?? '').toLowerCase().includes('tv');
-    return (
-      detail?.airing === true ||
-      item?.airing === true ||
-      isAiringAnime(detail) ||
-      isAiringAnime(item) ||
-      isAiringAnime(catalog) ||
-      seasonHeuristic
-    );
+    // Field-fallback priority: list item first (most current user-side data),
+    // then detail (status doc), then the catalog snapshot — matches what the
+    // inline heuristic used before being lifted to lib/utils/anime.js.
+    return isAiringWithSeasonHeuristic([item, detail, catalog], {
+      currentSeason,
+      currentYear,
+    });
   };
 
   const statusCounts = useMemo(() => {
@@ -140,7 +133,7 @@ function MyList({ t }) {
       const detail = detailsById.get(String(item.id)) || {};
       const rawStatus = detail.status || 'plan';
       const isAiring = isAiringNow(detail, item);
-      const status = isAiring && rawStatus === 'completed' ? 'watching' : rawStatus;
+      const status = resolveStatus(rawStatus, isAiring);
       counts.all += 1;
       if (status === 'watching') counts.watching += 1;
       if (status === 'completed') counts.completed += 1;
@@ -158,7 +151,7 @@ function MyList({ t }) {
       const detail = detailsById.get(String(item.id)) || {};
       const rawStatus = detail.status || 'plan';
       const isAiring = isAiringNow(detail, item);
-      const status = isAiring && rawStatus === 'completed' ? 'watching' : rawStatus;
+      const status = resolveStatus(rawStatus, isAiring);
       if (activeFilter === 'all') return true;
       if (activeFilter === 'on_hold') return status === 'on_hold' || status === 'hold';
       return status === activeFilter;
@@ -180,7 +173,7 @@ function MyList({ t }) {
         const detail = detailsById.get(String(item.id)) || {};
         const rawStatus = detail.status || 'plan';
         const isAiring = isAiringNow(detail, item);
-        const status = isAiring && rawStatus === 'completed' ? 'watching' : rawStatus;
+        const status = resolveStatus(rawStatus, isAiring);
         const rank = statusRank.has(status) ? statusRank.get(status) : 99;
         const rating = typeof detail.rating === 'number' ? detail.rating : -1;
         return { item, index, rank, status, rating };
@@ -604,7 +597,7 @@ function MyList({ t }) {
                   const detail = detailsById.get(String(item.id)) || {};
                   const rawStatus = detail.status || 'plan';
                   const isAiring = isAiringNow(detail, item);
-                  const status = isAiring && rawStatus === 'completed' ? 'watching' : rawStatus;
+                  const status = resolveStatus(rawStatus, isAiring);
                   return renderListRow(item, detail, status, isAiring);
                 })}
               </div>
@@ -614,7 +607,7 @@ function MyList({ t }) {
                   const detail = detailsById.get(String(item.id)) || {};
                   const rawStatus = detail.status || 'plan';
                   const isAiring = isAiringNow(detail, item);
-                  const status = isAiring && rawStatus === 'completed' ? 'watching' : rawStatus;
+                  const status = resolveStatus(rawStatus, isAiring);
                   return renderGridCard(item, detail, status, isAiring);
                 })}
               </div>

@@ -12,7 +12,7 @@ import RatingDisplay from '../../components/ui/RatingDisplay';
 import AddToListModal from '../../components/modals/AddToListModal';
 import RatingModal from '../../components/modals/RatingModal';
 import ReviewModal from '../../components/modals/ReviewModal';
-import { canReviewStatus } from '../../lib/utils/listTransitions';
+import { canReviewStatus, resolveStatus } from '../../lib/utils/listTransitions';
 import styles from './[id].module.css';
 import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
 import { getAnimeById, getAnimeCharacters } from '../../lib/services/jikan';
@@ -80,10 +80,10 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
   const [ratingEntry, setRatingEntry] = useState(null);
   const currentEntry = normalized ? getEntry(normalized.id) : null;
   const displayProgress = typeof currentEntry?.progress === 'number' ? currentEntry.progress : 0;
-  const displayStatus =
-    isAiringAnime(data) && currentEntry?.status === 'completed'
-      ? 'watching'
-      : currentEntry?.status || 'watching';
+  const displayStatus = resolveStatus(
+    currentEntry?.status || 'watching',
+    isAiringAnime(data),
+  );
 
   const openAddModal = (anime, entry = null) => {
     if (!anime) return;

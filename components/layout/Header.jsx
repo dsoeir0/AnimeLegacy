@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { Search, Bell, Sparkles, ArrowLeft } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import { filterOutHentai } from '../../lib/utils/anime';
+import { searchAnime } from '../../lib/services/jikan';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
 import IconButton from '../ui/IconButton';
@@ -64,22 +65,12 @@ function Header({ variant = 'default', t }) {
     }
     setIsLoading(true);
     const timer = setTimeout(async () => {
-      try {
-        const response = await fetch(
-          `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(trimmedQuery)}&limit=6&order_by=score&sort=desc`,
-        );
-        const payload = await response.json();
-        if (!isActive) return;
-        const safeData = Array.isArray(payload?.data) ? payload.data : [];
-        setResults(filterOutHentai(safeData));
-        setIsOpen(true);
-      } catch {
-        if (!isActive) return;
-        setResults([]);
-        setIsOpen(true);
-      } finally {
-        if (isActive) setIsLoading(false);
-      }
+      const payload = await searchAnime(trimmedQuery, 1, 6);
+      if (!isActive) return;
+      const safeData = !payload?.error && Array.isArray(payload?.data) ? payload.data : [];
+      setResults(filterOutHentai(safeData));
+      setIsOpen(true);
+      setIsLoading(false);
     }, 350);
     return () => {
       isActive = false;

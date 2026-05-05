@@ -5,6 +5,7 @@ import Modal from './Modal';
 import modalStyles from './Modal.module.css';
 import { isAiringAnime } from '../../lib/utils/anime';
 import { getSeasonFromDate } from '../../lib/utils/season';
+import { resolveStatus } from '../../lib/utils/listTransitions';
 import { FAVORITE_LIMIT } from '../../lib/constants';
 import styles from './AddToListModal.module.css';
 
@@ -62,9 +63,7 @@ function AddToListModal({
 
   useEffect(() => {
     if (!open) return;
-    const defaultStatus = initialStatus || 'plan';
-    const sanitizedStatus =
-      isAiring && defaultStatus === 'completed' ? 'watching' : defaultStatus;
+    const sanitizedStatus = resolveStatus(initialStatus, isAiring);
     const baseProgress = Number.isFinite(initialProgress) ? initialProgress : 0;
     setStatus(sanitizedStatus);
     setIsFavorite(Boolean(initialFavorite));
@@ -140,7 +139,7 @@ function AddToListModal({
               }
               setAiringCompletionWarning('');
               onConfirm({
-                status: isAiring && status === 'completed' ? 'watching' : status,
+                status: resolveStatus(status, isAiring),
                 progress: progressValue,
                 episodesTotal: totalEpisodes,
                 isFavorite: status === 'completed' ? isFavorite : false,

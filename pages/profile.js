@@ -17,6 +17,7 @@ import useAuth from '../hooks/useAuth';
 import useProfileData from '../hooks/useProfileData';
 import { FAVORITE_LIMIT } from '../lib/constants';
 import { isAiringAnime } from '../lib/utils/anime';
+import { resolveStatus } from '../lib/utils/listTransitions';
 import {
   buildStreakDots,
   computeGenreBars,
@@ -35,7 +36,7 @@ const TABS = [
 ];
 
 const normalizeSeasonStatus = (item) =>
-  isAiringAnime(item) && item?.status === 'completed' ? 'watching' : item?.status;
+  resolveStatus(item?.status, isAiringAnime(item));
 
 function ProfilePage({ t }) {
   const { user, loading: authLoading, signOutUser } = useAuth();
