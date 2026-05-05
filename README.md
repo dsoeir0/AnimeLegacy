@@ -6,7 +6,7 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black) ![React](https://img.shields.io/badge/React-18-61DAFB) ![Firebase](https://img.shields.io/badge/Firebase-10-FFCA28) ![License](https://img.shields.io/badge/license-MIT-green)
 
-[![Deploy](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/deploy-vps.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/deploy-vps.yml) [![CI](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/ci.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/ci.yml) [![Bundle size](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/bundle-size.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/bundle-size.yml)
+[![Deploy](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/deploy-vps.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/deploy-vps.yml) [![CI](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/ci.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/ci.yml)
 
 ---
 
@@ -310,17 +310,6 @@ Runs a production build with `@next/bundle-analyzer` enabled, then opens a treem
 ```bash
 pnpm analyze
 ```
-
-### CI — bundle-size comment on PRs
-
-[`.github/workflows/bundle-size.yml`](.github/workflows/bundle-size.yml) builds both the PR and its base branch, diffs per-route **First Load JS**, and posts a sticky comment on the PR that looks like:
-
-| Route | Size | First Load JS | Δ vs main |
-|-------|------|---------------|-----------|
-| `/profile` | 10.1 kB | 249 kB | +2.3 kB (+0.9%) |
-| `/my-list` | 7.22 kB | 252 kB | +18 kB (+7.7%) 🟡 |
-
-Anything growing more than ±2% gets flagged. There are **no hard gates** — a regression doesn't block merge — but nobody can merge without having seen the number, which is enough in practice.
 
 ---
 
