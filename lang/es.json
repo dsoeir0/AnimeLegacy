@@ -448,6 +448,77 @@
     "emptyTitle": "Todavía sin resultados",
     "emptyBody": "Prueba con un título diferente o comprueba la ortografía."
   },
+  "discoverPage": {
+    "metaTitle": "AnimeLegacy · Descubre",
+    "metaDesc": "Selecciones seleccionadas, colecciones basadas en el estado de ánimo y un dial de vibración para cuando \"¿qué debo ver?\" no tiene una buena palabra clave.",
+    "eyebrow": "DESCUBRE ",
+    "headingPrefix": "Pasea, no",
+    "headingAccent": "Buscar",
+    "headingSuffix": "<g id=\"1\">Rwort» JS«0* (13)</g>",
+    "subtitle": "Selecciones seleccionadas, colecciones basadas en el estado de ánimo y un dial de vibración para cuando \"¿qué debo ver?\" no tiene una buena palabra clave.",
+    "searchPlaceholder": "Título, estudio, género...",
+    "searchLabel": "Busca anime por título, estudio o género",
+    "activeLabel": "ACTIVO",
+    "clearAll": "Vaciar todo",
+    "editorial": {
+      "primaryEyebrow": "LOS MÁS VALORADOS",
+      "primaryCta": "abrir la página",
+      "secondaryEyebrowA": "FAVORITO DE LOS FANS",
+      "secondaryEyebrowB": "niveles bajos"
+    },
+    "moods": {
+      "eyebrow": "NAVEGA POR ESTADO DE ÁNIMO",
+      "heading": "Entonces, ¿qué te apetece?",
+      "slow": {
+        "label": "Quemaduras lentas",
+        "sub": "PACIENCIA RECOMPENSADA"
+      },
+      "cry": {
+        "label": "Películas para llorar",
+        "sub": "Deja tiempo para sentarte con él"
+      },
+      "adrenaline": {
+        "label": "Carretera Dash",
+        "sub": "Nada tranquilo al respecto"
+      },
+      "cozy": {
+        "label": "Domingos por la tarde",
+        "sub": "Relojes de confort"
+      },
+      "headtrip": {
+        "label": "Head-trips",
+        "sub": "Ven por la extrañeza"
+      },
+      "ensemble": {
+        "label": "Grandes conjuntos",
+        "sub": "Yesos con los que te mudas"
+      }
+    },
+    "vibe": {
+      "eyebrow": "VIBE FINDER · EXPERIMENTAL",
+      "heading": "Marcarlo.",
+      "pace": "RITMO",
+      "paceLeft": "Serene",
+      "paceRight": "Caótica",
+      "tone": "TONO",
+      "toneLeft": "Esperanzado",
+      "toneRight": "Desolador",
+      "length": "DURACIÓN",
+      "lengthLeft": "Reducido",
+      "lengthRight": "Expansión",
+      "hint": "Tres esferas, un pequeño rincón de espacio para degustar. Clasificado por proximidad — sin desempates de popularidad.",
+      "matchesEyebrow": "LOS 4 MEJORES PARTIDOS",
+      "matchLabel": "COINCIDEN "
+    },
+    "gems": {
+      "eyebrow": "GEMAS OCULTAS · PUNTUACIÓN ALTA, MENOS VISTAS",
+      "heading": "Títulos tranquilos, opiniones fuertes."
+    },
+    "genres": {
+      "eyebrow": "Todos los Géneros",
+      "heading": "Elige un hilo, síguelo."
+    }
+  },
   "anime": {
     "metaTitleSuffix": "AnimeLegacy",
     "metaDescFallback": "Detalles, personajes y destacados del anime.",
@@ -596,7 +667,9 @@
       "veteran": "Veteranos",
       "active": "Activos",
       "newWave": "Nueva ola",
-      "showingCount": "{n} VISIBLES"
+      "showingCount": "{n} VISIBLES",
+      "searchPlaceholder": "Buscar en esta página…",
+      "searchLabel": "Buscar estudios en esta página"
     },
     "card": {
       "foundedShort": "Fundado en",
@@ -637,8 +710,6 @@
       "avgScoreUnit": "/ 10",
       "airing": "TRANSMITIDO ACTUALMENTE",
       "airingUnit": "programas",
-      "fans": "VENTILADORES EN MAL",
-      "fansUnit": "seguidores",
       "best": "LOS MÁS VALORADOS",
       "bestUnit": "/ 10"
     },

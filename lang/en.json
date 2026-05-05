@@ -448,6 +448,77 @@
     "emptyTitle": "No results yet",
     "emptyBody": "Try a different title, or check your spelling."
   },
+  "discoverPage": {
+    "metaTitle": "AnimeLegacy · Discover",
+    "metaDesc": "Curated picks, mood-led collections, and a vibe dial for when \"what should I watch?\" doesn't have a good keyword.",
+    "eyebrow": "DISCOVER",
+    "headingPrefix": "Wander, don't",
+    "headingAccent": " search",
+    "headingSuffix": ".",
+    "subtitle": "Curated picks, mood-led collections, and a vibe dial for when \"what should I watch?\" doesn't have a good keyword.",
+    "searchPlaceholder": "Title, studio, genre…",
+    "searchLabel": "Search anime by title, studio, or genre",
+    "activeLabel": "ACTIVE",
+    "clearAll": "Clear all",
+    "editorial": {
+      "primaryEyebrow": "TOP RATED",
+      "primaryCta": "Open the page",
+      "secondaryEyebrowA": "FAN FAVOURITE",
+      "secondaryEyebrowB": "UNDER THE RADAR"
+    },
+    "moods": {
+      "eyebrow": "BROWSE BY MOOD",
+      "heading": "What are you in the mood for?",
+      "slow": {
+        "label": "Slow burns",
+        "sub": "Patience rewarded"
+      },
+      "cry": {
+        "label": "Films to cry to",
+        "sub": "Leave time to sit with it"
+      },
+      "adrenaline": {
+        "label": "Pure adrenaline",
+        "sub": "Nothing quiet about it"
+      },
+      "cozy": {
+        "label": "Sunday afternoons",
+        "sub": "Comfort watches"
+      },
+      "headtrip": {
+        "label": "Head-trips",
+        "sub": "Come for the strangeness"
+      },
+      "ensemble": {
+        "label": "Great ensembles",
+        "sub": "Casts you move in with"
+      }
+    },
+    "vibe": {
+      "eyebrow": "VIBE FINDER · EXPERIMENTAL",
+      "heading": "Dial it in.",
+      "pace": "PACE",
+      "paceLeft": "Serene",
+      "paceRight": "Chaotic",
+      "tone": "TONE",
+      "toneLeft": "Hopeful",
+      "toneRight": "Bleak",
+      "length": "LENGTH",
+      "lengthLeft": "Tight",
+      "lengthRight": "Sprawling",
+      "hint": "Three dials, a small corner of taste space. Ranked by proximity — no popularity tiebreaks.",
+      "matchesEyebrow": "TOP 4 MATCHES",
+      "matchLabel": "MATCH"
+    },
+    "gems": {
+      "eyebrow": "HIDDEN GEMS · HIGH SCORE, LESS WATCHED",
+      "heading": "Quiet titles, loud opinions."
+    },
+    "genres": {
+      "eyebrow": "ALL GENRES",
+      "heading": "Pick a thread, follow it."
+    }
+  },
   "anime": {
     "metaTitleSuffix": "AnimeLegacy",
     "metaDescFallback": "Anime details, characters, and highlights.",
@@ -596,7 +667,9 @@
       "veteran": "Veterans",
       "active": "Active",
       "newWave": "New wave",
-      "showingCount": "{n} SHOWN"
+      "showingCount": "{n} SHOWN",
+      "searchPlaceholder": "Search this page…",
+      "searchLabel": "Search studios on this page"
     },
     "card": {
       "foundedShort": "Founded",

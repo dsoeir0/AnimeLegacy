@@ -448,6 +448,77 @@
     "emptyTitle": "Pas encore de résultats",
     "emptyBody": "Essayez un autre titre ou vérifiez l'orthographe."
   },
+  "discoverPage": {
+    "metaTitle": "AnimeLegacy · Découvrir",
+    "metaDesc": "Les sélections sélectionnées, les collections axées sur l'humeur et un cadran vibré pour savoir quand « que dois-je regarder ? » n'ont pas un bon mot-clé.",
+    "eyebrow": "EN SAVOIR PLUS",
+    "headingPrefix": "Errer, ne pas",
+    "headingAccent": "Recherche",
+    "headingSuffix": "2 cuillerées à café de rhum, de liqueur de café ou de cognac (facultatif)",
+    "subtitle": "Les sélections sélectionnées, les collections axées sur l'humeur et un cadran vibré pour savoir quand « que dois-je regarder ? » n'ont pas un bon mot-clé.",
+    "searchPlaceholder": "Titre, studio, genre…",
+    "searchLabel": "Recherche d'anime par titre, studio ou genre",
+    "activeLabel": "ACTIF",
+    "clearAll": "Tout effacer",
+    "editorial": {
+      "primaryEyebrow": "MEILLEUR NOTÉ",
+      "primaryCta": "Ouvrir la page",
+      "secondaryEyebrowA": "FAN FAVORITE",
+      "secondaryEyebrowB": "Sous le radar"
+    },
+    "moods": {
+      "eyebrow": "PARCOURIR PAR HUMEUR",
+      "heading": "Pourquoi es-tu d'humeur ?",
+      "slow": {
+        "label": "Brûlures lentes",
+        "sub": "Patience récompensée"
+      },
+      "cry": {
+        "label": "Films à pleurer",
+        "sub": "Laisser le temps de s'asseoir avec"
+      },
+      "adrenaline": {
+        "label": "Pure adrénaline.",
+        "sub": "Rien de silencieux à ce sujet"
+      },
+      "cozy": {
+        "label": "Dimanche après-midi",
+        "sub": "Montres confort"
+      },
+      "headtrip": {
+        "label": "Head-trips",
+        "sub": "Venez pour l'étrangeté"
+      },
+      "ensemble": {
+        "label": "Grands ensembles",
+        "sub": "Permet d'emménager avec"
+      }
+    },
+    "vibe": {
+      "eyebrow": "VIBE FINDER · EXPÉRIMENTAL",
+      "heading": "Composez-le.",
+      "pace": "PACE",
+      "paceLeft": "Serein",
+      "paceRight": "Chaotique",
+      "tone": "TONALITÉ",
+      "toneLeft": "Optimiste",
+      "toneRight": "Morne",
+      "length": "Long en bouche",
+      "lengthLeft": "Tendu",
+      "lengthRight": "tentaculaire",
+      "hint": "Trois cadrans, un petit coin d'espace gustatif. Classé par proximité — pas de tiebreaks de popularité.",
+      "matchesEyebrow": "TOP 4 DES CORRESPONDANCES",
+      "matchLabel": "MATCH"
+    },
+    "gems": {
+      "eyebrow": "GEMS CACHÉS · SCORE ÉLEVÉ, MOINS REGARDÉ",
+      "heading": "Titres silencieux, opinions fortes."
+    },
+    "genres": {
+      "eyebrow": "... dans tous les secteurs d’activités :",
+      "heading": "Choisissez un fil de discussion, suivez-le."
+    }
+  },
   "anime": {
     "metaTitleSuffix": "AnimeLegacy",
     "metaDescFallback": "Détails, personnages et points forts de l'anime.",
@@ -596,7 +667,9 @@
       "veteran": "Vétérans",
       "active": "Actifs",
       "newWave": "Nouvelle vague",
-      "showingCount": "{n} AFFICHÉS"
+      "showingCount": "{n} AFFICHÉS",
+      "searchPlaceholder": "Rechercher sur cette page…",
+      "searchLabel": "Rechercher des studios sur cette page"
     },
     "card": {
       "foundedShort": "Fondé en",
@@ -637,8 +710,6 @@
       "avgScoreUnit": "/ 10",
       "airing": "ACTUELLEMENT EN COURS D'AÉRATION",
       "airingUnit": "indique***",
-      "fans": "VENTILATEURS SUR MAL",
-      "fansUnit": "abonnés",
       "best": "MEILLEUR NOTÉ",
       "bestUnit": "/ 10"
     },

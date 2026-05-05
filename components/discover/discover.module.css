@@ -1,0 +1,668 @@
+/* Shared styles for the Discover page sub-components. Page-level layout
+   (the section gutters, header, search input) lives in the page's own
+   module.css so this file stays focused on the block-level visuals. */
+
+/* ─────────── Editorial feature ─────────── */
+.editorial {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+}
+
+.editorialPrimary {
+  position: relative;
+  height: 440px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--al-border);
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.editorialPrimary:hover {
+  border-color: var(--al-border-strong);
+}
+
+.editorialBanner {
+  object-fit: cover;
+}
+
+.editorialPrimaryGradient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(6, 7, 9, 0.94) 0%, rgba(6, 7, 9, 0.55) 45%, rgba(6, 7, 9, 0.15) 75%, transparent 100%),
+    linear-gradient(180deg, transparent 60%, rgba(6, 7, 9, 0.9));
+  pointer-events: none;
+}
+
+.editorialPrimaryInner {
+  position: absolute;
+  inset: 0;
+  padding: 40px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.editorialTopRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editorialTopEyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: var(--al-warm-ink);
+}
+
+.editorialTopDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--al-fg-3);
+}
+
+.editorialTopMeta {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  color: var(--al-fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.editorialBody {
+  max-width: 520px;
+}
+
+.editorialEyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: var(--al-fg-3);
+  margin-bottom: 12px;
+}
+
+.editorialTitle {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(36px, 4vw, 52px);
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.editorialSynopsis {
+  margin: 0 0 20px;
+  color: rgba(243, 244, 248, 0.82);
+  font-size: 14.5px;
+  line-height: 1.55;
+  max-width: 480px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.editorialSecondary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editorialSecondaryCard {
+  position: relative;
+  flex: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--al-border);
+  text-decoration: none;
+  color: inherit;
+  min-height: 0;
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.editorialSecondaryCard:hover {
+  border-color: var(--al-border-strong);
+}
+
+.editorialSecondaryImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.editorialSecondaryGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 7, 9, 0.2) 0%, rgba(6, 7, 9, 0.92) 100%);
+  pointer-events: none;
+}
+
+.editorialSecondaryInner {
+  position: absolute;
+  inset: 0;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.editorialSecondaryEyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--al-primary-ink);
+  margin-bottom: 8px;
+}
+
+.editorialSecondaryTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.editorialSecondaryMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: rgba(243, 244, 248, 0.7);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.metaDot {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--al-fg-3);
+}
+
+/* ─────────── Section heads ─────────── */
+.sectionHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.sectionEyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: var(--al-fg-3);
+  margin-bottom: 6px;
+}
+
+.sectionEyebrowWarm {
+  color: var(--al-warm-ink);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: var(--al-fg-1);
+}
+
+/* ─────────── Mood grid ─────────── */
+.moodGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.moodCard {
+  position: relative;
+  text-align: left;
+  padding: 20px;
+  min-height: 140px;
+  border-radius: 14px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: background var(--dur-2) var(--ease-standard),
+    border-color var(--dur-2) var(--ease-standard);
+}
+
+.moodCard:hover {
+  background: var(--al-ink-4);
+  border-color: var(--al-border-strong);
+}
+
+.moodTint {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 140px;
+  height: 140px;
+  pointer-events: none;
+}
+
+.moodBody {
+  position: relative;
+  z-index: 1;
+}
+
+.moodSwatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
+
+.moodLabel {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.moodSub {
+  font-size: 12.5px;
+  color: var(--al-fg-2);
+}
+
+.moodPosters {
+  position: relative;
+  z-index: 1;
+  height: 48px;
+  margin-top: 16px;
+}
+
+.moodPoster {
+  position: absolute;
+  width: 36px;
+  height: 48px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--al-border-strong);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  top: 0;
+  background: var(--al-ink-3);
+}
+
+.moodPosterImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─────────── Vibe finder ─────────── */
+.vibeCard {
+  padding: 28px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 36px;
+  border: 1px solid var(--al-border);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(111, 131, 255, 0.05) 0%, transparent 60%),
+    var(--al-ink-2);
+}
+
+.vibeControls {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.vibeSliderHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.vibeSliderLabel {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: var(--al-fg-3);
+}
+
+.vibeSliderValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  color: var(--al-fg-3);
+}
+
+.vibeSlider {
+  width: 100%;
+  accent-color: var(--al-primary-2);
+}
+
+.vibeSliderAxis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--al-fg-2);
+}
+
+.vibeHint {
+  padding: 10px 14px;
+  background: var(--al-ink-1);
+  border-radius: 10px;
+  border: 1px solid var(--al-border);
+  font-size: 11.5px;
+  color: var(--al-fg-2);
+  line-height: 1.5;
+}
+
+.vibeMatches {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  align-content: start;
+}
+
+.vibeMatchCard {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 58px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.vibeMatchCard:hover {
+  border-color: var(--al-border-strong);
+}
+
+.vibeMatchPoster {
+  width: 58px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--al-ink-4);
+}
+
+.vibeMatchImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.vibeMatchBody {
+  min-width: 0;
+}
+
+.vibeMatchTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vibeMatchGenres {
+  font-size: 11px;
+  color: var(--al-fg-2);
+  margin-top: 3px;
+}
+
+.vibeMatchScore {
+  text-align: right;
+}
+
+.vibeMatchScoreValue {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--al-primary-ink);
+  line-height: 1;
+}
+
+.vibeMatchScoreLabel {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-size: 8.5px;
+  color: var(--al-fg-3);
+  margin-top: 2px;
+}
+
+/* ─────────── Hidden gems ─────────── */
+.gemsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.gemCard {
+  border: 1px solid var(--al-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--al-ink-2);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--dur-2) var(--ease-standard),
+    transform var(--dur-2) var(--ease-standard);
+}
+
+.gemCard:hover {
+  border-color: var(--al-border-strong);
+  transform: translateY(-2px);
+}
+
+.gemBanner {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--al-ink-3);
+}
+
+.gemBannerImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gemBannerGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(6, 7, 9, 0.85));
+  pointer-events: none;
+}
+
+.gemScore {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  background: rgba(6, 7, 9, 0.8);
+  border-radius: 6px;
+  border: 1px solid var(--al-border);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--al-warm-ink);
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.gemBody {
+  padding: 14px;
+}
+
+.gemTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  margin-bottom: 4px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.gemSynopsis {
+  font-size: 11.5px;
+  color: var(--al-fg-2);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.gemFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--al-border);
+  font-size: 11px;
+}
+
+.gemFooterStudio {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 9.5px;
+  color: var(--al-fg-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.gemFooterRank {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--al-fg-3);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+/* ─────────── Genre rail ─────────── */
+.genreRail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genreChip {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  color: var(--al-fg-1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background var(--dur-2) var(--ease-standard),
+    border-color var(--dur-2) var(--ease-standard);
+}
+
+.genreChip:hover {
+  background: var(--al-ink-4);
+  border-color: var(--al-border-strong);
+}
+
+.genreChipCount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--al-fg-3);
+}
+
+/* ─────────── Responsive ─────────── */
+@media (max-width: 1100px) {
+  .editorial {
+    grid-template-columns: 1fr;
+  }
+  .editorialPrimary {
+    height: 360px;
+  }
+  .vibeCard {
+    grid-template-columns: 1fr;
+  }
+  .gemsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .moodGrid {
+    grid-template-columns: 1fr;
+  }
+  .editorialPrimaryInner {
+    padding: 28px 24px;
+  }
+  .editorialSecondaryInner {
+    padding: 18px 20px;
+  }
+  .vibeMatches {
+    grid-template-columns: 1fr;
+  }
+  .gemsGrid {
+    grid-template-columns: 1fr;
+  }
+}

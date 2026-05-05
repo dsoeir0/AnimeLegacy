@@ -448,6 +448,77 @@
     "emptyTitle": "Ainda sem resultados",
     "emptyBody": "Experimente um título diferente ou verifique a ortografia."
   },
+  "discoverPage": {
+    "metaTitle": "AnimeLegacy · Descubra",
+    "metaDesc": "Escolhas selecionadas, coleções animadas e um mostrador de vibração para quando \"o que devo assistir?\" não tem uma boa palavra-chave.",
+    "eyebrow": "DESCOBRE",
+    "headingPrefix": "Wander, não",
+    "headingAccent": "Procura",
+    "headingSuffix": ".",
+    "subtitle": "Escolhas selecionadas, coleções animadas e um mostrador de vibração para quando \"o que devo assistir?\" não tem uma boa palavra-chave.",
+    "searchPlaceholder": "Título, estúdio, género...",
+    "searchLabel": "Pesquisar anime por título, estúdio ou género",
+    "activeLabel": "ATIVOS",
+    "clearAll": "Limpar tudo",
+    "editorial": {
+      "primaryEyebrow": "MAIS VOTADOS",
+      "primaryCta": "Abrir a página",
+      "secondaryEyebrowA": "FAVORITO DOS FÃS",
+      "secondaryEyebrowB": "fora do alcance do radar"
+    },
+    "moods": {
+      "eyebrow": "NAVEGUE POR HUMOR",
+      "heading": "O que te apetece?",
+      "slow": {
+        "label": "Queimaduras lentas",
+        "sub": "Paciência recompensada"
+      },
+      "cry": {
+        "label": "Filmes para chorar",
+        "sub": "Deixe tempo para se sentar com ele"
+      },
+      "adrenaline": {
+        "label": "Adrenalina pura.",
+        "sub": "Não há nada de silencioso nisso"
+      },
+      "cozy": {
+        "label": "Tardes de domingo",
+        "sub": "Relógios confortáveis"
+      },
+      "headtrip": {
+        "label": "Viagens de cabeça",
+        "sub": "Venha pela estranheza"
+      },
+      "ensemble": {
+        "label": "Grandes conjuntos",
+        "sub": "Elencos com os quais você vai morar"
+      }
+    },
+    "vibe": {
+      "eyebrow": "LOCALIZADOR DE VIBRAÇÕES · EXPERIMENTAL",
+      "heading": "Disque.",
+      "pace": "PACE",
+      "paceLeft": "Serena",
+      "paceRight": "caótico",
+      "tone": "TONE",
+      "toneLeft": "Esperançoso",
+      "toneRight": "alburno",
+      "length": "COMPRIMENTO",
+      "lengthLeft": "Apertado. ",
+      "lengthRight": "Alastrando",
+      "hint": "Três mostradores, um pequeno canto do espaço de degustação. Classificado por proximidade — sem desempates de popularidade.",
+      "matchesEyebrow": "AS 4 MELHORES PARTIDAS",
+      "matchLabel": "o que consegue ver?"
+    },
+    "gems": {
+      "eyebrow": "JOIAS ESCONDIDAS · PONTUAÇÃO ALTA, MENOS VIGIADA",
+      "heading": "Títulos silenciosos, opiniões altas."
+    },
+    "genres": {
+      "eyebrow": "Todos os géneros",
+      "heading": "Escolha um fio, siga-o."
+    }
+  },
   "anime": {
     "metaTitleSuffix": "AnimeLegacy",
     "metaDescFallback": "Detalhes, personagens e destaques do anime.",
@@ -596,7 +667,9 @@
       "veteran": "Veteranos",
       "active": "Ativos",
       "newWave": "Nova vaga",
-      "showingCount": "{n} VISÍVEIS"
+      "showingCount": "{n} VISÍVEIS",
+      "searchPlaceholder": "Pesquisar nesta página…",
+      "searchLabel": "Pesquisar estúdios nesta página"
     },
     "card": {
       "foundedShort": "Fundado em",
@@ -637,8 +710,6 @@
       "avgScoreUnit": "/ 10",
       "airing": "EM EXIBIÇÃO NO MOMENTO",
       "airingUnit": "Programas",
-      "fans": "VENTILADORES NO MAL",
-      "fansUnit": "Seguidores",
       "best": "MAIS VOTADOS",
       "bestUnit": "/ 10"
     },
