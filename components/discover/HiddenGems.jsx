@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import { primaryStudioName } from '../../lib/utils/anime';
@@ -32,13 +33,13 @@ function HiddenGems({ gems, t }) {
             >
               <div className={styles.gemBanner}>
                 {url ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
+                  <Image
                     src={url}
                     alt=""
+                    fill
+                    sizes="(max-width: 1100px) 50vw, 33vw"
                     className={styles.gemBannerImg}
                     loading="lazy"
-                    decoding="async"
                   />
                 ) : null}
                 <div className={styles.gemBannerGradient} />

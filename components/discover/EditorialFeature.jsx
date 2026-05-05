@@ -8,9 +8,9 @@ import { getAnimeBannerUrl } from '../../lib/utils/media';
 import styles from './discover.module.css';
 
 // 2-column editorial hero: one big "staff pick" on the left, two smaller
-// cards stacked on the right. Primary uses <Image priority> because it's
-// the only big hero on the page; secondary use plain <img> to stay inside
-// the Hobby tier image-optimization budget.
+// cards stacked on the right. Primary uses <Image priority> for above-the-
+// fold sharpness; secondary cards also use <Image> so DPR-aware variants
+// ship on Retina displays.
 function EditorialFeature({ primary, secondary, t }) {
   if (!primary) return null;
   const primaryBanner = primary.banner || getAnimeBannerUrl(primary);
@@ -70,13 +70,13 @@ function EditorialFeature({ primary, secondary, t }) {
               className={styles.editorialSecondaryCard}
             >
               {banner ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
+                <Image
                   src={banner}
                   alt=""
+                  fill
+                  sizes="(max-width: 1100px) 100vw, 30vw"
                   className={styles.editorialSecondaryImage}
                   loading="lazy"
-                  decoding="async"
                 />
               ) : null}
               <div className={styles.editorialSecondaryGradient} />

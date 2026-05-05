@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import { getAnimeThumbUrl } from '../../lib/utils/media';
@@ -103,13 +104,13 @@ function VibeFinder({ pool, t }) {
                 >
                   <div className={styles.vibeMatchPoster}>
                     {url ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
+                      <Image
                         src={url}
                         alt=""
+                        fill
+                        sizes="64px"
                         className={styles.vibeMatchImg}
                         loading="lazy"
-                        decoding="async"
                       />
                     ) : null}
                   </div>

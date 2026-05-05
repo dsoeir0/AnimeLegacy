@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
@@ -65,7 +66,13 @@ function Modal({
       >
         {backdropImage ? (
           <div className={styles.hero} aria-hidden="true">
-            <img src={backdropImage} alt="" className={styles.heroImage} />
+            <Image
+              src={backdropImage}
+              alt=""
+              fill
+              sizes="(max-width: 600px) 100vw, 600px"
+              className={styles.heroImage}
+            />
             <div className={styles.heroOverlay} />
           </div>
         ) : null}

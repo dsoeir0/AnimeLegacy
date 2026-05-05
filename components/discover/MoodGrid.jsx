@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import { getAnimeThumbUrl } from '../../lib/utils/media';
@@ -54,13 +55,13 @@ function MoodGrid({ postersByMood, t }) {
                       style={{ left: `${i * 28}px`, zIndex: 3 - i }}
                     >
                       {url ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
+                        <Image
                           src={url}
                           alt=""
+                          fill
+                          sizes="80px"
                           className={styles.moodPosterImg}
                           loading="lazy"
-                          decoding="async"
                         />
                       ) : null}
                     </div>
