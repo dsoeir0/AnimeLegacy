@@ -21,11 +21,17 @@ function EditorialFeature({ primary, secondary, t }) {
         className={styles.editorialPrimary}
       >
         {primaryBanner ? (
+          // sizes is wider than the actual render width on purpose. AniList
+          // banners are 1900×400; our container is 440px tall × ~1100px wide
+          // (2.5:1, way squarer than the source 4.75:1). With object-fit:cover
+          // the browser has to vertically upscale by ~2x, which blurs unless
+          // we serve a larger source. Forcing 100vw makes Next.js pick the
+          // 1920w variant, giving us ~1.1x upscale instead of ~2x.
           <Image
             src={primaryBanner}
             alt=""
             fill
-            sizes="(max-width: 1100px) 100vw, 60vw"
+            sizes="100vw"
             quality={85}
             priority
             className={styles.editorialBanner}
@@ -70,11 +76,15 @@ function EditorialFeature({ primary, secondary, t }) {
               className={styles.editorialSecondaryCard}
             >
               {banner ? (
+                // Same aspect-ratio mismatch as the primary — see comment
+                // there. Secondary cards are ~half-height/half-width but the
+                // banner source ratio still doesn't match the slot, so we
+                // ship a large variant to avoid browser upscaling.
                 <Image
                   src={banner}
                   alt=""
                   fill
-                  sizes="(max-width: 1100px) 100vw, 30vw"
+                  sizes="(max-width: 1100px) 100vw, 50vw"
                   className={styles.editorialSecondaryImage}
                   loading="lazy"
                 />
