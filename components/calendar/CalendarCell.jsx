@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { getAnimeImageUrl } from '../../lib/utils/media';
 import styles from './calendar.module.css';
@@ -20,18 +21,13 @@ function CalendarCell({ anime, broadcastTime, inList, localTime }) {
       title={tooltip}
     >
       <div className={styles.entryPoster}>
-        {/* Plain <img> — not next/image — because this is a 44px
-            decorative thumb and one calendar week can paint ~90 of
-            them. Re-encoding 90 tiny images per render through
-            next/image would add real CPU work on the VPS for zero
-            visual gain at this size. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={poster}
           alt=""
+          fill
+          sizes="44px"
           className={styles.entryImage}
           loading="lazy"
-          decoding="async"
         />
       </div>
       <div className={styles.entryBody}>

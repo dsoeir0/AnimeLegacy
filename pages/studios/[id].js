@@ -266,18 +266,13 @@ function StudioDetailPage({ producer, works, related, t }) {
                           />
                           <div className={styles.timelinePoster}>
                             {getAnimeThumbUrl(a) ? (
-                              // Plain <img> — see CLAUDE.md "Tiny decorative thumbs"
-                              // exception. Timeline posters render at ~110px wide;
-                              // MAL's image_url is already 225–320px so browser
-                              // downscale is clean and we avoid the per-request
-                              // CPU cost of re-encoding through next/image.
-                              /* eslint-disable-next-line @next/next/no-img-element */
-                              <img
+                              <Image
                                 src={getAnimeThumbUrl(a)}
                                 alt=""
+                                fill
+                                sizes="110px"
                                 className={styles.timelinePosterImg}
                                 loading="lazy"
-                                decoding="async"
                               />
                             ) : null}
                           </div>
