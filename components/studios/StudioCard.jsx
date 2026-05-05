@@ -103,11 +103,11 @@ function StudioCard({ studio, posters, postersLoading, t }) {
                     {url ? (
                       // Plain <img> — not next/image — because these are 80px
                       // decorative thumbs. MAL already serves 192×272 for
-                      // this URL which downscales perfectly at any DPR, and
-                      // each <Image> for these on Hobby tier burns through
-                      // the 5K/month Vercel Image transformations budget
-                      // (23 studios × 4 thumbs × multiple /studios visits).
-                      // loading="lazy" preserves below-the-fold deferral.
+                      // this URL which downscales perfectly at any DPR, so
+                      // running it through next/image would add CPU work on
+                      // the VPS (re-encoding to WebP per request) for zero
+                      // perceptible quality gain. loading="lazy" preserves
+                      // below-the-fold deferral.
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={url}

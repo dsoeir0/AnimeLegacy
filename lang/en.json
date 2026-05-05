@@ -420,7 +420,7 @@
       "profile": "Your username, bio, avatar (stored as a data URL inside your own user document)."
     },
     "storageHeading": "Where it lives",
-    "storageBody": "All personal data is stored in Google Firestore (Firebase) under your user ID. Anime catalogue entries and global character favourite counters are shared across users and contain no personal data. Anonymous analytics are collected by Vercel Analytics.",
+    "storageBody": "All personal data is stored in Google Firestore (Firebase) under your user ID. Anime catalogue entries and global character favourite counters are shared across users and contain no personal data. No third-party analytics or trackers are used.",
     "rightsHeading": "Your rights (GDPR)",
     "rightsBody": "You can at any time request:",
     "rightsList": {

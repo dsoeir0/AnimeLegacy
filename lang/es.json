@@ -420,7 +420,7 @@
       "profile": "Tu nombre de usuario, biografía, avatar (guardado como data URL dentro de tu propio documento de usuario)."
     },
     "storageHeading": "Dónde reside",
-    "storageBody": "Todos los datos personales se guardan en Google Firestore (Firebase) bajo tu ID de usuario. Las entradas del catálogo de anime y los contadores globales de personajes favoritos se comparten entre usuarios y no contienen datos personales. Los análisis anónimos los recoge Vercel Analytics.",
+    "storageBody": "Todos los datos personales se almacenan en Google Firestore (Firebase) bajo su ID de usuario. Las entradas del catálogo de anime y los contadores de personajes favoritos globales se comparten entre los usuarios y no contienen datos personales. No se utilizan análisis ni rastreadores de terceros.",
     "rightsHeading": "Tus derechos (RGPD)",
     "rightsBody": "Puedes en cualquier momento solicitar:",
     "rightsList": {

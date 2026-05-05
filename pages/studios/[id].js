@@ -269,8 +269,8 @@ function StudioDetailPage({ producer, works, related, t }) {
                               // Plain <img> — see CLAUDE.md "Tiny decorative thumbs"
                               // exception. Timeline posters render at ~110px wide;
                               // MAL's image_url is already 225–320px so browser
-                              // downscale is clean and we don't burn a Vercel
-                              // Image transformation for each (anime × page view).
+                              // downscale is clean and we avoid the per-request
+                              // CPU cost of re-encoding through next/image.
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img
                                 src={getAnimeThumbUrl(a)}

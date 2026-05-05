@@ -22,9 +22,9 @@ function CalendarCell({ anime, broadcastTime, inList, localTime }) {
       <div className={styles.entryPoster}>
         {/* Plain <img> — not next/image — because this is a 44px
             decorative thumb and one calendar week can paint ~90 of
-            them. Going through Vercel's Image Optimizer would burn
-            the Hobby tier's 5K/month transformations budget fast
-            for zero visual gain at this size. */}
+            them. Re-encoding 90 tiny images per render through
+            next/image would add real CPU work on the VPS for zero
+            visual gain at this size. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={poster}
