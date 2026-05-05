@@ -434,6 +434,25 @@
     "contactCta": "Enviar correo para solicitar eliminación",
     "slaNote": "Respondemos en un plazo de 30 días, conforme al Artículo 17 del RGPD."
   },
+  "license": {
+    "metaTitle": "AnimeLegacy · Licencia",
+    "metaDesc": "AnimeLegacy es de código abierto bajo la licencia MIT: lo que puede hacer con el código.",
+    "eyebrow": "LICENCIA · MIT",
+    "title": "Código abierto, en términos permisivos.",
+    "intro": "El código fuente de AnimeLegacy se publica en GitHub bajo la licencia MIT. Eso lo convierte en una de las licencias más permisivas disponibles: casi todo está permitido.",
+    "whatHeading": "Cómo puede contribuir",
+    "whatBody": "La Licencia del MIT le otorga el derecho a:",
+    "permissions": {
+      "use": "Utilizar el código en proyectos personales o comerciales.",
+      "modify": "Modificar, remezclar y construir obras derivadas.",
+      "distribute": "Distribuir copias del código, modificadas o no modificadas.",
+      "sublicense": "Sublicenciarlo bajo diferentes términos dentro de su propio proyecto."
+    },
+    "conditionsHeading": "es la única condición.",
+    "conditionsBody": "Cualquier copia o parte sustancial del código debe incluir el aviso original de derechos de autor y una copia del texto de la Licencia MIT. No hay obligación de compartir modificaciones, atribuir más allá del archivo de licencia o notificar a nadie.",
+    "fullTextHeading": "licencia completa",
+    "sourceLink": "Código:"
+  },
   "search": {
     "metaTitle": "AnimeLegacy · Búsqueda de {query}",
     "metaTitleFallback": "AnimeLegacy · Búsqueda",

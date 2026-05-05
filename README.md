@@ -4,7 +4,9 @@
 
 Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typography-led, designed to stay out of your way while you decide what to watch next.
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black) ![React](https://img.shields.io/badge/React-18-61DAFB) ![Firebase](https://img.shields.io/badge/Firebase-10-FFCA28) ![License](https://img.shields.io/badge/license-private-lightgrey)
+![Next.js](https://img.shields.io/badge/Next.js-14-black) ![React](https://img.shields.io/badge/React-18-61DAFB) ![Firebase](https://img.shields.io/badge/Firebase-10-FFCA28) ![License](https://img.shields.io/badge/license-MIT-green)
+
+[![Deploy](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/deploy-vps.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/deploy-vps.yml) [![CI](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/ci.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/ci.yml) [![Bundle size](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/bundle-size.yml/badge.svg)](https://github.com/dsoeir0/AnimeLegacy/actions/workflows/bundle-size.yml)
 
 ---
 
@@ -378,4 +380,4 @@ Before opening a PR:
 
 ## License
 
-Private project. All rights reserved.
+MIT — see [`LICENSE`](LICENSE) for the full text. Use, fork, and learn from the code freely; please retain the copyright notice in any redistributed copies.

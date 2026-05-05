@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import Logo from '../ui/Logo';
 import styles from './AuthShell.module.css';
@@ -123,7 +124,18 @@ function AuthShell({ title = 'AnimeLegacy · Access', description = 'Sign in to 
           </div>
         </aside>
 
-        <section className={styles.right}>{children}</section>
+        <section className={styles.right}>
+          {children}
+          <footer className={styles.legalFooter}>
+            <Link href="/privacy" className={styles.legalLink}>
+              {t('privacy.eyebrow')}
+            </Link>
+            <span className={styles.legalSep} aria-hidden="true">·</span>
+            <Link href="/license" className={styles.legalLink}>
+              {t('license.eyebrow')}
+            </Link>
+          </footer>
+        </section>
       </div>
     </>
   );

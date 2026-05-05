@@ -135,9 +135,15 @@ function Sidebar({ t }) {
           ) : null}
         </Link>
         {!collapsed ? (
-          <Link href="/privacy" className={styles.footerLink}>
-            {t('privacy.eyebrow')}
-          </Link>
+          <div className={styles.footerLinks}>
+            <Link href="/privacy" className={styles.footerLink}>
+              {t('privacy.eyebrow')}
+            </Link>
+            <span className={styles.footerSep} aria-hidden="true">·</span>
+            <Link href="/license" className={styles.footerLink}>
+              {t('license.eyebrow')}
+            </Link>
+          </div>
         ) : null}
       </div>
     </aside>
