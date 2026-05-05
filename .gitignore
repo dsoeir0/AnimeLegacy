@@ -29,8 +29,7 @@ firebase-debug.log*
 firestore-debug.log*
 
 # local env files
-.env
-.env*.local
+.env*
 !.env.local.example
 
 # secrets
