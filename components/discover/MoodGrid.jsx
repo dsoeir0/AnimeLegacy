@@ -5,10 +5,6 @@ import { getAnimeThumbUrl } from '../../lib/utils/media';
 import { DISCOVER_MOODS } from './moods';
 import styles from './discover.module.css';
 
-// 6 curated mood cards. Clicking navigates to /search pre-filtered with
-// the mood's Jikan genre query — see `moods.js` for the taxonomy.
-// `postersByMood` is a { [moodId]: [anime, anime, anime] } map computed
-// in getServerSideProps so the poster stack is pre-populated at SSR.
 function MoodGrid({ postersByMood, t }) {
   return (
     <>

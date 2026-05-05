@@ -39,7 +39,6 @@
   background: var(--al-ink-4);
 }
 
-/* Plain <img> needs explicit fill rules (next/image fill did this for us). */
 .entryImage {
   position: absolute;
   inset: 0;

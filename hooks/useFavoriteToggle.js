@@ -3,24 +3,6 @@ import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { getFirebaseClient } from '../lib/firebase/client';
 import { FAVORITE_LIMIT } from '../lib/constants';
 
-// Generic favourite-toggle hook used by /characters/[id], /voices/[id],
-// and /studios/[id]. Keeps the state machine (isFavorite, count, total,
-// error, loaded) and the toggle handler in one place so the per-bucket
-// pages stay declarative — they only configure the bucket name, the
-// service functions, and the payload shape.
-//
-// `statsCollectionName` is optional. When provided, the hook also
-// subscribes to the global counter doc and exposes `favoriteTotal`
-// for pages that want to display it (currently only /characters).
-//
-// Returns an object suitable to spread or destructure:
-//   { isFavorite, favoriteCount, favoriteTotal, favoriteError,
-//     favoriteLoaded, toggleFavorite }
-//
-// The hook deliberately avoids transactional consistency between the
-// optimistic UI update and the underlying Firestore writes — see the
-// service files (`favoriteCharacters.js` etc.) for why partial failure
-// is acceptable.
 export default function useFavoriteToggle({
   uid,
   entityId,

@@ -6,10 +6,6 @@ import { getAnimeThumbUrl } from '../../lib/utils/media';
 import { rankByVibe } from '../../lib/utils/vibeFinder';
 import styles from './discover.module.css';
 
-// 3-slider editorial block. Pure client-state — we rank against a pool of
-// anime passed down from SSR (typically the top-scored list we already
-// fetch for the editorial + hidden-gems sections so no extra request).
-// The coords/matching logic is in lib/utils/vibeFinder.js and tested there.
 function VibeFinder({ pool, t }) {
   const [pace, setPace] = useState(35);
   const [tone, setTone] = useState(50);

@@ -558,7 +558,6 @@
   border: 1px dashed var(--al-border);
 }
 
-/* Plain <img> needs explicit fill rules (next/image fill did this for us). */
 .posterImage {
   position: absolute;
   inset: 0;

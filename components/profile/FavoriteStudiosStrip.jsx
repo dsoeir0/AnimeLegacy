@@ -3,9 +3,6 @@ import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import styles from './profile.module.css';
 
-// Mirrors FavoriteCharactersStrip — studios have a different shape
-// (id, name, established, imageUrl) and link to /studios/[id]. The
-// secondary line shows the founding year if known.
 function FavoriteStudiosStrip({ favorites, limit, emptyMessage, t }) {
   const slice = typeof limit === 'number' ? favorites.slice(0, limit) : favorites;
   if (!slice.length) {

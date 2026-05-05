@@ -3,8 +3,6 @@ import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import styles from './profile.module.css';
 
-// Mirrors FavoriteCharactersStrip — voices have the same shape as
-// characters (id, name, nameKanji, imageUrl) but link to /voices/[id].
 function FavoriteVoicesStrip({ favorites, limit, emptyMessage, t }) {
   const slice = typeof limit === 'number' ? favorites.slice(0, limit) : favorites;
   if (!slice.length) {
