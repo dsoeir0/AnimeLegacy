@@ -153,6 +153,7 @@ AnimeLegacy/
 | `/sign-in`, `/sign-up` | Auth |
 | `/forgot-password`, `/reset-password` | Recovery flow |
 | `/privacy` | GDPR rights + account-deletion contact |
+| `/license` | MIT License full text + repo link |
 | `/api/delete-account` | Self-service erasure endpoint (auto when Admin SDK configured, 503 fallback otherwise) |
 
 ---
