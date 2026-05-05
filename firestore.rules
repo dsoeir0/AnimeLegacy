@@ -1,35 +1,51 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Anime catalog cache. Read public; writes restricted to authenticated
+    // users with the exact field whitelist used by `ensureAnimeCatalog` and
+    // `useTranslatedText`. Prevents random users from writing arbitrary
+    // 1MB blobs to inflate Firestore bills.
+    //
+    // Catalog fields come from lib/services/animeCatalog.js::buildAnimeCatalogPayload;
+    // translation fields come from hooks/useTranslatedText.js with
+    // cacheCollection='anime'.
     match /anime/{animeId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null
+        && request.resource.data.keys().hasOnly([
+            'animeId', 'title',
+            'posterUrl', 'bannerUrl',
+            'year', 'season', 'type', 'status',
+            'episodesTotal', 'durationMin',
+            'genres', 'studios', 'malScore',
+            'updatedAt',
+            'synopsisByLang', 'backgroundByLang'
+        ]);
     }
 
-    // Catalogue-style caches for translated biographies. Mirror the anime/{id}
-    // pattern: anyone can read (so anonymous visitors see previously-translated
-    // text), only authenticated users can write (so they contribute to the
-    // shared cache after their first view). Used by the `useTranslatedText`
-    // hook with cacheCollection = 'characters' | 'people'.
+    // Translation caches for biographies (characters/people) and studio
+    // "about". Same shape: writers must be authenticated; the only writable
+    // payload is the translation maps. Caps the per-doc size to prevent
+    // abuse via 1MB junk writes.
     match /characters/{characterId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null
+        && request.resource.data.keys().hasOnly(['biographyByLang'])
+        && request.resource.data.biographyByLang is map;
     }
 
     match /people/{personId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null
+        && request.resource.data.keys().hasOnly(['biographyByLang'])
+        && request.resource.data.biographyByLang is map;
     }
 
-    // Translation cache for studio "about" bios. Same semantics as
-    // `characters` / `people`: anyone can read (so anonymous visitors see
-    // previously-translated text), only authenticated users can write (so
-    // they contribute to the shared cache on first view). Backs the
-    // `useTranslatedText({ cacheCollection: 'studios' })` call in
-    // pages/studios/[id].js.
     match /studios/{studioId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null
+        && request.resource.data.keys().hasOnly(['aboutByLang'])
+        && request.resource.data.aboutByLang is map;
     }
 
     match /characterStats/{characterId} {

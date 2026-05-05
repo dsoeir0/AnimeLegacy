@@ -200,19 +200,28 @@ describe('anime/{id} catalog rules', () => {
   });
 });
 
+// Translation caches: characters and people use `biographyByLang`,
+// studios use `aboutByLang`. The whitelist on each rule blocks any
+// extra fields, so attackers can't write arbitrary payloads.
+const TRANSLATION_CACHES = [
+  { col: 'characters', field: 'biographyByLang' },
+  { col: 'people', field: 'biographyByLang' },
+  { col: 'studios', field: 'aboutByLang' },
+];
+
 describe('characters/{id} + people/{id} + studios/{id} translation caches', () => {
-  for (const col of ['characters', 'people', 'studios']) {
+  for (const { col, field } of TRANSLATION_CACHES) {
     it(`anyone can read ${col}/{id}`, async () => {
       await setDoc(doc(authed('userA'), col, '42'), {
-        biographyByLang: { pt: 'Biografia traduzida.' },
+        [field]: { pt: 'Tradução exemplo.' },
       });
       await assertSucceeds(getDoc(doc(anon(), col, '42')));
     });
 
-    it(`signed-in users can write to ${col}/{id}`, async () => {
+    it(`signed-in users can write only the whitelisted field on ${col}/{id}`, async () => {
       await assertSucceeds(
         setDoc(doc(authed('userA'), col, '42'), {
-          biographyByLang: { pt: 'Biografia traduzida.' },
+          [field]: { pt: 'Tradução exemplo.' },
         }),
       );
     });
@@ -220,7 +229,16 @@ describe('characters/{id} + people/{id} + studios/{id} translation caches', () =
     it(`anonymous users cannot write to ${col}/{id}`, async () => {
       await assertFails(
         setDoc(doc(anon(), col, '42'), {
-          biographyByLang: { pt: 'Spam.' },
+          [field]: { pt: 'Spam.' },
+        }),
+      );
+    });
+
+    it(`rejects extra fields beyond the whitelist on ${col}/{id}`, async () => {
+      await assertFails(
+        setDoc(doc(authed('userA'), col, '42'), {
+          [field]: { pt: 'Tradução.' },
+          maliciousBlob: 'a'.repeat(1000),
         }),
       );
     });
