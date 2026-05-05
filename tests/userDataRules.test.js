@@ -140,34 +140,37 @@ describe('users/{uid}/activity rules', () => {
   });
 });
 
-describe('users/{uid}/favoriteCharacters rules', () => {
-  it('owner can write favourite characters', async () => {
-    await assertSucceeds(
-      setDoc(doc(authed('userA'), 'users', 'userA', 'favoriteCharacters', '42'), {
-        id: 42,
-        name: 'Test Character',
-        updatedAt: new Date(),
-      }),
-    );
-  });
+// Three favourite subcollections share the same isolation rules: only the
+// owner can read or write, no cross-user access. Parameterised so that new
+// favourite types (voices, studios, etc.) only require adding the slug here.
+for (const col of ['favoriteCharacters', 'favoriteVoices', 'favoriteStudios']) {
+  describe(`users/{uid}/${col} rules`, () => {
+    it(`owner can write ${col}`, async () => {
+      await assertSucceeds(
+        setDoc(doc(authed('userA'), 'users', 'userA', col, '42'), {
+          id: 42,
+          name: 'Test entry',
+          updatedAt: new Date(),
+        }),
+      );
+    });
 
-  it('other users cannot read or write favourite characters', async () => {
-    await setDoc(
-      doc(authed('userA'), 'users', 'userA', 'favoriteCharacters', '42'),
-      { id: 42, name: 'Seeded' },
-    );
-    const stranger = authed('userB');
-    await assertFails(
-      getDoc(doc(stranger, 'users', 'userA', 'favoriteCharacters', '42')),
-    );
-    await assertFails(
-      setDoc(doc(stranger, 'users', 'userA', 'favoriteCharacters', '42'), {
+    it(`other users cannot read or write ${col}`, async () => {
+      await setDoc(doc(authed('userA'), 'users', 'userA', col, '42'), {
         id: 42,
-        name: 'Impersonated',
-      }),
-    );
+        name: 'Seeded',
+      });
+      const stranger = authed('userB');
+      await assertFails(getDoc(doc(stranger, 'users', 'userA', col, '42')));
+      await assertFails(
+        setDoc(doc(stranger, 'users', 'userA', col, '42'), {
+          id: 42,
+          name: 'Impersonated',
+        }),
+      );
+    });
   });
-});
+}
 
 describe('anime/{id} catalog rules', () => {
   it('anyone can read catalog docs (public by design)', async () => {
@@ -224,37 +227,42 @@ describe('characters/{id} + people/{id} + studios/{id} translation caches', () =
   }
 });
 
-describe('characterStats/{id} rules', () => {
-  it('allows an authenticated user to set only favoritesCount', async () => {
-    await assertSucceeds(
-      setDoc(doc(authed('userA'), 'characterStats', '42'), {
-        favoritesCount: 5,
-      }),
-    );
-  });
+// All three *Stats collections share the same shape constraint: writers
+// must be authenticated and the body must contain only `favoritesCount`,
+// a non-negative int. Parameterised to avoid drift if any rule is touched.
+for (const col of ['characterStats', 'voiceStats', 'studioStats']) {
+  describe(`${col}/{id} rules`, () => {
+    it(`allows an authenticated user to set only favoritesCount on ${col}`, async () => {
+      await assertSucceeds(
+        setDoc(doc(authed('userA'), col, '42'), {
+          favoritesCount: 5,
+        }),
+      );
+    });
 
-  it('rejects any additional fields beyond favoritesCount', async () => {
-    await assertFails(
-      setDoc(doc(authed('userA'), 'characterStats', '42'), {
-        favoritesCount: 5,
-        maliciousField: 'nope',
-      }),
-    );
-  });
+    it(`rejects any additional fields beyond favoritesCount on ${col}`, async () => {
+      await assertFails(
+        setDoc(doc(authed('userA'), col, '42'), {
+          favoritesCount: 5,
+          maliciousField: 'nope',
+        }),
+      );
+    });
 
-  it('rejects a negative favoritesCount', async () => {
-    await assertFails(
-      setDoc(doc(authed('userA'), 'characterStats', '42'), {
-        favoritesCount: -1,
-      }),
-    );
-  });
+    it(`rejects a negative favoritesCount on ${col}`, async () => {
+      await assertFails(
+        setDoc(doc(authed('userA'), col, '42'), {
+          favoritesCount: -1,
+        }),
+      );
+    });
 
-  it('rejects a non-integer favoritesCount', async () => {
-    await assertFails(
-      setDoc(doc(authed('userA'), 'characterStats', '42'), {
-        favoritesCount: 'five',
-      }),
-    );
+    it(`rejects a non-integer favoritesCount on ${col}`, async () => {
+      await assertFails(
+        setDoc(doc(authed('userA'), col, '42'), {
+          favoritesCount: 'five',
+        }),
+      );
+    });
   });
-});
+}

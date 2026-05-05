@@ -12,11 +12,15 @@ export default function useProfileData(uid) {
   const [activity, setActivity] = useState([]);
   const [catalogGenres, setCatalogGenres] = useState({});
   const [favoriteCharacters, setFavoriteCharacters] = useState([]);
+  const [favoriteVoices, setFavoriteVoices] = useState([]);
+  const [favoriteStudios, setFavoriteStudios] = useState([]);
   const [loadedAnime, setLoadedAnime] = useState(false);
   const [loadedList, setLoadedList] = useState(false);
   const [loadedActivity, setLoadedActivity] = useState(false);
   const [loadedProfile, setLoadedProfile] = useState(false);
   const [loadedFavoriteCharacters, setLoadedFavoriteCharacters] = useState(false);
+  const [loadedFavoriteVoices, setLoadedFavoriteVoices] = useState(false);
+  const [loadedFavoriteStudios, setLoadedFavoriteStudios] = useState(false);
 
   useEffect(() => {
     if (!uid) {
@@ -25,11 +29,15 @@ export default function useProfileData(uid) {
       setListItems([]);
       setActivity([]);
       setFavoriteCharacters([]);
+      setFavoriteVoices([]);
+      setFavoriteStudios([]);
       setLoadedAnime(true);
       setLoadedList(true);
       setLoadedActivity(true);
       setLoadedProfile(true);
       setLoadedFavoriteCharacters(true);
+      setLoadedFavoriteVoices(true);
+      setLoadedFavoriteStudios(true);
       return undefined;
     }
     const { db } = getFirebaseClient();
@@ -39,6 +47,8 @@ export default function useProfileData(uid) {
       setLoadedList(true);
       setLoadedActivity(true);
       setLoadedFavoriteCharacters(true);
+      setLoadedFavoriteVoices(true);
+      setLoadedFavoriteStudios(true);
       return undefined;
     }
 
@@ -76,12 +86,28 @@ export default function useProfileData(uid) {
       setLoadedFavoriteCharacters(true);
     });
 
+    const favoriteVoicesRef = collection(db, 'users', uid, 'favoriteVoices');
+    const favoriteVoicesQuery = query(favoriteVoicesRef, orderBy('updatedAt', 'desc'));
+    const unsubscribeFavoriteVoices = onSnapshot(favoriteVoicesQuery, (snapshot) => {
+      setFavoriteVoices(snapshot.docs.map((docItem) => docItem.data()));
+      setLoadedFavoriteVoices(true);
+    });
+
+    const favoriteStudiosRef = collection(db, 'users', uid, 'favoriteStudios');
+    const favoriteStudiosQuery = query(favoriteStudiosRef, orderBy('updatedAt', 'desc'));
+    const unsubscribeFavoriteStudios = onSnapshot(favoriteStudiosQuery, (snapshot) => {
+      setFavoriteStudios(snapshot.docs.map((docItem) => docItem.data()));
+      setLoadedFavoriteStudios(true);
+    });
+
     return () => {
       unsubscribeProfile();
       unsubscribeAnime();
       unsubscribeList();
       unsubscribeActivity();
       unsubscribeFavoriteCharacters();
+      unsubscribeFavoriteVoices();
+      unsubscribeFavoriteStudios();
     };
   }, [uid]);
 
@@ -279,10 +305,20 @@ export default function useProfileData(uid) {
     genres: watchedGenres,
     favorites,
     favoriteCharacters,
+    favoriteVoices,
+    favoriteStudios,
     activity: filteredActivity,
     activityAll: filteredActivityAll,
     profile,
-    loading: !(loadedAnime && loadedList && loadedActivity && loadedProfile && loadedFavoriteCharacters),
+    loading: !(
+      loadedAnime &&
+      loadedList &&
+      loadedActivity &&
+      loadedProfile &&
+      loadedFavoriteCharacters &&
+      loadedFavoriteVoices &&
+      loadedFavoriteStudios
+    ),
     animeItems,
   };
 }

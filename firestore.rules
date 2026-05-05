@@ -40,6 +40,22 @@ service cloud.firestore {
         && request.resource.data.favoritesCount >= 0;
     }
 
+    match /voiceStats/{voiceId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.resource.data.keys().hasOnly(['favoritesCount'])
+        && request.resource.data.favoritesCount is int
+        && request.resource.data.favoritesCount >= 0;
+    }
+
+    match /studioStats/{studioId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.resource.data.keys().hasOnly(['favoritesCount'])
+        && request.resource.data.favoritesCount is int
+        && request.resource.data.favoritesCount >= 0;
+    }
+
     match /usernames/{username} {
       allow read: if true;
       allow create: if request.auth != null
@@ -69,6 +85,14 @@ service cloud.firestore {
       }
 
       match /favoriteCharacters/{characterId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /favoriteVoices/{voiceId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /favoriteStudios/{studioId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }

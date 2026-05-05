@@ -1,17 +1,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { translate, getLanguage } from 'react-switch-lang';
 import {
   ArrowLeft,
   ChevronRight,
   ExternalLink,
+  Star,
 } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import RatingDisplay from '../../components/ui/RatingDisplay';
+import useAuth from '../../hooks/useAuth';
 import useTranslatedText from '../../hooks/useTranslatedText';
 import { getAnimeByProducer, getProducerById, getProducers } from '../../lib/services/jikan';
+import {
+  setStudioFavorite,
+  unsetStudioFavorite,
+} from '../../lib/services/favoriteStudios';
+import { getFirebaseClient } from '../../lib/firebase/client';
+import { FAVORITE_LIMIT } from '../../lib/constants';
 import { dedupeByMalId, filterOutHentai } from '../../lib/utils/anime';
 import { getAnimeBannerUrl, getAnimeThumbUrl } from '../../lib/utils/media';
 import {
@@ -57,6 +66,62 @@ function StudioDetailPage({ producer, works, related, t }) {
   });
 
   const [formatFilter, setFormatFilter] = useState(FILTER_ALL);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteError, setFavoriteError] = useState('');
+  const [favoriteCount, setFavoriteCount] = useState(0);
+  const [favoriteLoaded, setFavoriteLoaded] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!producer?.mal_id || !user?.uid) return undefined;
+    const { db } = getFirebaseClient();
+    if (!db) return undefined;
+    const favoritesRef = collection(db, 'users', user.uid, 'favoriteStudios');
+    const unsubscribe = onSnapshot(favoritesRef, (snapshot) => {
+      const ids = snapshot.docs.map((d) => String(d.id));
+      setFavoriteCount(ids.length);
+      setIsFavorite(ids.includes(String(producer.mal_id)));
+      setFavoriteLoaded(true);
+    });
+    return () => unsubscribe();
+  }, [producer?.mal_id, user?.uid]);
+
+  const toggleFavorite = async () => {
+    if (!producer?.mal_id || typeof window === 'undefined') return;
+    if (!user?.uid) {
+      setFavoriteError(t('errors.signInToFavoriteStudios'));
+      return;
+    }
+    if (!favoriteLoaded) {
+      setFavoriteError(t('errors.loadingFavorites'));
+      return;
+    }
+    const next = !isFavorite;
+    if (next && favoriteCount >= FAVORITE_LIMIT) {
+      setFavoriteError(t('errors.favoriteLimitStudios', { limit: FAVORITE_LIMIT }));
+      return;
+    }
+    setFavoriteError('');
+    setIsFavorite(next);
+    try {
+      const studioId = String(producer.mal_id);
+      if (next) {
+        await setStudioFavorite({
+          uid: user.uid,
+          studio: {
+            id: studioId,
+            name: pickStudioName(producer) || t('status.unknown'),
+            established: producer?.established || '',
+            imageUrl: producer?.images?.jpg?.image_url || '',
+          },
+        });
+      } else {
+        await unsetStudioFavorite({ uid: user.uid, studioId });
+      }
+    } catch {
+      setFavoriteError(t('errors.globalFavoritesUnavailable'));
+    }
+  };
 
   const filteredWorks = useMemo(
     () => works.filter((w) => matchesFormat(w, formatFilter)),
@@ -199,6 +264,30 @@ function StudioDetailPage({ producer, works, related, t }) {
             unit={t('studioPage.kpi.bestUnit')}
             color={accent.ink}
           />
+        </section>
+
+        {/* ───── Favorite toggle ───── */}
+        <section className={styles.favoriteCard}>
+          <div className={styles.favoriteLeft}>
+            <div className={styles.favoriteTitle}>{t('studioPage.favoriteTitle')}</div>
+            <div className={styles.favoriteHint}>
+              {isFavorite
+                ? t('studioPage.favoriteHintOn')
+                : t('studioPage.favoriteHintOff')}
+              {favoriteError ? (
+                <span className={styles.favoriteError}> {favoriteError}</span>
+              ) : null}
+            </div>
+          </div>
+          <Button
+            variant={isFavorite ? 'collection' : 'secondary'}
+            size="md"
+            icon={Star}
+            onClick={toggleFavorite}
+            disabled={!user?.uid || !favoriteLoaded}
+          >
+            {isFavorite ? t('actions.favorited') : t('actions.favorite')}
+          </Button>
         </section>
 
         {/* ───── Two columns ───── */}

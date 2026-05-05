@@ -6,6 +6,8 @@ import Layout from '../components/layout/Layout';
 import ActivityGroups from '../components/profile/ActivityGroups';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import FavoriteCharactersStrip from '../components/profile/FavoriteCharactersStrip';
+import FavoriteStudiosStrip from '../components/profile/FavoriteStudiosStrip';
+import FavoriteVoicesStrip from '../components/profile/FavoriteVoicesStrip';
 import FavoritesStrip from '../components/profile/FavoritesStrip';
 import GenreBars from '../components/profile/GenreBars';
 import KpiRow from '../components/profile/KpiRow';
@@ -45,6 +47,8 @@ function ProfilePage({ t }) {
     stats,
     favorites,
     favoriteCharacters,
+    favoriteVoices,
+    favoriteStudios,
     activityAll,
     profile,
     animeItems,
@@ -279,6 +283,44 @@ function ProfilePage({ t }) {
                           <FavoriteCharactersStrip favorites={favoriteCharacters} limit={6} />
                         </div>
                       ) : null}
+
+                      {favoriteVoices.length > 0 ? (
+                        <div className={styles.section}>
+                          <div className={styles.sectionHead}>
+                            <div className={styles.titleGroup}>
+                              <h3 className={styles.sectionTitle}>
+                                {t('profile.favoriteVoicesTitle')}
+                              </h3>
+                              <span className={styles.kicker}>
+                                {t('profile.favoritesCount', {
+                                  n: favoriteVoices.length,
+                                  limit: FAVORITE_LIMIT,
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                          <FavoriteVoicesStrip favorites={favoriteVoices} limit={6} />
+                        </div>
+                      ) : null}
+
+                      {favoriteStudios.length > 0 ? (
+                        <div className={styles.section}>
+                          <div className={styles.sectionHead}>
+                            <div className={styles.titleGroup}>
+                              <h3 className={styles.sectionTitle}>
+                                {t('profile.favoriteStudiosTitle')}
+                              </h3>
+                              <span className={styles.kicker}>
+                                {t('profile.favoritesCount', {
+                                  n: favoriteStudios.length,
+                                  limit: FAVORITE_LIMIT,
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                          <FavoriteStudiosStrip favorites={favoriteStudios} limit={6} />
+                        </div>
+                      ) : null}
                     </>
                   ) : null}
 
@@ -314,6 +356,40 @@ function ProfilePage({ t }) {
                           </div>
                         </div>
                         <FavoriteCharactersStrip favorites={favoriteCharacters} />
+                      </div>
+
+                      <div className={styles.section}>
+                        <div className={styles.sectionHead}>
+                          <div className={styles.titleGroup}>
+                            <h3 className={styles.sectionTitle}>
+                              {t('profile.favoriteVoicesTitle')}
+                            </h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', {
+                                n: favoriteVoices.length,
+                                limit: FAVORITE_LIMIT,
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        <FavoriteVoicesStrip favorites={favoriteVoices} />
+                      </div>
+
+                      <div className={styles.section}>
+                        <div className={styles.sectionHead}>
+                          <div className={styles.titleGroup}>
+                            <h3 className={styles.sectionTitle}>
+                              {t('profile.favoriteStudiosTitle')}
+                            </h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', {
+                                n: favoriteStudios.length,
+                                limit: FAVORITE_LIMIT,
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        <FavoriteStudiosStrip favorites={favoriteStudios} />
                       </div>
                     </>
                   ) : null}
