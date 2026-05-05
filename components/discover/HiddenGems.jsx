@@ -5,9 +5,6 @@ import { primaryStudioName } from '../../lib/utils/anime';
 import { getAnimeBannerUrl } from '../../lib/utils/media';
 import styles from './discover.module.css';
 
-// "Hidden gems" rail. Fed a pre-ranked pool from SSR — typically anime
-// with score ≥ 8.0 and popularity rank > threshold (less watched but well
-// rated). No extra Jikan calls needed at render time.
 function HiddenGems({ gems, t }) {
   if (!gems || !gems.length) return null;
   return (
@@ -37,7 +34,7 @@ function HiddenGems({ gems, t }) {
                     src={url}
                     alt=""
                     fill
-                    sizes="(max-width: 1100px) 50vw, 33vw"
+                    sizes="1200px"
                     className={styles.gemBannerImg}
                     loading="lazy"
                   />

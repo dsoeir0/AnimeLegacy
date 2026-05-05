@@ -400,12 +400,8 @@ export async function getServerSideProps(context) {
   const topList = Array.isArray(topRes?.data) ? filterOutHentai(topRes.data) : [];
   const editorial = buildDiscoverPayload(topList);
 
-  // MAL only ships ~225×320 posters. The Editorial hero and the Hidden
-  // Gems banner cards render at 600–1200px wide, which made the MAL
-  // fallback look heavily upscaled. Enrich the entries that drive those
-  // big visuals with AniList's bannerImage (1920×500+) or
-  // coverImage.extraLarge (~460×640+). Cached for 6h via _cache.js, so
-  // SSR cost is one batched request the first time per content cycle.
+  // MAL posters are 225×320; AniList's bannerImage is 1920×500. Enrich the
+  // hero entries so cover-fit doesn't browser-upscale at large render sizes.
   const heroIds = [
     editorial.primary?.mal_id,
     ...(editorial.secondary || []).map((a) => a?.mal_id),

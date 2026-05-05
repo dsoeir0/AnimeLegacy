@@ -7,10 +7,6 @@ import { primaryStudioName } from '../../lib/utils/anime';
 import { getAnimeBannerUrl } from '../../lib/utils/media';
 import styles from './discover.module.css';
 
-// 2-column editorial hero: one big "staff pick" on the left, two smaller
-// cards stacked on the right. Primary uses <Image priority> for above-the-
-// fold sharpness; secondary cards also use <Image> so DPR-aware variants
-// ship on Retina displays.
 function EditorialFeature({ primary, secondary, t }) {
   if (!primary) return null;
   const primaryBanner = primary.banner || getAnimeBannerUrl(primary);
@@ -21,17 +17,12 @@ function EditorialFeature({ primary, secondary, t }) {
         className={styles.editorialPrimary}
       >
         {primaryBanner ? (
-          // sizes is wider than the actual render width on purpose. AniList
-          // banners are 1900×400; our container is 440px tall × ~1100px wide
-          // (2.5:1, way squarer than the source 4.75:1). With object-fit:cover
-          // the browser has to vertically upscale by ~2x, which blurs unless
-          // we serve a larger source. Forcing 100vw makes Next.js pick the
-          // 1920w variant, giving us ~1.1x upscale instead of ~2x.
+          // Pixel-fixed sizes — viewport-relative leaves narrow screens with a tiny variant cover-fit upscales.
           <Image
             src={primaryBanner}
             alt=""
             fill
-            sizes="100vw"
+            sizes="2000px"
             quality={85}
             priority
             className={styles.editorialBanner}
@@ -76,15 +67,11 @@ function EditorialFeature({ primary, secondary, t }) {
               className={styles.editorialSecondaryCard}
             >
               {banner ? (
-                // Same aspect-ratio mismatch as the primary — see comment
-                // there. Secondary cards are ~half-height/half-width but the
-                // banner source ratio still doesn't match the slot, so we
-                // ship a large variant to avoid browser upscaling.
                 <Image
                   src={banner}
                   alt=""
                   fill
-                  sizes="(max-width: 1100px) 100vw, 50vw"
+                  sizes="1200px"
                   className={styles.editorialSecondaryImage}
                   loading="lazy"
                 />
