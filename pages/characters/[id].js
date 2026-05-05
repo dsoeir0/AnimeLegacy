@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ArrowRight } from 'lucide-react';
 import { translate, getLanguage } from 'react-switch-lang';
-import { collection, doc, onSnapshot } from 'firebase/firestore';
 import {
   setCharacterFavorite,
   unsetCharacterFavorite,
@@ -12,6 +11,7 @@ import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import styles from './[id].module.css';
 import useAuth from '../../hooks/useAuth';
+import useFavoriteToggle from '../../hooks/useFavoriteToggle';
 import useTranslatedText from '../../hooks/useTranslatedText';
 import {
   getCharacterAnime,
@@ -19,8 +19,6 @@ import {
   getCharacterVoices,
 } from '../../lib/services/jikan';
 import { getAnimeImageUrl, getCharacterImageUrl } from '../../lib/utils/media';
-import { getFirebaseClient } from '../../lib/firebase/client';
-import { FAVORITE_LIMIT } from '../../lib/constants';
 
 const buildBio = (about = '') =>
   about
@@ -87,87 +85,42 @@ function CharacterPage({
   });
   const biography = buildBio(translatedAbout || character?.about || '');
   const [showAllAppearances, setShowAllAppearances] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [favoriteError, setFavoriteError] = useState('');
-  const [favoriteTotal, setFavoriteTotal] = useState(0);
-  const [favoriteCount, setFavoriteCount] = useState(0);
-  const [favoriteLoaded, setFavoriteLoaded] = useState(false);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (!character?.mal_id || !user?.uid) return undefined;
-    const { db } = getFirebaseClient();
-    if (!db) return undefined;
-    const favoritesRef = collection(db, 'users', user.uid, 'favoriteCharacters');
-    const unsubscribe = onSnapshot(favoritesRef, (snapshot) => {
-      const ids = snapshot.docs.map((d) => String(d.id));
-      setFavoriteCount(ids.length);
-      setIsFavorite(ids.includes(String(character.mal_id)));
-      setFavoriteLoaded(true);
-    });
-    return () => unsubscribe();
-  }, [character?.mal_id, user?.uid]);
-
-  useEffect(() => {
-    let unsubscribe = null;
-    if (!character?.mal_id) return undefined;
-    const { db } = getFirebaseClient();
-    if (!db) {
-      setFavoriteTotal(0);
-      return undefined;
-    }
-    const ref = doc(db, 'characterStats', String(character.mal_id));
-    unsubscribe = onSnapshot(
-      ref,
-      (snap) => {
-        if (snap.exists()) setFavoriteTotal(snap.data()?.favoritesCount || 0);
-        else setFavoriteTotal(0);
+  const {
+    isFavorite,
+    favoriteTotal,
+    favoriteError,
+    favoriteLoaded,
+    toggleFavorite,
+  } = useFavoriteToggle({
+    uid: user?.uid,
+    entityId: character?.mal_id,
+    collectionName: 'favoriteCharacters',
+    statsCollectionName: 'characterStats',
+    setFavoriteFn: setCharacterFavorite,
+    unsetFavoriteFn: unsetCharacterFavorite,
+    buildSetPayload: () => ({
+      uid: user.uid,
+      character: {
+        id: String(character.mal_id),
+        name: character?.name || t('status.unknown'),
+        nameKanji: character?.name_kanji || '',
+        imageUrl: imageUrl || '',
       },
-      () => setFavoriteTotal(0),
-    );
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [character?.mal_id]);
-
-  const toggleFavorite = async () => {
-    if (!character?.mal_id || typeof window === 'undefined') return;
-    if (!user?.uid) {
-      setFavoriteError(t('errors.signInToFavoriteCharacters'));
-      return;
-    }
-    if (!favoriteLoaded) {
-      setFavoriteError(t('errors.loadingFavorites'));
-      return;
-    }
-    const next = !isFavorite;
-    if (next && favoriteCount >= FAVORITE_LIMIT) {
-      setFavoriteError(t('errors.favoriteLimitCharacters', { limit: FAVORITE_LIMIT }));
-      return;
-    }
-    setFavoriteError('');
-    setIsFavorite(next);
-    const delta = next ? 1 : -1;
-    setFavoriteTotal((c) => Math.max(0, (c || 0) + delta));
-    try {
-      const characterId = String(character.mal_id);
-      if (next) {
-        await setCharacterFavorite({
-          uid: user.uid,
-          character: {
-            id: characterId,
-            name: character?.name || t('status.unknown'),
-            nameKanji: character?.name_kanji || '',
-            imageUrl: imageUrl || '',
-          },
-        });
-      } else {
-        await unsetCharacterFavorite({ uid: user.uid, characterId });
-      }
-    } catch {
-      setFavoriteError(t('errors.globalFavoritesUnavailable'));
-    }
-  };
+    }),
+    buildUnsetPayload: () => ({
+      uid: user.uid,
+      characterId: String(character.mal_id),
+    }),
+    errorKeys: {
+      signIn: 'errors.signInToFavoriteCharacters',
+      loading: 'errors.loadingFavorites',
+      limit: 'errors.favoriteLimitCharacters',
+      generic: 'errors.globalFavoritesUnavailable',
+    },
+    t,
+  });
 
   const ageValue = useMemo(() => character?.age || parseBioValue('Age', character?.about || ''), [character]);
   const heightValue = useMemo(() => character?.height || parseBioValue('Height', character?.about || ''), [character]);

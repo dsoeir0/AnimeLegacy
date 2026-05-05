@@ -1,20 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { collection, onSnapshot } from 'firebase/firestore';
 import { ArrowRight, Star } from 'lucide-react';
 import { translate, getLanguage } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import useAuth from '../../hooks/useAuth';
+import useFavoriteToggle from '../../hooks/useFavoriteToggle';
 import useTranslatedText from '../../hooks/useTranslatedText';
 import { getPersonById, getPersonAnime, getPersonVoices } from '../../lib/services/jikan';
 import {
   setVoiceFavorite,
   unsetVoiceFavorite,
 } from '../../lib/services/favoriteVoices';
-import { getFirebaseClient } from '../../lib/firebase/client';
-import { FAVORITE_LIMIT } from '../../lib/constants';
 import styles from './[id].module.css';
 
 const personImage = (person) =>
@@ -35,10 +33,6 @@ const characterImage = (character) =>
 function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
   const [showAllAnime, setShowAllAnime] = useState(false);
   const [showAllRoles, setShowAllRoles] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [favoriteError, setFavoriteError] = useState('');
-  const [favoriteCount, setFavoriteCount] = useState(0);
-  const [favoriteLoaded, setFavoriteLoaded] = useState(false);
   const { user } = useAuth();
 
   // Hook calls before any early return — rules of hooks. We feed empty
@@ -53,57 +47,40 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
     cacheCollection: 'people',
   });
 
-  useEffect(() => {
-    if (!person?.mal_id || !user?.uid) return undefined;
-    const { db } = getFirebaseClient();
-    if (!db) return undefined;
-    const favoritesRef = collection(db, 'users', user.uid, 'favoriteVoices');
-    const unsubscribe = onSnapshot(favoritesRef, (snapshot) => {
-      const ids = snapshot.docs.map((d) => String(d.id));
-      setFavoriteCount(ids.length);
-      setIsFavorite(ids.includes(String(person.mal_id)));
-      setFavoriteLoaded(true);
-    });
-    return () => unsubscribe();
-  }, [person?.mal_id, user?.uid]);
-
-  const toggleFavorite = async () => {
-    if (!person?.mal_id || typeof window === 'undefined') return;
-    if (!user?.uid) {
-      setFavoriteError(t('errors.signInToFavoriteVoices'));
-      return;
-    }
-    if (!favoriteLoaded) {
-      setFavoriteError(t('errors.loadingFavorites'));
-      return;
-    }
-    const next = !isFavorite;
-    if (next && favoriteCount >= FAVORITE_LIMIT) {
-      setFavoriteError(t('errors.favoriteLimitVoices', { limit: FAVORITE_LIMIT }));
-      return;
-    }
-    setFavoriteError('');
-    setIsFavorite(next);
-    try {
-      const voiceId = String(person.mal_id);
-      if (next) {
-        await setVoiceFavorite({
-          uid: user.uid,
-          voice: {
-            id: voiceId,
-            name: person?.name || t('status.unknown'),
-            nameKanji:
-              [person?.family_name, person?.given_name].filter(Boolean).join(' ') || '',
-            imageUrl: personImage(person) || '',
-          },
-        });
-      } else {
-        await unsetVoiceFavorite({ uid: user.uid, voiceId });
-      }
-    } catch {
-      setFavoriteError(t('errors.globalFavoritesUnavailable'));
-    }
-  };
+  const {
+    isFavorite,
+    favoriteError,
+    favoriteLoaded,
+    toggleFavorite,
+  } = useFavoriteToggle({
+    uid: user?.uid,
+    entityId: person?.mal_id,
+    collectionName: 'favoriteVoices',
+    statsCollectionName: 'voiceStats',
+    setFavoriteFn: setVoiceFavorite,
+    unsetFavoriteFn: unsetVoiceFavorite,
+    buildSetPayload: () => ({
+      uid: user.uid,
+      voice: {
+        id: String(person.mal_id),
+        name: person?.name || t('status.unknown'),
+        nameKanji:
+          [person?.family_name, person?.given_name].filter(Boolean).join(' ') || '',
+        imageUrl: personImage(person) || '',
+      },
+    }),
+    buildUnsetPayload: () => ({
+      uid: user.uid,
+      voiceId: String(person.mal_id),
+    }),
+    errorKeys: {
+      signIn: 'errors.signInToFavoriteVoices',
+      loading: 'errors.loadingFavorites',
+      limit: 'errors.favoriteLimitVoices',
+      generic: 'errors.globalFavoritesUnavailable',
+    },
+    t,
+  });
 
   if (!person) {
     return (
