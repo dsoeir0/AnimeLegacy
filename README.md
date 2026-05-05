@@ -17,6 +17,8 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 - **Favorites** — curate up to 10 favorite anime and 10 favorite characters, featured on your profile.
 - **MyAnimeList import** — paste your MAL username and pull your full list (every status, progress, score) plus favourite anime and favourite characters in one step. Skip-silent merge leaves existing entries intact, and the 10-per-category favourite cap is honoured.
 - **Character & voice actor pages** — biographies, appearances, and cross-linked cast.
+- **Studios index & detail** — every producer from Jikan, filtered down to actual animation studios only (Jikan lumps animators, financiers and licensors together; a client-side sweep classifies by role). Each studio has a dedicated detail page with a filmography timeline grouped by year, KPI strip, genre-mix breakdown, score histogram, upcoming releases, and related studios.
+- **Discover page** (`/search`) — dual-mode. With no query: editorial feature (top-rated primary + two under-the-radar secondary), 6 curated mood collections, an experimental **Vibe Finder** with pace/tone/length sliders that rank anime by Euclidean distance on a genre-derived coord space, hidden-gem cards (score ≥ 8 but less watched), and a clickable genre rail with real Jikan counts. With a query/genre/mood filter: standard search results grid with removable filter chips.
 - **Profile** — live stats (episodes watched, days spent, mean score), top genres, seasonal progress, and activity feed.
 - **Global search** — debounced Jikan search with cover preview, keyboard navigation, and ⌘K shortcut.
 - **Auth** — email/password + Google OAuth with password strength rules and account deletion.
@@ -34,8 +36,7 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 | Typography | Space Grotesk (display) · Plus Jakarta Sans (body) · JetBrains Mono (numerics) |
 | Auth & DB | Firebase Auth + Firestore |
 | Anime data | [Jikan v4](https://jikan.moe) (MyAnimeList) + [AniList GraphQL](https://anilist.gitbook.io) for higher-res covers |
-| Analytics | Vercel Analytics |
-| Deployment | Vercel |
+| Deployment | Hetzner Cloud (CX23) + Caddy reverse proxy + systemd |
 
 ---
 
@@ -55,12 +56,7 @@ pnpm install
 
 ### Configure environment
 
-Copy `.env.local.example` to `.env.local` and fill in your Firebase credentials. Alternatively, if the project is linked to Vercel, pull them straight from the dashboard:
-
-```bash
-pnpm dlx vercel link           # one-time: pick the animelegacy project
-pnpm dlx vercel env pull .env.local
-```
+Copy `.env.local.example` to `.env.local` and fill in your Firebase credentials.
 
 Manual setup — `.env.local`:
 
@@ -145,7 +141,10 @@ AnimeLegacy/
 | `/seasons/[year]` | Seasonal browse with filters |
 | `/anime/[id]` | Anime detail, cast, trailer, add-to-list |
 | `/characters/[id]` | Character detail, bio, appearances, voice actors |
-| `/search?q=` | Search results (Jikan) |
+| `/search` | Discover page — editorial picks, moods, vibe finder, hidden gems, genre rail |
+| `/search?q=` / `?genre=` / `?mood=` | Search results (Jikan) — filterable via query string |
+| `/studios` | Studios index with featured studio, filters, and paginated grid |
+| `/studios/[id]` | Studio detail — hero, KPIs, filmography timeline, score distribution |
 | `/my-list` | Personal list with tabs, list/grid view |
 | `/profile` | Profile stats, favorites, reviews, activity |
 | `/movies` | Top rated movies |
@@ -230,7 +229,7 @@ Both external APIs (Jikan + AniList) are wrapped by a shared cache at [`lib/serv
 | Jikan — `/anime?q=` (search) | not cached | Every query is unique |
 | AniList — cover/banner per MAL ID | 6h | Cover URLs are effectively immutable |
 
-The cache lives inside each serverless function instance and survives the warm lifetime that Vercel Fluid Compute gives us (minutes–hours). It serves stale data when the origin fails, so a Jikan 429 burst doesn't blank out popular pages. When the deployment scales out horizontally enough that cross-instance coherence matters, the `cached(key, ttlMs, fetcher)` signature is a drop-in replacement slot for Upstash Redis or Vercel KV.
+The cache lives inside the long-running Node process on the VPS, so it persists for the whole uptime of the systemd service. It serves stale data when the origin fails, so a Jikan 429 burst doesn't blank out popular pages. When the deployment scales horizontally to multiple machines, the `cached(key, ttlMs, fetcher)` signature is a drop-in replacement slot for Upstash Redis or any shared KV store.
 
 ---
 
@@ -257,7 +256,7 @@ Security rules live in [`firestore.rules`](firestore.rules). Key invariants:
 
 `/privacy` is always available and explains how to request erasure. There are two deletion modes:
 
-- **Self-service (automated)**: requires `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, and `FIREBASE_ADMIN_PRIVATE_KEY` in Vercel. When present, the Delete account button in the profile edit modal calls `/api/delete-account`, which wipes every subcollection under `users/{uid}`, releases the username reservation, and removes the Firebase Auth user.
+- **Self-service (automated)**: requires `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, and `FIREBASE_ADMIN_PRIVATE_KEY` set in the production environment (loaded from `.env.local` on the VPS). When present, the Delete account button in the profile edit modal calls `/api/delete-account`, which wipes every subcollection under `users/{uid}`, releases the username reservation, and removes the Firebase Auth user.
 - **Manual fallback (current default)**: without those env vars, the API returns `503` and the UI points users at `/privacy` to request removal via email. See [`docs/account-deletion.md`](docs/account-deletion.md) for the operator runbook — what to click, in what order, to stay GDPR-compliant without automation.
 
 ---
@@ -325,17 +324,31 @@ Anything growing more than ±2% gets flagged. There are **no hard gates** — a 
 
 ## Deployment
 
-AnimeLegacy deploys to Vercel out of the box.
+AnimeLegacy runs on a single Hetzner Cloud VPS (CX23, Nuremberg) with Caddy as the reverse proxy and HTTPS provider, and systemd supervising the Next.js process.
 
-1. Push to GitHub.
-2. Import the repo at [vercel.com/new](https://vercel.com/new).
-3. Add the environment variables from **Quick start**.
-4. Deploy.
+**Pipeline:**
+
+1. Push to `main` on GitHub.
+2. The [`.github/workflows/deploy-vps.yml`](.github/workflows/deploy-vps.yml) workflow SSHes into the VPS using a deploy-only key (stored in `VPS_SSH_KEY` secret).
+3. On the VPS: `git pull`, `pnpm install --frozen-lockfile`, `pnpm build`, `sudo systemctl restart animelegacy`.
+4. Caddy is already running; the new build is picked up on restart with no reverse-proxy config change.
+
+**Server layout:**
+
+| Component | Path / config |
+|---|---|
+| App | `/home/duarte/apps/animelegacy/` |
+| systemd unit | `/etc/systemd/system/animelegacy.service` (port 3000) |
+| Caddyfile | `/etc/caddy/Caddyfile` (HTTPS auto via Let's Encrypt) |
+| Env vars | `/home/duarte/apps/animelegacy/.env.local` (Firebase) |
+| Backups | Hetzner snapshots — 7 days, daily, automatic |
+
+**DNS:** managed at Cloudflare Registrar with two A records (`@` and `www`) pointing to the VPS IP. Cloudflare proxy is **off** (DNS only) so Caddy can issue/renew certs directly via Let's Encrypt HTTP-01 challenge.
 
 Password-reset emails are handled by Firebase Authentication — customize the template in the Firebase console and point the action URL to:
 
 ```
-https://<your-domain>/reset-password
+https://animelegacy.org/reset-password
 ```
 
 See [`docs/email-deliverability.md`](docs/email-deliverability.md) for deliverability tips.
