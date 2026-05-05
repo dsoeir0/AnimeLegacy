@@ -24,7 +24,7 @@ function HiddenGems({ gems, t }) {
       </div>
       <div className={styles.gemsGrid}>
         {gems.map((a) => {
-          const url = getAnimeBannerUrl(a);
+          const url = a.banner || getAnimeBannerUrl(a);
           return (
             <Link
               key={a.mal_id}

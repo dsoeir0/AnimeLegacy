@@ -24,6 +24,7 @@ import {
   searchAnime,
   slimAnimeResponse,
 } from '../lib/services/jikan';
+import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
 
 const findMood = (id) => DISCOVER_MOODS.find((m) => m.id === id) || null;
 
@@ -397,6 +398,36 @@ export async function getServerSideProps(context) {
   // slices the top list into editorial/secondary/gems/vibePool/moods.
   const topRes = await getTopAnime('', 1);
   const topList = Array.isArray(topRes?.data) ? filterOutHentai(topRes.data) : [];
+  const editorial = buildDiscoverPayload(topList);
+
+  // MAL only ships ~225×320 posters. The Editorial hero and the Hidden
+  // Gems banner cards render at 600–1200px wide, which made the MAL
+  // fallback look heavily upscaled. Enrich the entries that drive those
+  // big visuals with AniList's bannerImage (1920×500+) or
+  // coverImage.extraLarge (~460×640+). Cached for 6h via _cache.js, so
+  // SSR cost is one batched request the first time per content cycle.
+  const heroIds = [
+    editorial.primary?.mal_id,
+    ...(editorial.secondary || []).map((a) => a?.mal_id),
+    ...(editorial.gems || []).map((a) => a?.mal_id),
+  ].filter(Boolean);
+
+  if (heroIds.length > 0) {
+    const aniListMap = await fetchAniListMediaByMalIds(heroIds);
+    const enrich = (entry) => {
+      if (!entry?.mal_id) return entry;
+      const data = aniListMap[entry.mal_id];
+      const banner = data?.bannerImage || data?.coverImage?.extraLarge || null;
+      return banner ? { ...entry, banner } : entry;
+    };
+    if (editorial.primary) editorial.primary = enrich(editorial.primary);
+    if (Array.isArray(editorial.secondary)) {
+      editorial.secondary = editorial.secondary.map(enrich);
+    }
+    if (Array.isArray(editorial.gems)) {
+      editorial.gems = editorial.gems.map(enrich);
+    }
+  }
 
   return {
     props: {
@@ -407,7 +438,7 @@ export async function getServerSideProps(context) {
       pagination: {},
       activeGenre: null,
       activeMood: null,
-      editorial: buildDiscoverPayload(topList),
+      editorial,
       genres,
     },
   };
