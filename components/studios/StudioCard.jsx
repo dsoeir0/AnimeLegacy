@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Bookmark } from 'lucide-react';
 import { translate } from 'react-switch-lang';
+import { getAnimeThumbUrl } from '../../lib/utils/media';
 import { pickStudioName, studioInitials } from '../../lib/utils/studio';
 import { accentForStudio } from '../../lib/utils/studioAccent';
 import styles from './studios.module.css';
@@ -12,11 +13,6 @@ const yearOf = (iso) => {
   const y = new Date(iso).getFullYear();
   return Number.isFinite(y) ? y : null;
 };
-
-const posterUrl = (anime) =>
-  anime?.images?.webp?.image_url ||
-  anime?.images?.jpg?.image_url ||
-  '';
 
 const shortenBio = (about, max = 150) => {
   if (typeof about !== 'string') return '';
@@ -101,7 +97,7 @@ function StudioCard({ studio, posters, postersLoading, t }) {
           ) : (
             <>
               {displayPosters.map((p) => {
-                const url = posterUrl(p);
+                const url = getAnimeThumbUrl(p);
                 return (
                   <div key={p.mal_id} className={styles.posterSlot}>
                     {url ? (

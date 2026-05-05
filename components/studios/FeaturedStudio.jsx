@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Bell } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Button from '../ui/Button';
+import { getAnimeBannerUrl } from '../../lib/utils/media';
 import { pickStudioName, studioInitial } from '../../lib/utils/studio';
 import { accentForStudio } from '../../lib/utils/studioAccent';
 import styles from './studios.module.css';
@@ -14,13 +15,6 @@ const yearOf = (iso) => {
   const y = new Date(iso).getFullYear();
   return Number.isFinite(y) ? y : null;
 };
-
-const posterUrl = (anime) =>
-  anime?.images?.webp?.large_image_url ||
-  anime?.images?.webp?.image_url ||
-  anime?.images?.jpg?.large_image_url ||
-  anime?.images?.jpg?.image_url ||
-  '';
 
 const shortenBio = (about, max = 320) => {
   if (typeof about !== 'string') return '';
@@ -128,7 +122,7 @@ function FeaturedStudio({ studio, portfolio, t }) {
         <div className={styles.portfolioLabel}>{t('studios.featured.recentWork')}</div>
         <div className={styles.portfolioGrid}>
           {portfolio.map((anime) => {
-            const url = posterUrl(anime);
+            const url = getAnimeBannerUrl(anime);
             return (
               <Link
                 key={anime.mal_id}

@@ -13,6 +13,7 @@ import RatingDisplay from '../../components/ui/RatingDisplay';
 import useTranslatedText from '../../hooks/useTranslatedText';
 import { getAnimeByProducer, getProducerById, getProducers } from '../../lib/services/jikan';
 import { dedupeByMalId, filterOutHentai } from '../../lib/utils/anime';
+import { getAnimeBannerUrl, getAnimeThumbUrl } from '../../lib/utils/media';
 import {
   classifyProducerRole,
   pickStudioName,
@@ -45,18 +46,6 @@ const matchesFormat = (anime, filter) => {
   return true;
 };
 
-const posterSmall = (anime) =>
-  anime?.images?.webp?.image_url ||
-  anime?.images?.jpg?.image_url ||
-  '';
-
-const posterLarge = (anime) =>
-  anime?.images?.webp?.large_image_url ||
-  anime?.images?.webp?.image_url ||
-  anime?.images?.jpg?.large_image_url ||
-  anime?.images?.jpg?.image_url ||
-  '';
-
 function StudioDetailPage({ producer, works, related, t }) {
   const currentLang = typeof getLanguage === 'function' ? getLanguage() : 'en';
   const { text: translatedAbout } = useTranslatedText({
@@ -85,7 +74,7 @@ function StudioDetailPage({ producer, works, related, t }) {
   const genres = topGenres(works, 8);
 
   const accent = producer ? accentForStudio(producer.mal_id) : null;
-  const heroPoster = works[0] ? posterLarge(works[0]) : null;
+  const heroPoster = works[0] ? getAnimeBannerUrl(works[0]) : null;
 
   if (!producer) {
     return (
@@ -276,7 +265,7 @@ function StudioDetailPage({ producer, works, related, t }) {
                             }}
                           />
                           <div className={styles.timelinePoster}>
-                            {posterSmall(a) ? (
+                            {getAnimeThumbUrl(a) ? (
                               // Plain <img> — see CLAUDE.md "Tiny decorative thumbs"
                               // exception. Timeline posters render at ~110px wide;
                               // MAL's image_url is already 225–320px so browser
@@ -284,7 +273,7 @@ function StudioDetailPage({ producer, works, related, t }) {
                               // Image transformation for each (anime × page view).
                               /* eslint-disable-next-line @next/next/no-img-element */
                               <img
-                                src={posterSmall(a)}
+                                src={getAnimeThumbUrl(a)}
                                 alt=""
                                 className={styles.timelinePosterImg}
                                 loading="lazy"

@@ -10,7 +10,7 @@ import StudioFilterBar from '../../components/studios/StudioFilterBar';
 import StudioCard from '../../components/studios/StudioCard';
 import { getAnimeByProducer, getProducers } from '../../lib/services/jikan';
 import { filterOutHentai } from '../../lib/utils/anime';
-import { classifyProducerRole } from '../../lib/utils/studio';
+import { classifyProducerRole, pickStudioName } from '../../lib/utils/studio';
 import styles from './index.module.css';
 
 // Founding-year bands used by the filter bar. Arbitrary but match how the
@@ -73,15 +73,21 @@ function StudiosIndexPage({ items, portfolio, featuredIndex = 0, pagination, pag
   // reference and re-fire this effect — looping forever and wiping state
   // before any batch could ever land. Use the prop reference directly.
   const [filter, setFilter] = useState(FILTER_ALL);
+  const [searchQuery, setSearchQuery] = useState('');
   const [postersByStudio, setPostersByStudio] = useState({});
   const [hiddenIds, setHiddenIds] = useState(new Set());
   const fetchRunId = useRef(0);
 
   const visibleRest = useMemo(() => {
     const onlyStudios = rest.filter((s) => !hiddenIds.has(String(s.mal_id)));
-    if (filter === FILTER_ALL) return onlyStudios;
-    return onlyStudios.filter((s) => matchesFilter(yearOf(s.established), filter));
-  }, [filter, rest, hiddenIds]);
+    const byFilter =
+      filter === FILTER_ALL
+        ? onlyStudios
+        : onlyStudios.filter((s) => matchesFilter(yearOf(s.established), filter));
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return byFilter;
+    return byFilter.filter((s) => pickStudioName(s).toLowerCase().includes(q));
+  }, [filter, rest, hiddenIds, searchQuery]);
 
   const restIdsSignature = useMemo(
     () =>
@@ -173,6 +179,8 @@ function StudiosIndexPage({ items, portfolio, featuredIndex = 0, pagination, pag
               onFilterChange={setFilter}
               visibleCount={visibleRest.length}
               filters={FILTERS}
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
             />
 
             <section className={styles.gridSection}>
