@@ -20,11 +20,14 @@ function EditorialFeature({ primary, secondary, t }) {
         className={styles.editorialPrimary}
       >
         {primaryBanner ? (
+          // Force the 1920w variant on desktop. AniList banners are ~1900×400
+          // (4.75:1) cover-fitted into a 440px-tall hero, so smaller variants
+          // upscale ~2x vertically and look blurred.
           <Image
             src={primaryBanner}
             alt=""
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1100px) 90vw, 1280px"
+            sizes="(max-width: 768px) 100vw, 2000px"
             quality={85}
             priority
             className={styles.editorialBanner}
@@ -73,7 +76,7 @@ function EditorialFeature({ primary, secondary, t }) {
                   src={banner}
                   alt=""
                   fill
-                  sizes="(max-width: 768px) 50vw, 480px"
+                  sizes="(max-width: 768px) 50vw, 1200px"
                   className={styles.editorialSecondaryImage}
                   loading="lazy"
                 />

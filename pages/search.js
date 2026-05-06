@@ -412,8 +412,9 @@ export async function getServerSideProps(context) {
     const aniListMap = await fetchAniListMediaByMalIds(heroIds);
     const enrich = (entry) => {
       if (!entry?.mal_id) return entry;
-      const data = aniListMap[entry.mal_id];
-      const banner = data?.bannerImage || data?.coverImage?.extraLarge || null;
+      // bannerImage only — coverImage.extraLarge is a vertical poster and
+      // upscaling it via object-fit:cover gives the blurred-face artefact.
+      const banner = aniListMap[entry.mal_id]?.bannerImage || null;
       return banner ? { ...entry, banner } : entry;
     };
     if (editorial.primary) editorial.primary = enrich(editorial.primary);
