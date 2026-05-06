@@ -4,12 +4,15 @@ import { ArrowRight } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Button from '../ui/Button';
 import { primaryStudioName } from '../../lib/utils/anime';
-import { getAnimeBannerUrl } from '../../lib/utils/media';
 import styles from './discover.module.css';
 
 function EditorialFeature({ primary, secondary, t }) {
   if (!primary) return null;
-  const primaryBanner = primary.banner || getAnimeBannerUrl(primary);
+  // Only the AniList-enriched bannerImage fits this banner-shaped slot.
+  // Falling back to the MAL poster (225×320) here would force `object-fit:
+  // cover` to upscale a vertical poster into a wide hero — visually a heavy
+  // blur of one character's face.
+  const primaryBanner = primary.banner || null;
   return (
     <div className={styles.editorial}>
       <Link
@@ -17,12 +20,11 @@ function EditorialFeature({ primary, secondary, t }) {
         className={styles.editorialPrimary}
       >
         {primaryBanner ? (
-          // Pixel-fixed sizes — viewport-relative leaves narrow screens with a tiny variant cover-fit upscales.
           <Image
             src={primaryBanner}
             alt=""
             fill
-            sizes="2000px"
+            sizes="(max-width: 768px) 100vw, (max-width: 1100px) 90vw, 1280px"
             quality={85}
             priority
             className={styles.editorialBanner}
@@ -59,7 +61,7 @@ function EditorialFeature({ primary, secondary, t }) {
 
       <div className={styles.editorialSecondary}>
         {secondary.slice(0, 2).map((a, i) => {
-          const banner = a.banner || getAnimeBannerUrl(a);
+          const banner = a.banner || null;
           return (
             <Link
               key={a.mal_id}
@@ -71,7 +73,7 @@ function EditorialFeature({ primary, secondary, t }) {
                   src={banner}
                   alt=""
                   fill
-                  sizes="1200px"
+                  sizes="(max-width: 768px) 50vw, 480px"
                   className={styles.editorialSecondaryImage}
                   loading="lazy"
                 />

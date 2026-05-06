@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import { primaryStudioName } from '../../lib/utils/anime';
-import { getAnimeBannerUrl } from '../../lib/utils/media';
 import styles from './discover.module.css';
 
 function HiddenGems({ gems, t }) {
@@ -21,7 +20,7 @@ function HiddenGems({ gems, t }) {
       </div>
       <div className={styles.gemsGrid}>
         {gems.map((a) => {
-          const url = a.banner || getAnimeBannerUrl(a);
+          const url = a.banner || null;
           return (
             <Link
               key={a.mal_id}
@@ -34,7 +33,7 @@ function HiddenGems({ gems, t }) {
                     src={url}
                     alt=""
                     fill
-                    sizes="1200px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1100px) 50vw, 360px"
                     className={styles.gemBannerImg}
                     loading="lazy"
                   />

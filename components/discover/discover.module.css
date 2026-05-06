@@ -19,6 +19,10 @@
   color: inherit;
   display: block;
   transition: border-color var(--dur-2) var(--ease-standard);
+  background:
+    radial-gradient(ellipse at 18% 30%, rgba(132, 217, 255, 0.16), transparent 55%),
+    radial-gradient(ellipse at 82% 70%, rgba(176, 132, 255, 0.14), transparent 55%),
+    var(--al-ink-2);
 }
 
 .editorialPrimary:hover {
@@ -135,6 +139,9 @@
   color: inherit;
   min-height: 0;
   transition: border-color var(--dur-2) var(--ease-standard);
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(132, 217, 255, 0.12), transparent 60%),
+    var(--al-ink-2);
 }
 
 .editorialSecondaryCard:hover {
@@ -505,7 +512,9 @@
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  background: var(--al-ink-3);
+  background:
+    linear-gradient(135deg, rgba(132, 217, 255, 0.08), rgba(176, 132, 255, 0.06)),
+    var(--al-ink-3);
 }
 
 .gemBannerImg {
@@ -653,16 +662,64 @@
   .moodGrid {
     grid-template-columns: 1fr;
   }
+  /* Banner is 3.84:1 — fixed 360px height on a ~340px-wide phone forces
+     `object-fit: cover` to crop ~78% of the banner width and present a
+     vertically stretched sliver that reads as a blur. Using aspect-ratio
+     keeps proportions reasonable so the title overlay still has room. */
+  .editorialPrimary {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
   .editorialPrimaryInner {
-    padding: 28px 24px;
+    padding: 22px 20px;
+  }
+  .editorialBody {
+    max-width: none;
+  }
+  .editorialTitle {
+    font-size: clamp(22px, 6vw, 32px);
+    margin-bottom: 10px;
+  }
+  .editorialSynopsis {
+    font-size: 13px;
+    -webkit-line-clamp: 2;
+    margin-bottom: 14px;
+  }
+  .editorialSecondary {
+    flex-direction: row;
+  }
+  .editorialSecondaryCard {
+    aspect-ratio: 16 / 10;
   }
   .editorialSecondaryInner {
-    padding: 18px 20px;
+    padding: 14px 16px;
+  }
+  .editorialSecondaryTitle {
+    font-size: 16px;
+  }
+  .vibeCard {
+    padding: 18px;
+    gap: 24px;
   }
   .vibeMatches {
     grid-template-columns: 1fr;
   }
+  .vibeMatchCard {
+    grid-template-columns: 48px 1fr auto;
+    padding: 10px;
+    gap: 10px;
+  }
+  .vibeMatchPoster {
+    width: 48px;
+    height: 64px;
+  }
   .gemsGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .editorialSecondary {
+    flex-direction: column;
   }
 }
