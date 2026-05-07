@@ -223,6 +223,17 @@
   gap: 10px;
 }
 
+.gridResults {
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+}
+
+.filterBannerWrap {
+  padding: 0 32px;
+}
+
 .empty {
   margin: 24px 32px;
   padding: 48px 32px;

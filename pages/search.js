@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import HorizontalRow from '../components/cards/HorizontalRow';
+import PosterCard from '../components/cards/PosterCard';
 import IconButton from '../components/ui/IconButton';
 import AddToListModal from '../components/modals/AddToListModal';
 import EditorialFeature from '../components/discover/EditorialFeature';
@@ -12,19 +13,41 @@ import MoodGrid from '../components/discover/MoodGrid';
 import VibeFinder from '../components/discover/VibeFinder';
 import HiddenGems from '../components/discover/HiddenGems';
 import GenreRail from '../components/discover/GenreRail';
+import BecauseYouLiked from '../components/discover/BecauseYouLiked';
+import SurpriseMe from '../components/discover/SurpriseMe';
+import AiringThisWeek from '../components/discover/AiringThisWeek';
+import FilterBanner from '../components/discover/FilterBanner';
 import { DISCOVER_MOODS } from '../components/discover/moods';
 import styles from './search.module.css';
 import useMyList from '../hooks/useMyList';
-import { dedupeByMalId, filterOutHentai, normalizeAnime } from '../lib/utils/anime';
+import {
+  dedupeByMalId,
+  filterOutHentai,
+  filterUnreleased,
+  normalizeAnime,
+} from '../lib/utils/anime';
 import { buildDiscoverPayload } from '../lib/utils/discoverPayload';
+import {
+  applyExtraFilters,
+  buildGenreQuery,
+  normalizeDecade,
+  normalizeScore,
+  normalizeSort,
+  normalizeStatus,
+  normalizeType,
+  normalizeView,
+  overrideSort,
+} from '../lib/utils/discoverFilter';
 import {
   getAnimeByFilter,
   getAnimeGenres,
+  getSchedules,
   getTopAnime,
   searchAnime,
   slimAnimeResponse,
 } from '../lib/services/jikan';
 import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
+import { WEEKDAY_KEYS } from '../lib/utils/time';
 
 const findMood = (id) => DISCOVER_MOODS.find((m) => m.id === id) || null;
 
@@ -38,6 +61,13 @@ function DiscoverPage({
   activeMood,
   editorial,
   genres,
+  schedulesByDay,
+  sort,
+  view,
+  type,
+  status,
+  decade,
+  minScore,
   t,
 }) {
   const router = useRouter();
@@ -61,6 +91,12 @@ function DiscoverPage({
       ...(query ? { q: query } : {}),
       ...(activeGenre ? { genre: activeGenre.mal_id } : {}),
       ...(activeMood ? { mood: activeMood.id } : {}),
+      ...(sort && sort !== 'top' ? { sort } : {}),
+      ...(view && view !== 'grid' ? { view } : {}),
+      ...(type ? { type } : {}),
+      ...(status ? { status } : {}),
+      ...(decade ? { decade } : {}),
+      ...(minScore ? { min: minScore } : {}),
       page: nextPage,
     },
   });
@@ -121,10 +157,10 @@ function DiscoverPage({
             <div className={styles.eyebrow}>
               {t('discoverPage.eyebrow')}
             </div>
-            {isSearchMode ? (
+            {isSearchMode && query ? (
               <h1 className={styles.heading}>
                 {t('search.resultsFor')}{' '}
-                <span className={styles.highlight}>&ldquo;{query || activeGenre?.name || (activeMood ? t(activeMood.labelKey) : '')}&rdquo;</span>
+                <span className={styles.highlight}>&ldquo;{query}&rdquo;</span>
               </h1>
             ) : (
               <>
@@ -154,7 +190,7 @@ function DiscoverPage({
           </form>
         </header>
 
-        {(query || activeGenre || activeMood) ? (
+        {query ? (
           <div className={styles.activeFilters}>
             <span className={styles.activeLabel}>
               {t('discoverPage.activeLabel')}
@@ -216,30 +252,61 @@ function DiscoverPage({
             </div>
           ) : (
             <>
-              <div className={styles.resultsInfo}>
-                <span className={styles.eyebrowInline}>
-                  {t('search.titlesOnPage', { n: items.length })}
-                </span>
-                <span className={styles.pageInfo}>
-                  {t('search.foundBody', { n: total })} ·{' '}
-                  {t('search.pageOf', { current: page, total: lastPage })}
-                </span>
-              </div>
-              <div className={styles.list}>
-                {items.map((element) => {
-                  const normalized = normalizeAnime(element);
-                  const entry = entryFor(element.mal_id);
-                  return (
-                    <HorizontalRow
+              {activeMood || activeGenre ? (
+                <div className={styles.filterBannerWrap}>
+                  <FilterBanner
+                    activeMood={activeMood}
+                    activeGenre={activeGenre}
+                    count={total}
+                    sort={sort}
+                    view={view}
+                    type={type}
+                    status={status}
+                    decade={decade}
+                    minScore={minScore}
+                    accent={activeMood?.accent}
+                  />
+                </div>
+              ) : (
+                <div className={styles.resultsInfo}>
+                  <span className={styles.eyebrowInline}>
+                    {t('search.titlesOnPage', { n: items.length })}
+                  </span>
+                  <span className={styles.pageInfo}>
+                    {t('search.foundBody', { n: total })} ·{' '}
+                    {t('search.pageOf', { current: page, total: lastPage })}
+                  </span>
+                </div>
+              )}
+              {view === 'grid' ? (
+                <div className={styles.gridResults}>
+                  {items.map((element) => (
+                    <PosterCard
                       key={element.mal_id}
                       anime={element}
-                      entry={entry}
+                      width="100%"
                       href={`/anime/${element.mal_id}`}
-                      onEdit={canEdit ? () => openAddModal(normalized, entry) : undefined}
+                      inList={Boolean(entryFor(element.mal_id))}
                     />
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.list}>
+                  {items.map((element) => {
+                    const normalized = normalizeAnime(element);
+                    const entry = entryFor(element.mal_id);
+                    return (
+                      <HorizontalRow
+                        key={element.mal_id}
+                        anime={element}
+                        entry={entry}
+                        href={`/anime/${element.mal_id}`}
+                        onEdit={canEdit ? () => openAddModal(normalized, entry) : undefined}
+                      />
+                    );
+                  })}
+                </div>
+              )}
               {lastPage > 1 ? (
                 <div className={styles.pagination}>
                   <Link href={buildResultsLink(Math.max(1, page - 1))} className={styles.pageLink}>
@@ -284,9 +351,21 @@ function DiscoverPage({
               </section>
             ) : null}
 
+            {schedulesByDay ? (
+              <section className={styles.section}>
+                <AiringThisWeek schedulesByDay={schedulesByDay} />
+              </section>
+            ) : null}
+
             {editorial?.moodPosters ? (
               <section className={styles.section}>
                 <MoodGrid postersByMood={editorial.moodPosters} />
+              </section>
+            ) : null}
+
+            {genres?.length ? (
+              <section className={styles.section}>
+                <GenreRail genres={genres} />
               </section>
             ) : null}
 
@@ -296,15 +375,21 @@ function DiscoverPage({
               </section>
             ) : null}
 
+            {editorial?.vibePool?.length ? (
+              <section className={styles.section}>
+                <BecauseYouLiked pool={editorial.vibePool} />
+              </section>
+            ) : null}
+
             {editorial?.gems?.length ? (
               <section className={styles.section}>
                 <HiddenGems gems={editorial.gems} />
               </section>
             ) : null}
 
-            {genres?.length ? (
+            {editorial?.vibePool?.length ? (
               <section className={styles.section}>
-                <GenreRail genres={genres} />
+                <SurpriseMe pool={editorial.vibePool} />
               </section>
             ) : null}
           </>
@@ -336,6 +421,12 @@ export async function getServerSideProps(context) {
   const genreIdRaw = context.query?.genre;
   const genreId = Number.parseInt(genreIdRaw, 10);
   const moodId = typeof context.query?.mood === 'string' ? context.query.mood : null;
+  const sort = normalizeSort(context.query?.sort);
+  const view = normalizeView(context.query?.view);
+  const type = normalizeType(context.query?.type);
+  const status = normalizeStatus(context.query?.status);
+  const decade = normalizeDecade(context.query?.decade);
+  const minScore = normalizeScore(context.query?.min);
 
   const genresRes = await getAnimeGenres();
   const genres = (Array.isArray(genresRes?.data) ? genresRes.data : []).map((g) => ({
@@ -357,13 +448,21 @@ export async function getServerSideProps(context) {
         response = { data: [], pagination: {} };
       }
     } else {
-      response = await getAnimeByFilter({
-        params: activeMood ? activeMood.query : `genres=${activeGenre.mal_id}&order_by=score&sort=desc`,
-        page,
+      const baseParams = activeMood
+        ? overrideSort(activeMood.query, sort)
+        : buildGenreQuery(activeGenre.mal_id, sort);
+      const params = applyExtraFilters(baseParams, {
+        type,
+        status,
+        decade,
+        minScore,
+        sort,
+        today: new Date().toISOString().slice(0, 10),
       });
+      response = await getAnimeByFilter({ params, page });
     }
     const filtered = Array.isArray(response?.data)
-      ? dedupeByMalId(filterOutHentai(response.data))
+      ? dedupeByMalId(filterOutHentai(filterUnreleased(response.data)))
       : [];
     const results = slimAnimeResponse({ data: filtered });
     const pagination = response?.pagination || {};
@@ -376,10 +475,22 @@ export async function getServerSideProps(context) {
         pagination,
         activeGenre,
         activeMood: activeMood
-          ? { id: activeMood.id, labelKey: activeMood.labelKey, accent: activeMood.accent }
+          ? {
+              id: activeMood.id,
+              labelKey: activeMood.labelKey,
+              subKey: activeMood.subKey,
+              accent: activeMood.accent,
+            }
           : null,
         editorial: null,
         genres,
+        schedulesByDay: null,
+        sort,
+        view,
+        type,
+        status,
+        decade,
+        minScore,
       },
     };
   }
@@ -388,10 +499,15 @@ export async function getServerSideProps(context) {
   const topList = Array.isArray(topRes?.data) ? filterOutHentai(topRes.data) : [];
   const editorial = buildDiscoverPayload(topList);
 
+  const moodPosterIds = editorial.moodPosters
+    ? Object.values(editorial.moodPosters).flat().map((a) => a?.mal_id)
+    : [];
   const heroIds = [
     editorial.primary?.mal_id,
     ...(editorial.secondary || []).map((a) => a?.mal_id),
     ...(editorial.gems || []).map((a) => a?.mal_id),
+    ...(editorial.vibePool || []).map((a) => a?.mal_id),
+    ...moodPosterIds,
   ].filter(Boolean);
 
   if (heroIds.length > 0) {
@@ -408,6 +524,31 @@ export async function getServerSideProps(context) {
     if (Array.isArray(editorial.gems)) {
       editorial.gems = editorial.gems.map(enrich);
     }
+    if (Array.isArray(editorial.vibePool)) {
+      editorial.vibePool = editorial.vibePool.map(enrich);
+    }
+    if (editorial.moodPosters) {
+      for (const k of Object.keys(editorial.moodPosters)) {
+        editorial.moodPosters[k] = editorial.moodPosters[k].map(enrich);
+      }
+    }
+  }
+
+  let schedulesByDay = null;
+  try {
+    const scheduleEntries = await Promise.all(
+      WEEKDAY_KEYS.map((key) => getSchedules(key).then((res) => [key, res])),
+    );
+    schedulesByDay = Object.fromEntries(
+      scheduleEntries.map(([key, res]) => [
+        key,
+        Array.isArray(res?.data)
+          ? dedupeByMalId(filterOutHentai(res.data)).map(slimScheduleAnime)
+          : [],
+      ]),
+    );
+  } catch {
+    schedulesByDay = null;
   }
 
   return {
@@ -421,6 +562,29 @@ export async function getServerSideProps(context) {
       activeMood: null,
       editorial,
       genres,
+      schedulesByDay,
+      sort,
+      view,
+      type: '',
+      status: '',
+      decade: '',
+      minScore: '',
     },
   };
 }
+
+const slimScheduleAnime = (item) => ({
+  mal_id: item?.mal_id ?? null,
+  title: item?.title ?? null,
+  images: {
+    webp: {
+      image_url: item?.images?.webp?.image_url ?? null,
+      large_image_url: item?.images?.webp?.large_image_url ?? null,
+    },
+    jpg: {
+      image_url: item?.images?.jpg?.image_url ?? null,
+      large_image_url: item?.images?.jpg?.large_image_url ?? null,
+    },
+  },
+  broadcast: item?.broadcast?.time ? { time: item.broadcast.time } : null,
+});
