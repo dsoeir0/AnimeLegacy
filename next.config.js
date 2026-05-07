@@ -51,4 +51,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
-module.exports = withBundleAnalyzer(nextConfig);
+const { withSentryConfig } = require('@sentry/nextjs');
+
+module.exports = withSentryConfig(withBundleAnalyzer(nextConfig), {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  disableSourceMapUpload: !process.env.SENTRY_AUTH_TOKEN,
+  hideSourceMaps: true,
+});
