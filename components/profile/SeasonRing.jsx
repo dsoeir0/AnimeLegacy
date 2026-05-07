@@ -3,8 +3,6 @@ import { translate } from 'react-switch-lang';
 import Button from '../ui/Button';
 import styles from './profile.module.css';
 
-// SVG arc constants for a 34-radius stroke. Precomputed so we don't redo the
-// math on every render.
 const CIRCUMFERENCE = 2 * Math.PI * 34;
 
 function SeasonRing({ seasonLabel, progress, done, total, t }) {

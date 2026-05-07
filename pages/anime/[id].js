@@ -31,10 +31,6 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
     : [];
   const producers = Array.isArray(data.producers) ? data.producers : [];
   const posterUrl = getAnimeImageUrl(data, aniListMedia) || '/logo_no_text.png';
-  // AniList sometimes has a proper 1920x400 landscape banner. When it doesn't,
-  // `getAnimeBannerUrl` falls back to the vertical poster — which looks awful
-  // when stretched to fill a wide hero. Track which case we're in so the CSS
-  // can apply a heavy blur as a cinematic mask on the fallback path.
   const hasLandscapeBanner = Boolean(aniListMedia?.bannerImage);
   const backdropUrl = getAnimeBannerUrl(data, aniListMedia) || posterUrl;
   const trailerUrl = data?.trailer?.embed_url || '';
@@ -568,10 +564,6 @@ export async function getServerSideProps(context) {
   if (isHentaiAnime(animeResposta?.data)) {
     return { notFound: true };
   }
-  // Pull AniList cover + banner URLs separately. AniList has proper 1920x400
-  // landscape banner images that Jikan doesn't expose — without this the hero
-  // on /anime/[id] was stretching the vertical poster to fill the wide space
-  // and looking blurry. Cached at 6h per MAL ID.
   const aniListMap = await fetchAniListMediaByMalIds([Number(id)]);
   const aniListMedia = aniListMap[id] || null;
   return { props: { animeResposta, charactersResposta, aniListMedia } };

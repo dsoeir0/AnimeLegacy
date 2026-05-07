@@ -1,9 +1,6 @@
 import { translate } from 'react-switch-lang';
 import styles from './studios.module.css';
 
-// Page header with the eyebrow, split-gradient title, subtitle, and the
-// two page-wide stats (Studios / Productions). Purely presentational — all
-// state owned by pages/studios/index.js.
 function StudiosHeader({ totals, t }) {
   return (
     <header className={styles.head}>

@@ -8,9 +8,6 @@ import {
 } from '../../lib/constants';
 import styles from './AuthForms.module.css';
 
-// Shared helper: caller (AuthPage) converts the picked file to a data URL
-// before handing it to upsertUserProfile. Centralised so the size/type
-// validation stays in sync with the avatar helper text.
 export const fileToDataUrl = (file, t) =>
   new Promise((resolve, reject) => {
     if (!file) return resolve('');

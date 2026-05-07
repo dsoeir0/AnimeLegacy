@@ -9,8 +9,6 @@ import { WEEKDAY_KEYS, isSameCalendarDay, weekdayDates } from '../lib/utils/time
 import { bucketizeSchedule } from '../lib/utils/calendarSchedule';
 import styles from './calendar.module.css';
 
-// UI-facing day list (label keys for translation). Index matches
-// `WEEKDAY_KEYS` so day arrays stay in sync with bucketizing.
 const DAY_LABELS = WEEKDAY_KEYS.map((key) => ({
   key,
   labelKey: `calendar.days.${key}`,
@@ -21,8 +19,7 @@ function CalendarPage({ schedulesByDay, t }) {
   const [now, setNow] = useState(() => new Date());
   const [bucket, setBucket] = useState(null);
 
-  // SSR cannot know the viewer's timezone, so we rebucket on the client
-  // after hydration. Until then we render the timetable shell only.
+  // SSR can't know viewer TZ — rebucket client-side post-hydration.
   useEffect(() => {
     setNow(new Date());
     setBucket(bucketizeSchedule(schedulesByDay));

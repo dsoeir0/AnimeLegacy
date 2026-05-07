@@ -1,8 +1,5 @@
 import styles from './Skeleton.module.css';
 
-// Leverages the shimmering `.al-skeleton` utility defined in tokens.css.
-// Use `variant="poster"` for the common 2:3 anime poster aspect ratio,
-// or provide explicit `width` / `height` for custom sizes.
 export default function Skeleton({
   variant = 'block',
   width,

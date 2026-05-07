@@ -22,10 +22,6 @@ const withTimeout = (promise, ms, label) =>
     ),
   ]);
 
-// Encapsulates the whole edit flow: form state, avatar preview lifecycle,
-// the username-claim race, and the final upsert. The page only needs to
-// tell this component when to open/close and who the current user/profile
-// is — it takes over the rest.
 function EditProfileModal({
   user,
   profile,

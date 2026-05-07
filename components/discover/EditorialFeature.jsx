@@ -8,10 +8,7 @@ import styles from './discover.module.css';
 
 function EditorialFeature({ primary, secondary, t }) {
   if (!primary) return null;
-  // Only the AniList-enriched bannerImage fits this banner-shaped slot.
-  // Falling back to the MAL poster (225×320) here would force `object-fit:
-  // cover` to upscale a vertical poster into a wide hero — visually a heavy
-  // blur of one character's face.
+  // banner-shaped slot needs AniList bannerImage; MAL poster would upscale to a blurred face
   const primaryBanner = primary.banner || null;
   return (
     <div className={styles.editorial}>
@@ -20,9 +17,6 @@ function EditorialFeature({ primary, secondary, t }) {
         className={styles.editorialPrimary}
       >
         {primaryBanner ? (
-          // Force the 1920w variant on desktop. AniList banners are ~1900×400
-          // (4.75:1) cover-fitted into a 440px-tall hero, so smaller variants
-          // upscale ~2x vertically and look blurred.
           <Image
             src={primaryBanner}
             alt=""

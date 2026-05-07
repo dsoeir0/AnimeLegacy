@@ -47,8 +47,6 @@ function DiscoverPage({
   const [pendingEntry, setPendingEntry] = useState(null);
   const [inputValue, setInputValue] = useState(query || '');
 
-  // Keep the input in sync when navigation happens (user clicks a mood
-  // chip, clears via the filter chip, etc.).
   useEffect(() => {
     setInputValue(query || '');
   }, [query]);
@@ -118,7 +116,6 @@ function DiscoverPage({
       }
     >
       <div className={styles.page}>
-        {/* ───── Header ───── */}
         <header className={styles.head}>
           <div>
             <div className={styles.eyebrow}>
@@ -157,7 +154,6 @@ function DiscoverPage({
           </form>
         </header>
 
-        {/* Active filter chips */}
         {(query || activeGenre || activeMood) ? (
           <div className={styles.activeFilters}>
             <span className={styles.activeLabel}>
@@ -212,7 +208,6 @@ function DiscoverPage({
           </div>
         ) : null}
 
-        {/* ───── Results ───── */}
         {isSearchMode ? (
           items.length === 0 ? (
             <div className={styles.empty}>
@@ -279,7 +274,6 @@ function DiscoverPage({
             </>
           )
         ) : (
-          /* ───── Discover mode ───── */
           <>
             {editorial?.primary ? (
               <section className={styles.sectionTight}>
@@ -343,8 +337,6 @@ export async function getServerSideProps(context) {
   const genreId = Number.parseInt(genreIdRaw, 10);
   const moodId = typeof context.query?.mood === 'string' ? context.query.mood : null;
 
-  // Genres catalogue is cheap + stable — always fetched for the active-
-  // filter chip label lookup (and the discover-mode rail).
   const genresRes = await getAnimeGenres();
   const genres = (Array.isArray(genresRes?.data) ? genresRes.data : []).map((g) => ({
     mal_id: g.mal_id,
@@ -355,7 +347,6 @@ export async function getServerSideProps(context) {
     Number.isFinite(genreId) ? genres.find((g) => g.mal_id === genreId) || null : null;
   const activeMood = moodId ? findMood(moodId) : null;
 
-  // --- Results mode (query OR genre OR mood filter) ---
   const isResultsMode = Boolean(query || activeGenre || activeMood);
   if (isResultsMode) {
     let response;
@@ -393,15 +384,10 @@ export async function getServerSideProps(context) {
     };
   }
 
-  // --- Discover mode (no filters) ---
-  // One Jikan call feeds every block below — `buildDiscoverPayload`
-  // slices the top list into editorial/secondary/gems/vibePool/moods.
   const topRes = await getTopAnime('', 1);
   const topList = Array.isArray(topRes?.data) ? filterOutHentai(topRes.data) : [];
   const editorial = buildDiscoverPayload(topList);
 
-  // MAL posters are 225×320; AniList's bannerImage is 1920×500. Enrich the
-  // hero entries so cover-fit doesn't browser-upscale at large render sizes.
   const heroIds = [
     editorial.primary?.mal_id,
     ...(editorial.secondary || []).map((a) => a?.mal_id),
@@ -412,8 +398,6 @@ export async function getServerSideProps(context) {
     const aniListMap = await fetchAniListMediaByMalIds(heroIds);
     const enrich = (entry) => {
       if (!entry?.mal_id) return entry;
-      // bannerImage only — coverImage.extraLarge is a vertical poster and
-      // upscaling it via object-fit:cover gives the blurred-face artefact.
       const banner = aniListMap[entry.mal_id]?.bannerImage || null;
       return banner ? { ...entry, banner } : entry;
     };

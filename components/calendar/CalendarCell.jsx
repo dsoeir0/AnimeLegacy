@@ -3,10 +3,6 @@ import Link from 'next/link';
 import { getAnimeImageUrl } from '../../lib/utils/media';
 import styles from './calendar.module.css';
 
-// Compact schedule entry sitting inside a timetable hour slot.
-// 44px poster thumb + time + title clamped to 2 lines. A small dot in
-// the top-right marks entries that are in the user's list.
-
 function CalendarCell({ anime, broadcastTime, inList, localTime }) {
   const poster = getAnimeImageUrl(anime) || '/logo_no_text.png';
   const displayTime = localTime || broadcastTime;

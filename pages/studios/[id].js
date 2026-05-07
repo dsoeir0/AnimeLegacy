@@ -106,8 +106,6 @@ function StudioDetailPage({ producer, works, related, t }) {
   );
   const groupedWorks = useMemo(() => groupByYear(filteredWorks), [filteredWorks]);
 
-  // Aggregates are cheap — computed on each render rather than memoised.
-  // Studios rarely have more than ~24 anime in the fetched window.
   const mean = avgScore(works);
   const airing = countAiring(works);
   const upcoming = upcomingAnime(works).slice(0, 3);
@@ -153,7 +151,6 @@ function StudioDetailPage({ producer, works, related, t }) {
       description={t('studio.metaDescFallback', { name })}
     >
       <div className={styles.page}>
-        {/* ───── Hero ───── */}
         <section className={styles.hero}>
           {heroPoster ? (
             <Image
@@ -220,7 +217,6 @@ function StudioDetailPage({ producer, works, related, t }) {
           </div>
         </section>
 
-        {/* ───── KPI strip ───── */}
         <section className={styles.kpiStrip}>
           <Kpi label={t('studioPage.kpi.yearsActive')} value={yearsActive ?? '—'} unit={t('studioPage.kpi.yearsUnit')} />
           <Kpi label={t('studioPage.kpi.productions')} value={producer.count || 0} unit={t('studioPage.kpi.productionsUnit')} />
@@ -243,7 +239,6 @@ function StudioDetailPage({ producer, works, related, t }) {
           />
         </section>
 
-        {/* ───── Favorite toggle ───── */}
         <section className={styles.favoriteCard}>
           <div className={styles.favoriteLeft}>
             <div className={styles.favoriteTitle}>{t('studioPage.favoriteTitle')}</div>
@@ -267,9 +262,7 @@ function StudioDetailPage({ producer, works, related, t }) {
           </Button>
         </section>
 
-        {/* ───── Two columns ───── */}
         <section className={styles.cols}>
-          {/* LEFT — filmography timeline */}
           <div>
             <header className={styles.colHead}>
               <div>
@@ -396,7 +389,6 @@ function StudioDetailPage({ producer, works, related, t }) {
             )}
           </div>
 
-          {/* RIGHT — signature genres + score distribution */}
           <aside className={styles.side}>
             {genres.length ? (
               <div className={styles.sideBlock}>
@@ -493,7 +485,6 @@ function StudioDetailPage({ producer, works, related, t }) {
           </aside>
         </section>
 
-        {/* ───── Upcoming ───── */}
         {upcoming.length ? (
           <section className={styles.upcoming}>
             <header className={styles.colHead}>
@@ -548,7 +539,6 @@ function StudioDetailPage({ producer, works, related, t }) {
           </section>
         ) : null}
 
-        {/* ───── Related studios ───── */}
         {related.length ? (
           <section className={styles.related}>
             <header className={styles.colHead}>
@@ -619,9 +609,6 @@ export async function getServerSideProps(context) {
   const { id } = context.query;
   const producerId = Number(id);
 
-  // Kick off the main two fetches in parallel, plus the "related" page for
-  // the sidebar block at the bottom. Jikan caches at the TTL layer, so a
-  // page 1 list is usually instant on repeat views.
   const [producerRes, worksRes, relatedRes] = await Promise.all([
     getProducerById(id),
     getAnimeByProducer(id),
@@ -632,13 +619,9 @@ export async function getServerSideProps(context) {
     ? dedupeByMalId(filterOutHentai(worksRes.data))
     : [];
 
-  // Role filter: only include anime where THIS producer is in the
-  // `studios[]` list. Without this, a studio's catalogue page shows
-  // everything they licensed or co-produced, not just what they animated.
   const { matches: roleMatches } = classifyProducerRole(rawWorks, producerId);
   const works = roleMatches.length ? roleMatches : rawWorks;
 
-  // Related = top-favourited producers, excluding this one, capped at 4.
   const relatedCandidates = Array.isArray(relatedRes?.data) ? relatedRes.data : [];
   const related = relatedCandidates
     .filter((s) => Number(s?.mal_id) !== producerId)

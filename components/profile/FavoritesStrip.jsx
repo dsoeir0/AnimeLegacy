@@ -4,8 +4,6 @@ import { Heart, Star } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import styles from './profile.module.css';
 
-// Ranked grid of favorite anime. The page passes `limit` to trim for the
-// Overview tab (shows 6) and omits it for the full Favorites tab.
 function FavoritesStrip({ favorites, limit, t }) {
   const slice = typeof limit === 'number' ? favorites.slice(0, limit) : favorites;
   if (!slice.length) {

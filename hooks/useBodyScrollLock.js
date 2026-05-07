@@ -1,9 +1,6 @@
 import { useEffect } from 'react';
 
-// Locks page scroll while `active` is true. Reserves room for the missing
-// scrollbar so the page doesn't reflow when the lock engages/disengages.
-// Multiple concurrent consumers are refcounted via a module-level counter,
-// so the last modal to unmount is the one that restores the body style.
+// Refcounted; reserves the scrollbar gap to prevent reflow on lock/unlock.
 let lockCount = 0;
 let savedOverflow = '';
 let savedPaddingRight = '';

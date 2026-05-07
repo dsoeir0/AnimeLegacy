@@ -44,9 +44,6 @@ const nextConfig = {
   },
 };
 
-// Wrapped only when ANALYZE=true so it has zero effect on regular builds.
-// Run `pnpm analyze` to pop the treemap — per-page chunks, shared chunks,
-// and the node_modules breakdown all visualised side-by-side.
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });

@@ -20,9 +20,6 @@ import {
 } from '../../lib/utils/malImport';
 import styles from './mal.module.css';
 
-// Small helper to poke Firestore at a safe cadence. Each `addItem` fans out
-// to multiple writes (list doc + catalogue + user-anime + activity), so
-// we don't want to unleash thousands in a single tick.
 const IMPORT_CONCURRENCY = 3;
 
 async function runInBatches(items, size, worker, onTick) {
@@ -59,9 +56,6 @@ function MalImportPage({ t }) {
     if (isAuthResolved && !user) router.replace('/sign-in');
   }, [isAuthResolved, user, router]);
 
-  // One-shot self-heal for users who imported before the addedAt fix
-  // landed. Silently backfills the field on any list doc that's missing
-  // it so invisible entries resurface in /my-list without losing data.
   useEffect(() => {
     if (!user?.uid) return;
     let cancelled = false;
@@ -69,9 +63,7 @@ function MalImportPage({ t }) {
       try {
         const n = await healMissingAddedAt(user.uid);
         if (!cancelled && n > 0) setHealedCount(n);
-      } catch {
-        // non-fatal; user can re-import as a fallback
-      }
+      } catch {}
     })();
     return () => {
       cancelled = true;
@@ -93,8 +85,6 @@ function MalImportPage({ t }) {
     [fetchedItems, existingIds],
   );
 
-  // Snapshot character favourites once the user lands on the preview — we
-  // need their count + ids to plan the character-favourite import.
   useEffect(() => {
     if (step !== STEP_PREVIEW || !user?.uid) return;
     let cancelled = false;
@@ -103,8 +93,7 @@ function MalImportPage({ t }) {
         const ids = await listCharacterFavoriteIds(user.uid);
         if (!cancelled) setExistingCharFavIds(ids);
       } catch {
-        // non-fatal — without the snapshot we may re-write an existing fav,
-        // which is a no-op at the doc level but double-counts the aggregate
+        // missing snapshot may double-count the aggregate counter
       }
     })();
     return () => {
@@ -197,11 +186,7 @@ function MalImportPage({ t }) {
       async (payload) => {
         const isFav = favoritePlan.animeFavoriteIds.has(String(payload.anime.id));
         try {
-          // NOTE: do NOT pass `keepAddedAt: true` here. `useMyList` queries
-          // with `orderBy('addedAt', 'desc')` which excludes documents that
-          // don't have the field, so imports without `addedAt` become
-          // invisible to the my-list view (even though the data exists and
-          // shows up in profile aggregates). See incident 2026-04-23.
+          // do NOT keep addedAt — useMyList orderBy('addedAt') excludes docs missing it
           const ok = await addItem(payload.anime, {
             ...payload.options,
             ...(isFav ? { isFavorite: true } : {}),
@@ -219,11 +204,7 @@ function MalImportPage({ t }) {
       (done) => setProgress(done),
     );
 
-    // Character favourites write path. Shared with the character-page
-    // favourite toggle via lib/services/favoriteCharacters.js so both
-    // places stay in lock-step on the "write user doc + bump aggregate"
-    // invariant. Sequential, not parallel — keeps the aggregate counter
-    // write order predictable if two deltas hit the same document.
+    // sequential keeps the aggregate counter write order predictable
     let charFavsImported = 0;
     let charFavsFailed = 0;
     if (favoritePlan.characters.length && user?.uid) {

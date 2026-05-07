@@ -5,11 +5,8 @@ import { X } from 'lucide-react';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 import styles from './Modal.module.css';
 
-// Portal-rendered modal shell. Handles body scroll lock, ESC-to-close,
-// backdrop click to close, and initial focus on the close button. Portals
-// to `document.body` so no ancestor's `transform`/`filter` can trap the
-// fixed-positioning (the `<main>` wrapper has a lingering `translateY(0)`
-// from the `al-rise` animation that would otherwise capture the modal).
+// Portals to body — `<main>` has a lingering `al-rise` transform that would otherwise
+// capture position:fixed.
 function Modal({
   open,
   onClose,
@@ -39,7 +36,6 @@ function Modal({
 
   useEffect(() => {
     if (!open) return;
-    // defer so the portal node exists before we try to focus
     const id = window.requestAnimationFrame(() => closeRef.current?.focus());
     return () => window.cancelAnimationFrame(id);
   }, [open]);

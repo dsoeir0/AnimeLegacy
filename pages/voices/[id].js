@@ -35,8 +35,6 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
   const [showAllRoles, setShowAllRoles] = useState(false);
   const { user } = useAuth();
 
-  // Hook calls before any early return — rules of hooks. We feed empty
-  // fallbacks when there's no person so the hook becomes a no-op.
   const currentLang =
     typeof getLanguage === 'function' ? getLanguage() : 'en';
   const { text: translatedAbout } = useTranslatedText({

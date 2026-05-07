@@ -1,9 +1,6 @@
 import { translate } from 'react-switch-lang';
 import styles from './AuthForms.module.css';
 
-// Inline SVG for the Google logo so we don't pull a 3rd-party asset just
-// for one button. Colours are Google's brand palette — the only place in
-// the project where we hardcode specific brand hex values.
 const GoogleLogo = () => (
   <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
     <path

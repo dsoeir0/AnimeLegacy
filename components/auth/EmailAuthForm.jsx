@@ -5,9 +5,6 @@ import Button from '../ui/Button';
 import { PASSWORD_RULES } from '../../lib/constants';
 import styles from './AuthForms.module.css';
 
-// The email+password (+confirm for signup) form. Validation state is owned
-// by AuthPage — this component is presentational so the page can decide
-// when to show errors (onBlur) and when to clear them (mode toggle).
 function EmailAuthForm({
   mode,
   email,

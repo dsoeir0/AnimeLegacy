@@ -8,16 +8,7 @@ import useAuth from '../../hooks/useAuth';
 import { getFirebaseClient } from '../../lib/firebase/client';
 import styles from './profile.module.css';
 
-// Delete-account danger zone inside the profile edit modal. Two-step:
-// 1. Click "Delete account" → confirmation pane expands with a typed check
-// 2. User types their exact username → the final red button activates
-//
-// Behaviour of /api/delete-account:
-//   - 200: full auto-delete succeeded → sign out + redirect home
-//   - 503 { fallback: '/privacy' }: Admin SDK not configured → show a note
-//       pointing the user to the manual email flow
-//   - other: surface the error message in red
-
+// 503 from /api/delete-account means Admin SDK not configured — show manual fallback.
 function DangerZone({ username, onClosed, t }) {
   const router = useRouter();
   const { signOutUser } = useAuth();
@@ -57,8 +48,6 @@ function DangerZone({ username, onClosed, t }) {
         setError(payload.error || t('profile.danger.failed'));
         return;
       }
-      // Success. Sign out locally (the Auth user is already gone server-side)
-      // and take them back to the home page.
       await signOutUser();
       if (onClosed) onClosed();
       router.replace('/');

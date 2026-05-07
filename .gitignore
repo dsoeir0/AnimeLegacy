@@ -51,3 +51,6 @@ next-env.d.ts
 # Claude Code local session data
 .claude/
 CLAUDE.md
+
+# Local-only operator notes (planning / roadmap)
+docs/improvements.md

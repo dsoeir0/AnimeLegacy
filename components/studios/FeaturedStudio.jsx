@@ -25,10 +25,6 @@ const shortenBio = (about, max = 320) => {
   return `${sliced.slice(0, cut > 120 ? cut : max)}…`;
 };
 
-// Hero-style block for the most-favourited animation studio on the page.
-// Shows identity (logo + name + founded year), a truncated bio, three
-// stats (Productions / Years active / Score avg of portfolio), two CTAs,
-// and a portfolio strip of the studio's top-scored anime.
 function FeaturedStudio({ studio, portfolio, t }) {
   if (!studio) return null;
 

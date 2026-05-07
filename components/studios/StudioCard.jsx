@@ -24,9 +24,6 @@ const shortenBio = (about, max = 150) => {
   return `${sliced.slice(0, cut > 80 ? cut : max)}…`;
 };
 
-// Grid card for a single studio. Receives its posters via props — the
-// parent page batches the fetches in a rate-limit-respecting sweep to
-// avoid hammering Jikan's 3 req/s limit.
 function StudioCard({ studio, posters, postersLoading, t }) {
   const name = pickStudioName(studio);
   const accent = accentForStudio(studio.mal_id);

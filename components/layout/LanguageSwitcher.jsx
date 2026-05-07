@@ -9,7 +9,6 @@ function LanguageSwitcher({ t }) {
   const [currentLang, setCurrentLang] = useState(DEFAULT_LANGUAGE);
   const rootRef = useRef(null);
 
-  // Sync with react-switch-lang on mount (after localStorage restore in _app.js runs).
   useEffect(() => {
     const active = typeof getLanguage === 'function' ? getLanguage() : DEFAULT_LANGUAGE;
     if (active && SUPPORTED_LANGUAGES.includes(active)) {
@@ -17,7 +16,6 @@ function LanguageSwitcher({ t }) {
     }
   }, []);
 
-  // Close on outside click.
   useEffect(() => {
     if (!open) return undefined;
     const handlePointerDown = (event) => {

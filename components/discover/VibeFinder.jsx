@@ -14,8 +14,6 @@ function VibeFinder({ pool, t }) {
   const target = { pace, tone, length };
   const matches = useMemo(
     () => (pool?.length ? rankByVibe(pool, target, 4) : []),
-    // Intentionally not memoising on `target` object identity — primitives
-    // cover the dep.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pool, pace, tone, length],
   );

@@ -5,9 +5,6 @@ import { translate } from 'react-switch-lang';
 import Button from './ui/Button';
 import styles from './ErrorBoundary.module.css';
 
-// Note: this component catches rendering errors. If translation setup itself
-// is broken, t() will return the key literal — a readable degradation. We
-// accept that over a hard crash.
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);

@@ -4,9 +4,7 @@ import Skeleton from '../ui/Skeleton';
 import { isAiringAnime } from '../../lib/utils/anime';
 import styles from './profile.module.css';
 
-// The "watching" status for airing shows is reconstructed from the completed
-// flag (we auto-downgrade), so surface both counts here. Kept as the KPI
-// owner's responsibility so the profile page doesn't hand-roll stats.
+// airing shows can't be "completed" — auto-downgrade
 const normalizeWatchingStatus = (item) =>
   isAiringAnime(item) && item?.status === 'completed' ? 'watching' : item?.status;
 

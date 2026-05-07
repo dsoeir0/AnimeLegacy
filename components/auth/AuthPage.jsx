@@ -151,8 +151,7 @@ function AuthPage({ initialMode = 'signin', t }) {
       }
     } catch (err) {
       setError(formatAuthError(err, t));
-      // If signup succeeded at the Auth layer but the follow-up setup failed,
-      // roll back the half-created Firebase user so they can retry from scratch.
+      // roll back half-created user if signup post-setup failed
       if (mode === 'signup') {
         const { auth } = getFirebaseClient();
         if (auth?.currentUser) {

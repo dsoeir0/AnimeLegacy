@@ -3,20 +3,6 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { getFirebaseClient } from '../lib/firebase/client';
 import { SUPPORTED_TARGETS } from '../lib/services/mymemory';
 
-// Generic text-translation hook. Used for anime synopses, character
-// biographies, and voice-actor biographies — anywhere a chunk of English
-// text needs to be shown translated when the user's language isn't English.
-//
-// Three-layer cache:
-//   1. sessionCache — module-level Map. Survives strict-mode double-effect,
-//      HMR re-renders, and intra-tab navigation. Anonymous users benefit
-//      most here since they can't write to Firestore.
-//   2. inflight — module-level Map<key, Promise>. Dedupes concurrent fetches
-//      for the same key (two mounts at once share one POST).
-//   3. Firestore at `{cacheCollection}/{docId}.{cacheField}.{lang}`. Shared
-//      across sessions and users. Requires auth to write; reads are public.
-//      Rules for each allowed collection must mirror the `anime/{id}` rule.
-
 const sessionCache = new Map();
 const inflight = new Map();
 
@@ -69,7 +55,7 @@ export default function useTranslatedText({
             return cached;
           }
         } catch {
-          // Fall through to live translation on any read failure.
+          // fall through to live translation
         }
       }
 
@@ -93,7 +79,7 @@ export default function useTranslatedText({
             { merge: true },
           );
         } catch {
-          // Anonymous user or rules rejected the write — sessionCache still covers us.
+          // sessionCache still covers anon users
         }
       }
 
@@ -116,7 +102,7 @@ export default function useTranslatedText({
         sessionCache.set(key, translated);
         setText(translated);
       } catch {
-        // Keep English fallback.
+        // keep English fallback
       } finally {
         if (!cancelled) setLoading(false);
       }

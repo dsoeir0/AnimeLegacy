@@ -83,13 +83,6 @@ function MyList({ t }) {
     if (!user) router.replace('/sign-in');
   }, [authLoading, router, user]);
 
-  // Self-heal for the addedAt bug shipped in the first MAL import. Docs
-  // that were written without `addedAt` are invisible to the
-  // orderBy('addedAt') query in useMyList. Running this on /my-list mount
-  // guarantees recovery even for users who don't revisit /import/mal.
-  // Idempotent — only writes to docs that are actually missing the field.
-  // The onSnapshot subscription in useMyList picks up the heal in
-  // real-time, so rows appear without a page refresh.
   useEffect(() => {
     if (!user?.uid) return;
     let cancelled = false;
@@ -97,9 +90,7 @@ function MyList({ t }) {
       try {
         await healMissingAddedAt(user.uid);
         if (cancelled) return;
-      } catch {
-        // non-fatal; the list query still works for non-broken docs
-      }
+      } catch {}
     })();
     return () => {
       cancelled = true;
@@ -118,9 +109,6 @@ function MyList({ t }) {
   const isAiringNow = (detail, item) => {
     const animeId = String(item?.id ?? detail?.animeId ?? '');
     const catalog = catalogById.get(animeId);
-    // Field-fallback priority: list item first (most current user-side data),
-    // then detail (status doc), then the catalog snapshot — matches what the
-    // inline heuristic used before being lifted to lib/utils/anime.js.
     return isAiringWithSeasonHeuristic([item, detail, catalog], {
       currentSeason,
       currentYear,

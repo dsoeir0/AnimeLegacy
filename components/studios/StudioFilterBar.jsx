@@ -2,10 +2,6 @@ import { Search, X } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import styles from './studios.module.css';
 
-// Filter chip row for the studios grid — 4 filters based on founding year
-// bands (defined in pages/studios/index.js), a text search input that
-// filters by studio name within the current page, and a "N SHOWN" count.
-// All state is owned by the parent page; this is pure presentation.
 function StudioFilterBar({
   filter,
   onFilterChange,

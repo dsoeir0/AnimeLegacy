@@ -1,9 +1,6 @@
 import { translate } from 'react-switch-lang';
 import styles from './StatusBadge.module.css';
 
-// Note: labels are keys into the translation dictionary; the `label` property
-// stays on STATUS_META for backwards compatibility where other code reads it
-// directly (e.g. inline meta strings), but the rendered component uses t().
 export const STATUS_META = {
   watching: { labelKey: 'status.watching', label: 'Watching', color: 'var(--al-status-watching)', bg: 'rgba(132,217,255,0.12)' },
   completed: { labelKey: 'status.completed', label: 'Completed', color: 'var(--al-status-completed)', bg: 'rgba(61,214,140,0.12)' },

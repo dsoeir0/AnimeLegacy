@@ -2,10 +2,6 @@ import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import styles from './discover.module.css';
 
-// Clickable genre chips. Each links to /search?genre={id} which filters
-// the Jikan anime search by that genre — see pages/search.js for the
-// receiving side. Counts come straight from Jikan's /genres/anime
-// response (so they reflect the real catalogue, not a mock).
 function GenreRail({ genres, t }) {
   if (!Array.isArray(genres) || genres.length === 0) return null;
   return (

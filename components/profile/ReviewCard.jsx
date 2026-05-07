@@ -4,7 +4,6 @@ import { translate } from 'react-switch-lang';
 import { formatRelativeTime } from '../../lib/utils/time';
 import styles from './profile.module.css';
 
-// Ring colour: rating ≥4 → warm (default), =3 → neutral mid, <3 → danger.
 const ringClass = (rating, styles) => {
   if (rating === null) return styles.reviewScoreMid;
   if (rating >= 4) return '';

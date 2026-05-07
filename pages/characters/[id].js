@@ -70,10 +70,6 @@ function CharacterPage({
     });
   }, [voicesRaw]);
   const imageUrl = getCharacterImageUrl(character) || '/logo_no_text.png';
-  // Translate the raw `about` string first (single round-trip to MyMemory
-  // regardless of how many paragraphs), then split into lines for render.
-  // Structured fields like "Gender: Male" / "Age: 24" survive translation
-  // cleanly because the labels are recognisable in any language.
   const currentLang =
     typeof getLanguage === 'function' ? getLanguage() : 'en';
   const { text: translatedAbout } = useTranslatedText({
