@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
   let uid;
   try {
-    const decoded = await auth.verifyIdToken(idToken);
+    const decoded = await auth.verifyIdToken(idToken, true);
     uid = decoded.uid;
   } catch {
     return res.status(401).json({ error: 'Invalid token' });
@@ -57,6 +57,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true });
   } catch (err) {
-    return res.status(500).json({ error: err?.message || 'Deletion failed' });
+    console.error('delete-account failed:', err);
+    return res.status(500).json({ error: 'Deletion failed' });
   }
 }
