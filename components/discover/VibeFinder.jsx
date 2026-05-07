@@ -9,13 +9,13 @@ import styles from './discover.module.css';
 function VibeFinder({ pool, t }) {
   const [pace, setPace] = useState(35);
   const [tone, setTone] = useState(50);
-  const [length, setLength] = useState(60);
+  const [world, setWorld] = useState(50);
 
-  const target = { pace, tone, length };
+  const target = { pace, tone, world };
   const matches = useMemo(
     () => (pool?.length ? rankByVibe(pool, target, 4) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pool, pace, tone, length],
+    [pool, pace, tone, world],
   );
 
   const renderSlider = (label, leftLabel, rightLabel, value, setValue) => (
@@ -68,11 +68,11 @@ function VibeFinder({ pool, t }) {
             setTone,
           )}
           {renderSlider(
-            t('discoverPage.vibe.length'),
-            t('discoverPage.vibe.lengthLeft'),
-            t('discoverPage.vibe.lengthRight'),
-            length,
-            setLength,
+            t('discoverPage.vibe.world'),
+            t('discoverPage.vibe.worldLeft'),
+            t('discoverPage.vibe.worldRight'),
+            world,
+            setWorld,
           )}
           <div className={styles.vibeHint}>{t('discoverPage.vibe.hint')}</div>
         </div>

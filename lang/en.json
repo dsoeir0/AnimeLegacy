@@ -496,6 +496,7 @@
     "moods": {
       "eyebrow": "BROWSE BY MOOD",
       "heading": "What are you in the mood for?",
+      "shuffle": "Shuffle",
       "slow": {
         "label": "Slow burns",
         "sub": "Patience rewarded"
@@ -519,6 +520,30 @@
       "ensemble": {
         "label": "Great ensembles",
         "sub": "Casts you move in with"
+      },
+      "firstLove": {
+        "label": "First love",
+        "sub": "Hearts on the line"
+      },
+      "mystery": {
+        "label": "Cold cases",
+        "sub": "Bring the magnifying glass"
+      },
+      "scifi": {
+        "label": "Future shock",
+        "sub": "Tomorrow's headlines"
+      },
+      "sports": {
+        "label": "All sweat, all heart",
+        "sub": "Sport as story"
+      },
+      "supernatural": {
+        "label": "Things that lurk",
+        "sub": "Come at your own risk"
+      },
+      "mecha": {
+        "label": "Giant steel",
+        "sub": "Cockpit drama, big stakes"
       }
     },
     "vibe": {
@@ -530,9 +555,9 @@
       "tone": "TONE",
       "toneLeft": "Hopeful",
       "toneRight": "Bleak",
-      "length": "LENGTH",
-      "lengthLeft": "Tight",
-      "lengthRight": "Sprawling",
+      "world": "WORLD",
+      "worldLeft": "Grounded",
+      "worldRight": "Fantastical",
       "hint": "Three dials, a small corner of taste space. Ranked by proximity — no popularity tiebreaks.",
       "matchesEyebrow": "TOP 4 MATCHES",
       "matchLabel": "MATCH"
@@ -544,6 +569,59 @@
     "genres": {
       "eyebrow": "ALL GENRES",
       "heading": "Pick a thread, follow it."
+    },
+    "airingThisWeek": {
+      "eyebrow": "AIRING THIS WEEK",
+      "heading": "What's coming, and when.",
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "becauseYouLiked": {
+      "eyebrow": "BECAUSE YOU'RE WATCHING",
+      "headingPrefix": "If ",
+      "headingSuffix": " lived there, these moved in next door.",
+      "shuffle": "Try another"
+    },
+    "surprise": {
+      "eyebrow": "CAN'T DECIDE? · ROLL THE DICE",
+      "headingPrefix": "Tonight's pick, ",
+      "headingAccent": "chosen for you",
+      "headingSuffix": ".",
+      "body": "No filters, no algorithm — just one anime, weighted by editorial taste and a small amount of chaos.",
+      "cta": "Surprise me",
+      "ctaRolling": "Rolling…",
+      "historyEyebrow": "THE DICE ROLLED"
+    },
+    "filter": {
+      "eyebrowMood": "MOOD · {count} TITLES",
+      "eyebrowGenre": "GENRE · {count} TITLES",
+      "sortTop": "Top rated",
+      "sortNew": "Newest",
+      "sortAz": "A→Z",
+      "viewGrid": "Grid view",
+      "viewList": "List view",
+      "clear": "Clear filter",
+      "sortPopular": "Popular",
+      "typeLabel": "TYPE",
+      "typeAny": "Any",
+      "type_tv": "TV",
+      "type_movie": "Movie",
+      "type_ova": "OVA",
+      "type_special": "Special",
+      "type_ona": "ONA",
+      "statusLabel": "STATUS",
+      "statusAny": "Any",
+      "status_airing": "Currently airing",
+      "status_complete": "Finished",
+      "decadeLabel": "DECADE",
+      "decadeAny": "Any",
+      "decade_2020": "2020s",
+      "decade_2010": "2010s",
+      "decade_2000": "2000s",
+      "decade_pre2000": "Pre-2000",
+      "minScoreLabel": "SCORE",
+      "minScoreAny": "Any",
+      "minScoreValue": "{n}+"
     }
   },
   "anime": {

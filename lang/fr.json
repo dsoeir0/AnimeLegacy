@@ -479,10 +479,10 @@
     "metaTitle": "AnimeLegacy · Découvrir",
     "metaDesc": "Les sélections sélectionnées, les collections axées sur l'humeur et un cadran vibré pour savoir quand « que dois-je regarder ? » n'ont pas un bon mot-clé.",
     "eyebrow": "EN SAVOIR PLUS",
-    "headingPrefix": "Errer, ne pas",
-    "headingAccent": "Recherche",
-    "headingSuffix": "2 cuillerées à café de rhum, de liqueur de café ou de cognac (facultatif)",
-    "subtitle": "Les sélections sélectionnées, les collections axées sur l'humeur et un cadran vibré pour savoir quand « que dois-je regarder ? » n'ont pas un bon mot-clé.",
+    "headingPrefix": "Erre, ne",
+    "headingAccent": "cherche pas",
+    "headingSuffix": ".",
+    "subtitle": "Sélection éditoriale, collections par humeur et un cadran de vibe pour quand « que regarder ? » n'a pas de bon mot-clé.",
     "searchPlaceholder": "Titre, studio, genre…",
     "searchLabel": "Recherche d'anime par titre, studio ou genre",
     "activeLabel": "ACTIF",
@@ -495,47 +495,72 @@
     },
     "moods": {
       "eyebrow": "PARCOURIR PAR HUMEUR",
-      "heading": "Pourquoi es-tu d'humeur ?",
+      "heading": "De quelle humeur êtes-vous ?",
       "slow": {
-        "label": "Brûlures lentes",
+        "label": "Lents et profonds",
         "sub": "Patience récompensée"
       },
       "cry": {
         "label": "Films à pleurer",
-        "sub": "Laisser le temps de s'asseoir avec"
+        "sub": "Réserve du temps pour les digérer"
       },
       "adrenaline": {
-        "label": "Pure adrénaline.",
-        "sub": "Rien de silencieux à ce sujet"
+        "label": "Pure adrénaline",
+        "sub": "Rien de calme ici"
       },
       "cozy": {
-        "label": "Dimanche après-midi",
-        "sub": "Montres confort"
+        "label": "Dimanches après-midi",
+        "sub": "À regarder peinard"
       },
       "headtrip": {
-        "label": "Head-trips",
-        "sub": "Venez pour l'étrangeté"
+        "label": "Voyages mentaux",
+        "sub": "Viens pour l'étrangeté"
       },
       "ensemble": {
-        "label": "Grands ensembles",
-        "sub": "Permet d'emménager avec"
-      }
+        "label": "Grands castings",
+        "sub": "Castings avec qui on vit"
+      },
+      "firstLove": {
+        "label": "Premiers amours",
+        "sub": "Le cœur à découvert"
+      },
+      "mystery": {
+        "label": "Affaires non résolues",
+        "sub": "Apporte la loupe"
+      },
+      "scifi": {
+        "label": "Choc du futur",
+        "sub": "Demain, en détail"
+      },
+      "sports": {
+        "label": "Tout en sueur",
+        "sub": "Le sport comme récit"
+      },
+      "supernatural": {
+        "label": "Ce qui rôde",
+        "sub": "À tes risques et périls"
+      },
+      "mecha": {
+        "label": "Acier géant",
+        "sub": "Drame en cabine"
+      },
+      "shuffle": "Mélanger"
     },
     "vibe": {
       "eyebrow": "VIBE FINDER · EXPÉRIMENTAL",
-      "heading": "Composez-le.",
-      "pace": "PACE",
+      "heading": "Réglez-le.",
+      "pace": "RYTHME",
       "paceLeft": "Serein",
       "paceRight": "Chaotique",
       "tone": "TONALITÉ",
       "toneLeft": "Optimiste",
       "toneRight": "Morne",
-      "length": "Long en bouche",
-      "lengthLeft": "Tendu",
-      "lengthRight": "tentaculaire",
-      "hint": "Trois cadrans, un petit coin d'espace gustatif. Classé par proximité — pas de tiebreaks de popularité.",
-      "matchesEyebrow": "TOP 4 DES CORRESPONDANCES",
-      "matchLabel": "MATCH"
+      "world": "MONDE",
+      "worldLeft": "Réaliste",
+      "worldRight": "Fantastique",
+      "hint": "Trois cadrans, un petit coin d'espace du goût. Classé par proximité — pas de départages par popularité.",
+      "matchesEyebrow": "TOP 4 CORRESPONDANCES",
+      "matchLabel": "AFFINITÉ"
     },
     "gems": {
       "eyebrow": "GEMS CACHÉS · SCORE ÉLEVÉ, MOINS REGARDÉ",
@@ -544,6 +569,59 @@
     "genres": {
       "eyebrow": "... dans tous les secteurs d’activités :",
       "heading": "Choisissez un fil de discussion, suivez-le."
+    },
+    "airingThisWeek": {
+      "eyebrow": "DIFFUSION CETTE SEMAINE",
+      "heading": "Ce qui s'en vient et quand.",
+      "today": "Aujourd’hui",
+      "tomorrow": "Demain"
+    },
+    "becauseYouLiked": {
+      "eyebrow": "PARCE QUE VOUS REGARDEZ",
+      "headingPrefix": "Si",
+      "headingSuffix": "vivaient là, ils ont emménagé dans la porte d'à côté.",
+      "shuffle": "Une autre"
+    },
+    "surprise": {
+      "eyebrow": "NE PEUT PAS DÉCIDER ? · LANCER LES DÉS",
+      "headingPrefix": "Le choix de ce soir,",
+      "headingAccent": "Sélectionné pour vous",
+      "headingSuffix": "Des",
+      "body": "Pas de filtres, pas d'algorithme — juste un anime, pondéré par le goût éditorial et une petite quantité de chaos.",
+      "cta": "Surprend moi.",
+      "ctaRolling": "Roulant",
+      "historyEyebrow": "LES DÉS ONT ROULÉ"
+    },
+    "filter": {
+      "eyebrowMood": "HUMEUR · {count} TITRES",
+      "eyebrowGenre": "GENRE · {count} TITRES",
+      "sortTop": "Meilleures notes",
+      "sortNew": "Plus récents",
+      "sortAz": "A→Z",
+      "viewGrid": "Vue grille",
+      "viewList": "Vue liste",
+      "clear": "Retirer le filtre",
+      "sortPopular": "Populaires",
+      "typeLabel": "TYPE",
+      "typeAny": "Tous",
+      "type_tv": "TV",
+      "type_movie": "Film",
+      "type_ova": "OVA",
+      "type_special": "Spécial",
+      "type_ona": "ONA",
+      "statusLabel": "STATUT",
+      "statusAny": "Tous",
+      "status_airing": "En cours",
+      "status_complete": "Terminés",
+      "decadeLabel": "DÉCENNIE",
+      "decadeAny": "Toutes",
+      "decade_2020": "2020s",
+      "decade_2010": "2010s",
+      "decade_2000": "2000s",
+      "decade_pre2000": "Avant 2000",
+      "minScoreLabel": "NOTE",
+      "minScoreAny": "Toutes",
+      "minScoreValue": "{n}+"
     }
   },
   "anime": {

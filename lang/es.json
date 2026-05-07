@@ -480,9 +480,9 @@
     "metaDesc": "Selecciones seleccionadas, colecciones basadas en el estado de ánimo y un dial de vibración para cuando \"¿qué debo ver?\" no tiene una buena palabra clave.",
     "eyebrow": "DESCUBRE ",
     "headingPrefix": "Pasea, no",
-    "headingAccent": "Buscar",
-    "headingSuffix": "<g id=\"1\">Rwort» JS«0* (13)</g>",
-    "subtitle": "Selecciones seleccionadas, colecciones basadas en el estado de ánimo y un dial de vibración para cuando \"¿qué debo ver?\" no tiene una buena palabra clave.",
+    "headingAccent": "busques",
+    "headingSuffix": ".",
+    "subtitle": "Selección curada, colecciones por estado de ánimo y un dial de vibe para cuando «¿qué veo hoy?» no tiene una buena palabra clave.",
     "searchPlaceholder": "Título, estudio, género...",
     "searchLabel": "Busca anime por título, estudio o género",
     "activeLabel": "ACTIVO",
@@ -494,48 +494,73 @@
       "secondaryEyebrowB": "niveles bajos"
     },
     "moods": {
-      "eyebrow": "NAVEGA POR ESTADO DE ÁNIMO",
-      "heading": "Entonces, ¿qué te apetece?",
+      "eyebrow": "EXPLORAR POR ESTADO DE ÁNIMO",
+      "heading": "¿Qué te apetece?",
+      "shuffle": "Barajar",
       "slow": {
-        "label": "Quemaduras lentas",
-        "sub": "PACIENCIA RECOMPENSADA"
+        "label": "Lentas y densas",
+        "sub": "Paciencia recompensada"
       },
       "cry": {
         "label": "Películas para llorar",
-        "sub": "Deja tiempo para sentarte con él"
+        "sub": "Reserva tiempo para digerirlo"
       },
       "adrenaline": {
-        "label": "Carretera Dash",
-        "sub": "Nada tranquilo al respecto"
+        "label": "Adrenalina pura",
+        "sub": "Nada tranquilo aquí"
       },
       "cozy": {
         "label": "Domingos por la tarde",
-        "sub": "Relojes de confort"
+        "sub": "Para ver tranquilo"
       },
       "headtrip": {
-        "label": "Head-trips",
-        "sub": "Ven por la extrañeza"
+        "label": "Viajes mentales",
+        "sub": "Ven por la rareza"
       },
       "ensemble": {
-        "label": "Grandes conjuntos",
-        "sub": "Yesos con los que te mudas"
+        "label": "Grandes repartos",
+        "sub": "Repartos con los que convives"
+      },
+      "firstLove": {
+        "label": "Primeros amores",
+        "sub": "Corazón en la mano"
+      },
+      "mystery": {
+        "label": "Casos sin resolver",
+        "sub": "Trae la lupa"
+      },
+      "scifi": {
+        "label": "Choque futuro",
+        "sub": "Mañana, en detalle"
+      },
+      "sports": {
+        "label": "Todo sudor, todo corazón",
+        "sub": "El deporte como historia"
+      },
+      "supernatural": {
+        "label": "Cosas que acechan",
+        "sub": "Por tu cuenta y riesgo"
+      },
+      "mecha": {
+        "label": "Acero gigante",
+        "sub": "Drama de cabina"
       }
     },
     "vibe": {
       "eyebrow": "VIBE FINDER · EXPERIMENTAL",
-      "heading": "Marcarlo.",
+      "heading": "Sintonízalo.",
       "pace": "RITMO",
-      "paceLeft": "Serene",
-      "paceRight": "Caótica",
+      "paceLeft": "Sereno",
+      "paceRight": "Caótico",
       "tone": "TONO",
       "toneLeft": "Esperanzado",
-      "toneRight": "Desolador",
-      "length": "DURACIÓN",
-      "lengthLeft": "Reducido",
-      "lengthRight": "Expansión",
-      "hint": "Tres esferas, un pequeño rincón de espacio para degustar. Clasificado por proximidad — sin desempates de popularidad.",
-      "matchesEyebrow": "LOS 4 MEJORES PARTIDOS",
-      "matchLabel": "COINCIDEN "
+      "toneRight": "Sombrío",
+      "world": "MUNDO",
+      "worldLeft": "Realista",
+      "worldRight": "Fantástico",
+      "hint": "Tres diales, un pequeño rincón del espacio del gusto. Ordenado por proximidad — sin desempates por popularidad.",
+      "matchesEyebrow": "TOP 4 COINCIDENCIAS",
+      "matchLabel": "AFINIDAD"
     },
     "gems": {
       "eyebrow": "GEMAS OCULTAS · PUNTUACIÓN ALTA, MENOS VISTAS",
@@ -544,6 +569,59 @@
     "genres": {
       "eyebrow": "Todos los Géneros",
       "heading": "Elige un hilo, síguelo."
+    },
+    "airingThisWeek": {
+      "eyebrow": "EN EMISIÓN ESTA SEMANA",
+      "heading": "Lo que viene, y cuándo.",
+      "today": "Hoy",
+      "tomorrow": "Mañana"
+    },
+    "becauseYouLiked": {
+      "eyebrow": "PORQUE ESTÁS VIENDO",
+      "headingPrefix": "De ser",
+      "headingSuffix": "vivían allí, estos se mudaron al lado.",
+      "shuffle": "Otra"
+    },
+    "surprise": {
+      "eyebrow": "¿NO PUEDE DECIDIR? · TIRAR LOS DADOS",
+      "headingPrefix": "La selección de esta noche,",
+      "headingAccent": "elegido para ti",
+      "headingSuffix": "<g id=\"1\">Rwort» JS«0* (13)</g>",
+      "body": "Sin filtros, sin algoritmos, solo un anime, ponderado por el gusto editorial y una pequeña cantidad de caos.",
+      "cta": "Me Sorprende",
+      "ctaRolling": "Laminación",
+      "historyEyebrow": "LOS DADOS TIRADOS"
+    },
+    "filter": {
+      "eyebrowMood": "ESTADO DE ÁNIMO · {count} TÍTULOS",
+      "eyebrowGenre": "GÉNERO · {count} TÍTULOS",
+      "sortTop": "Mejor valorados",
+      "sortNew": "Más recientes",
+      "sortAz": "A→Z",
+      "viewGrid": "Vista de cuadrícula",
+      "viewList": "Vista de lista",
+      "clear": "Quitar filtro",
+      "sortPopular": "Populares",
+      "typeLabel": "TIPO",
+      "typeAny": "Todos",
+      "type_tv": "TV",
+      "type_movie": "Película",
+      "type_ova": "OVA",
+      "type_special": "Especial",
+      "type_ona": "ONA",
+      "statusLabel": "ESTADO",
+      "statusAny": "Todos",
+      "status_airing": "En emisión",
+      "status_complete": "Terminados",
+      "decadeLabel": "DÉCADA",
+      "decadeAny": "Todas",
+      "decade_2020": "2020s",
+      "decade_2010": "2010s",
+      "decade_2000": "2000s",
+      "decade_pre2000": "Antes de 2000",
+      "minScoreLabel": "PUNT.",
+      "minScoreAny": "Todas",
+      "minScoreValue": "{n}+"
     }
   },
   "anime": {

@@ -230,7 +230,7 @@
     "statsCompleted": "concluídos",
     "statsWatched": "vistos",
     "statsMeanScore": "nota média",
-    "subtitleDefault": "Gira e acompanhe o seu percurso em anime em todos os formatos.",
+    "subtitleDefault": "Gere e acompanhe o seu percurso em anime em todos os formatos.",
     "tabs": {
       "all": "Todos",
       "watching": "A ver",
@@ -254,7 +254,7 @@
       "eyebrow": "IMPORTAR · MYANIMELIST",
       "titleStart": "Traga a sua",
       "titleEnd": "lista do MAL",
-      "subtitle": "Escreva o seu username do MyAnimeList e nós tratamos de puxar a lista. O seu perfil do MAL tem de ser público para isto funcionar.",
+      "subtitle": "Escreva o seu username do MyAnimeList e nós tratamos de obter a lista. O seu perfil do MAL tem de ser público para isto funcionar.",
       "healed": "Recuperadas {n} entradas de uma importação anterior que não estavam a aparecer na sua lista.",
       "backToList": "Voltar à minha lista",
       "loading": "A carregar a sua lista do AnimeLegacy…",
@@ -379,8 +379,8 @@
     "favoritesEmpty": "Marque um anime concluído como favorito para o destacar aqui.",
     "favoriteCharactersTitle": "Personagens favoritos",
     "favoriteCharactersEmpty": "Marque um personagem como favorito para o destacar aqui.",
-    "favoriteVoicesTitle": "Dubladores favoritos",
-    "favoriteVoicesEmpty": "Marque um dublador como favorito para apresentá-lo aqui.",
+    "favoriteVoicesTitle": "Atores de voz favoritos",
+    "favoriteVoicesEmpty": "Marque um ator de voz como favorito para apresentá-lo aqui.",
     "favoriteStudiosTitle": "Estúdios favoritos",
     "favoriteStudiosEmpty": "Marque um estúdio como favorito para apresentá-los aqui.",
     "favoritesCount": "{n}/{limit}",
@@ -395,7 +395,7 @@
     },
     "welcomeBack": "Bem-vindo de volta.",
     "signedInAs": "Sessão iniciada como",
-    "notYou": "Não é você?",
+    "notYou": "Não é a sua conta?",
     "alreadySignedInEyebrow": "SESSÃO JÁ INICIADA",
     "modalSettings": "DEFINIÇÕES",
     "modalTitle": "Editar perfil",
@@ -410,7 +410,7 @@
       "deleting": "A eliminar…",
       "failed": "Falha ao eliminar. Tente de novo ou contacte o suporte.",
       "manualTitle": "Eliminação automática ainda não disponível",
-      "manualBody": "Esta instância ainda não está configurada para eliminação self-service. Peça a remoção através da página de privacidade — a sua conta será eliminada manualmente em até 30 dias, como exige o RGPD.",
+      "manualBody": "Esta instância ainda não está configurada para eliminação self-service. Peça a remoção através da página de privacidade — a sua conta será eliminada manualmente no prazo de 30 dias, como exige o RGPD.",
       "goToPrivacy": "Ir à página de privacidade"
     }
   },
@@ -428,7 +428,7 @@
       "profile": "O seu nome de utilizador, biografia, avatar (guardado como data URL dentro do seu próprio documento de utilizador)."
     },
     "storageHeading": "Onde fica",
-    "storageBody": "Todos os dados pessoais são armazenados no Google Firestore (Firebase) sob o seu ID de utilizador. Entradas de catálogo de anime e contadores de favoritos de personagens globais são compartilhados entre os usuários e não contêm dados pessoais. Não são utilizadas análises ou localizadores de terceiros.",
+    "storageBody": "Todos os dados pessoais são armazenados no Google Firestore (Firebase) sob o seu ID de utilizador. Entradas de catálogo de anime e contadores de favoritos de personagens globais são partilhados entre os utilizadores e não contêm dados pessoais. Não são utilizadas análises ou localizadores de terceiros.",
     "rightsHeading": "Os seus direitos (RGPD)",
     "rightsBody": "Pode, a qualquer momento, solicitar:",
     "rightsList": {
@@ -444,10 +444,10 @@
   },
   "license": {
     "metaTitle": "AnimeLegacy · Licença",
-    "metaDesc": "O AnimeLegacy é de código aberto sob a Licença MIT — o que você pode fazer com o código.",
+    "metaDesc": "O AnimeLegacy é de código aberto sob a Licença MIT — o que pode fazer com o código.",
     "eyebrow": "LICENÇA · MIT",
     "title": "Código aberto, em termos permissivos.",
-    "intro": "O código-fonte do AnimeLegacy é publicado no GitHub sob a Licença MIT. Isso a torna uma das licenças mais permissivas disponíveis — quase tudo é permitido.",
+    "intro": "O código-fonte do AnimeLegacy é publicado no GitHub sob a Licença MIT. Isso torna-a uma das licenças mais permissivas disponíveis — quase tudo é permitido.",
     "whatHeading": "O que pode fazer",
     "whatBody": "A Licença MIT concede-lhe o direito de:",
     "permissions": {
@@ -457,7 +457,7 @@
       "sublicense": "Sublicencie-o sob termos diferentes dentro do seu próprio projeto."
     },
     "conditionsHeading": "A única condição",
-    "conditionsBody": "Qualquer cópia ou parte substancial do código deve incluir o aviso de direitos autorais original e uma cópia do texto da Licença MIT. Não há obrigação de compartilhar modificações, atribuir além do arquivo de licença ou notificar qualquer pessoa.",
+    "conditionsBody": "Qualquer cópia ou parte substancial do código deve incluir o aviso de direitos de autor original e uma cópia do texto da Licença MIT. Não há obrigação de partilhar modificações, atribuir além do ficheiro de licença ou notificar qualquer pessoa.",
     "fullTextHeading": "Texto completo da licença",
     "sourceLink": "Código-fonte"
   },
@@ -477,12 +477,12 @@
   },
   "discoverPage": {
     "metaTitle": "AnimeLegacy · Descubra",
-    "metaDesc": "Escolhas selecionadas, coleções animadas e um mostrador de vibração para quando \"o que devo assistir?\" não tem uma boa palavra-chave.",
+    "metaDesc": "Escolhas selecionadas, coleções animadas e um mostrador de vibração para quando \"o que devo ver?\" não tem uma boa palavra-chave.",
     "eyebrow": "DESCOBRE",
-    "headingPrefix": "Wander, não",
-    "headingAccent": "Procura",
+    "headingPrefix": "Vagueia, não",
+    "headingAccent": "procures",
     "headingSuffix": ".",
-    "subtitle": "Escolhas selecionadas, coleções animadas e um mostrador de vibração para quando \"o que devo assistir?\" não tem uma boa palavra-chave.",
+    "subtitle": "Escolhas curadas, coleções por humor e um botão de vibe para quando «o que vou ver hoje?» não tem uma boa palavra-chave.",
     "searchPlaceholder": "Título, estúdio, género...",
     "searchLabel": "Pesquisar anime por título, estúdio ou género",
     "activeLabel": "ATIVOS",
@@ -494,48 +494,73 @@
       "secondaryEyebrowB": "fora do alcance do radar"
     },
     "moods": {
-      "eyebrow": "NAVEGUE POR HUMOR",
+      "eyebrow": "EXPLORAR POR HUMOR",
       "heading": "O que te apetece?",
+      "shuffle": "Baralhar",
       "slow": {
-        "label": "Queimaduras lentas",
+        "label": "Lentas e densas",
         "sub": "Paciência recompensada"
       },
       "cry": {
         "label": "Filmes para chorar",
-        "sub": "Deixe tempo para se sentar com ele"
+        "sub": "Reserva tempo para o digerir"
       },
       "adrenaline": {
-        "label": "Adrenalina pura.",
-        "sub": "Não há nada de silencioso nisso"
+        "label": "Adrenalina pura",
+        "sub": "Nada de silencioso aqui"
       },
       "cozy": {
         "label": "Tardes de domingo",
-        "sub": "Relógios confortáveis"
+        "sub": "Conforto puro"
       },
       "headtrip": {
-        "label": "Viagens de cabeça",
-        "sub": "Venha pela estranheza"
+        "label": "Viagens mentais",
+        "sub": "Vem pela estranheza"
       },
       "ensemble": {
-        "label": "Grandes conjuntos",
-        "sub": "Elencos com os quais você vai morar"
+        "label": "Grandes elencos",
+        "sub": "Elencos com quem se vive"
+      },
+      "firstLove": {
+        "label": "Primeiros amores",
+        "sub": "Coração à frente"
+      },
+      "mystery": {
+        "label": "Casos por resolver",
+        "sub": "Traz a lupa"
+      },
+      "scifi": {
+        "label": "Choque futuro",
+        "sub": "Amanhã, em detalhe"
+      },
+      "sports": {
+        "label": "Tudo suor, tudo coração",
+        "sub": "Desporto como história"
+      },
+      "supernatural": {
+        "label": "Coisas que espreitam",
+        "sub": "Por tua conta e risco"
+      },
+      "mecha": {
+        "label": "Aço gigante",
+        "sub": "Drama em cockpit"
       }
     },
     "vibe": {
-      "eyebrow": "LOCALIZADOR DE VIBRAÇÕES · EXPERIMENTAL",
-      "heading": "Disque.",
-      "pace": "PACE",
-      "paceLeft": "Serena",
-      "paceRight": "caótico",
-      "tone": "TONE",
+      "eyebrow": "VIBE FINDER · EXPERIMENTAL",
+      "heading": "Acerta a vibe.",
+      "pace": "RITMO",
+      "paceLeft": "Sereno",
+      "paceRight": "Caótico",
+      "tone": "TOM",
       "toneLeft": "Esperançoso",
-      "toneRight": "alburno",
-      "length": "COMPRIMENTO",
-      "lengthLeft": "Apertado. ",
-      "lengthRight": "Alastrando",
-      "hint": "Três mostradores, um pequeno canto do espaço de degustação. Classificado por proximidade — sem desempates de popularidade.",
-      "matchesEyebrow": "AS 4 MELHORES PARTIDAS",
-      "matchLabel": "o que consegue ver?"
+      "toneRight": "Sombrio",
+      "world": "MUNDO",
+      "worldLeft": "Realista",
+      "worldRight": "Fantástico",
+      "hint": "Três botões, um pequeno canto do espaço de gosto. Ordenado por proximidade — sem desempates por popularidade.",
+      "matchesEyebrow": "TOP 4 CORRESPONDÊNCIAS",
+      "matchLabel": "AFINIDADE"
     },
     "gems": {
       "eyebrow": "JOIAS ESCONDIDAS · PONTUAÇÃO ALTA, MENOS VIGIADA",
@@ -544,6 +569,59 @@
     "genres": {
       "eyebrow": "Todos os géneros",
       "heading": "Escolha um fio, siga-o."
+    },
+    "airingThisWeek": {
+      "eyebrow": "EM EMISSÃO ESTA SEMANA",
+      "heading": "O que está por vir e quando.",
+      "today": "Hoje",
+      "tomorrow": "Amanhã"
+    },
+    "becauseYouLiked": {
+      "eyebrow": "PORQUE ESTÁS A VER",
+      "headingPrefix": "Se",
+      "headingSuffix": "viviam lá, estes mudaram-se para a casa ao lado.",
+      "shuffle": "Outra"
+    },
+    "surprise": {
+      "eyebrow": "NÃO CONSEGUE DECIDIR? · LANCE OS DADOS",
+      "headingPrefix": "A escolha de hoje à noite,",
+      "headingAccent": "escolhido para si",
+      "headingSuffix": ".",
+      "body": "Sem filtros, sem algoritmo — apenas um anime, ponderado pelo gosto editorial e uma pequena quantidade de caos.",
+      "cta": "Surpreenda-me!",
+      "ctaRolling": "A rolar",
+      "historyEyebrow": "OS DADOS FORAM LANÇADOS"
+    },
+    "filter": {
+      "eyebrowMood": "HUMOR · {count} TÍTULOS",
+      "eyebrowGenre": "GÉNERO · {count} TÍTULOS",
+      "sortTop": "Mais bem avaliados",
+      "sortNew": "Mais recentes",
+      "sortAz": "A→Z",
+      "viewGrid": "Vista em grelha",
+      "viewList": "Vista de lista",
+      "clear": "Remover filtro",
+      "sortPopular": "Populares",
+      "typeLabel": "TIPO",
+      "typeAny": "Todos",
+      "type_tv": "TV",
+      "type_movie": "Filme",
+      "type_ova": "OVA",
+      "type_special": "Special",
+      "type_ona": "ONA",
+      "statusLabel": "ESTADO",
+      "statusAny": "Todos",
+      "status_airing": "Em emissão",
+      "status_complete": "Terminados",
+      "decadeLabel": "DÉCADA",
+      "decadeAny": "Todas",
+      "decade_2020": "2020s",
+      "decade_2010": "2010s",
+      "decade_2000": "2000s",
+      "decade_pre2000": "Antes de 2000",
+      "minScoreLabel": "NOTA",
+      "minScoreAny": "Todas",
+      "minScoreValue": "{n}+"
     }
   },
   "anime": {
@@ -658,8 +736,8 @@
     },
     "biographyEyebrow": "BIOGRAFIA",
     "biographyMissing": "Biografia indisponível.",
-    "favoriteTitle": "Dublador favorito",
-    "favoriteHintOn": "Exibido no seu perfil.",
+    "favoriteTitle": "Ator de voz favorito",
+    "favoriteHintOn": "Apresentado no seu perfil.",
     "favoriteHintOff": "Marque para destacar no seu perfil.",
     "rolesEyebrow": "PAPÉIS",
     "rolesTitle": "Personagens dobrados",
@@ -738,10 +816,10 @@
       "yearsActive": "Período em atividade:",
       "yearsUnit": "anos",
       "productions": "TOTAL DE PRODUÇÕES",
-      "productionsUnit": "obras pé",
+      "productionsUnit": "obras",
       "avgScore": "Pontuação Média",
       "avgScoreUnit": "/ 10",
-      "airing": "EM EXIBIÇÃO NO MOMENTO",
+      "airing": "EM EMISSÃO",
       "airingUnit": "Programas",
       "best": "MAIS VOTADOS",
       "bestUnit": "/ 10"
@@ -750,8 +828,8 @@
       "eyebrow": "FILMOGRAFIA · POR ANO",
       "heading": "A linha temporal",
       "all": "Todos",
-      "tv": "Series",
-      "movie": "Movies",
+      "tv": "Séries",
+      "movie": "Filmes",
       "empty": "Nenhuma produção corresponde a este filtro.",
       "yearUnknown": "Sem data",
       "epShort": "{n} ep",
@@ -759,8 +837,8 @@
     },
     "signature": {
       "eyebrow": "PRINCIPAIS GÉNEROS",
-      "heading": "Genre mix",
-      "hint": "Gêneros que aparecem com mais frequência no catálogo de {name}."
+      "heading": "Mistura de géneros",
+      "hint": "Géneros que aparecem com mais frequência no catálogo de {name}."
     },
     "distribution": {
       "eyebrow": "\"Distribuição de Pontuação\"",
@@ -770,8 +848,8 @@
     },
     "upcoming": {
       "eyebrow": "Anunciado",
-      "heading": "Ainda não foi ao ar",
-      "status": "AINDA NÃO FOI AO AR"
+      "heading": "Ainda por estrear",
+      "status": "AINDA POR ESTREAR"
     },
     "related": {
       "eyebrow": "MAIS ESTÚDIOS",
@@ -937,9 +1015,9 @@
     "compare": {
       "eyebrow": "SOCIAL · EM PREPARAÇÃO",
       "title": "Comparar listas — em breve.",
-      "body": "Veja o que você e um amigo viram ambos, o que ele adorou e lhe escapou, e a sobreposição entre os vossos gostos.",
+      "body": "Veja o que viram em comum com um amigo, o que ele adorou e lhe escapou, e a sobreposição entre os vossos gostos.",
       "bullet1": "Compare duas listas lado a lado",
-      "bullet2": "Destaque os títulos que só um de vocês classificou",
+      "bullet2": "Destaque os títulos que apenas um de vós classificou",
       "bullet3": "Identifique favoritos partilhados e pontos cegos",
       "meta": "Compare a sua lista de anime com amigos — em breve.",
       "back": "Voltar à minha lista"

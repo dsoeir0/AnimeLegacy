@@ -43,9 +43,9 @@ describe('buildDiscoverPayload', () => {
     expect(buildDiscoverPayload(list).gems).toHaveLength(4);
   });
 
-  it('vibe pool is the top 20 entries', () => {
+  it('vibe pool is the top 25 entries', () => {
     const list = Array.from({ length: 30 }, (_, i) => make(i + 1));
-    expect(buildDiscoverPayload(list).vibePool).toHaveLength(20);
+    expect(buildDiscoverPayload(list).vibePool).toHaveLength(25);
   });
 
   it('mood posters pick entries whose genres match the mood query', () => {
