@@ -4,6 +4,7 @@ import { getFirebaseClient } from '../lib/firebase/client';
 import { getAnimeById } from '../lib/services/jikan';
 import { ensureAnimeCatalog } from '../lib/services/animeCatalog';
 import { computeGenres, computeStats } from '../lib/utils/profileStats';
+import { FAVORITE_LIMIT } from '../lib/constants';
 
 export default function useProfileData(uid) {
   const [profile, setProfile] = useState(null);
@@ -164,7 +165,7 @@ export default function useProfileData(uid) {
         });
         setCatalogGenres(next);
       } catch {
-        // Ignore catalog hydration errors; we'll retry on next run.
+        // retry next run
       }
     };
 
@@ -221,7 +222,7 @@ export default function useProfileData(uid) {
               ensureAnimeCatalog(data),
             ]);
           } catch {
-            // Ignore hydration errors; we will retry on next load.
+            // retry next load
           }
         }),
       );
@@ -267,7 +268,7 @@ export default function useProfileData(uid) {
     return computeGenres(watchedItems);
   }, [listItems, animeItems, catalogGenres]);
   const favorites = useMemo(
-    () => animeItems.filter((item) => item.isFavorite).slice(0, 10),
+    () => animeItems.filter((item) => item.isFavorite).slice(0, FAVORITE_LIMIT),
     [animeItems],
   );
   const filteredActivity = useMemo(() => {
