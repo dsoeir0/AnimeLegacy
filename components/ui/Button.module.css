@@ -45,7 +45,7 @@
 
 .variant_primary {
   background: var(--al-primary-gradient);
-  color: #060709;
+  color: var(--al-ink-0);
   border-color: rgba(255, 255, 255, 0.08);
 }
 .variant_primary:hover:not(:disabled) {
@@ -91,7 +91,7 @@
 
 .variant_collection {
   background: var(--al-collection-soft);
-  color: #b6a9ff;
+  color: var(--al-collection-ink);
   border-color: rgba(125, 107, 255, 0.3);
 }
 .variant_collection:hover:not(:disabled) {

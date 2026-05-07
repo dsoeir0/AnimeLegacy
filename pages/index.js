@@ -182,7 +182,7 @@ function ContinueWatching({ entries, animeById, onEditEntry, t }) {
 
                 />
                 <div className={styles.continuePlay}>
-                  <Play size={14} fill="#060709" stroke="#060709" />
+                  <Play size={14} style={{ fill: 'var(--al-ink-0)', stroke: 'var(--al-ink-0)' }} />
                 </div>
               </div>
               <div className={styles.continueBody}>

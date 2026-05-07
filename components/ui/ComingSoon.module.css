@@ -24,7 +24,7 @@
   height: 56px;
   border-radius: 16px;
   background: var(--al-primary-gradient);
-  color: #060709;
+  color: var(--al-ink-0);
   display: inline-flex;
   align-items: center;
   justify-content: center;

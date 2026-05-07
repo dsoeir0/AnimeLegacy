@@ -102,7 +102,7 @@
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 56px;
-  color: #fff;
+  color: var(--al-white);
   letter-spacing: -0.04em;
 }
 
@@ -126,7 +126,7 @@
   font-size: clamp(56px, 8.5vw, 112px);
   letter-spacing: -0.045em;
   line-height: 0.9;
-  color: #fff;
+  color: var(--al-white);
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 

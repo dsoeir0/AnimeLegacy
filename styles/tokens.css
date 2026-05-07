@@ -36,6 +36,10 @@
   /* In-list / collection purple */
   --al-collection: #7d6bff;
   --al-collection-soft: rgba(125,107,255,0.16);
+  --al-collection-ink: #b6a9ff;
+
+  /* Pure white — cinematic hero copy on photographic backgrounds */
+  --al-white: #fff;
 
   /* Warm editorial accent (for favorites / highlights / ratings) */
   --al-warm: #e8b468;

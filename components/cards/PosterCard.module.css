@@ -72,7 +72,7 @@
   height: 24px;
   border-radius: 8px;
   background: var(--al-collection);
-  color: #fff;
+  color: var(--al-white);
   display: inline-flex;
   align-items: center;
   justify-content: center;
