@@ -19,6 +19,7 @@ import {
   getCharacterVoices,
 } from '../../lib/services/jikan';
 import { getAnimeImageUrl, getCharacterImageUrl } from '../../lib/utils/media';
+import { localizeLanguage, localizeRole } from '../../lib/utils/charLocalize';
 
 const buildBio = (about = '') =>
   about
@@ -260,7 +261,7 @@ function CharacterPage({
                     </div>
                     <div className={styles.appearanceMeta}>
                       <div className={styles.appearanceTitle}>{title}</div>
-                      <div className={styles.appearanceRole}>{entry?.role || t('anime.roleLabel')}</div>
+                      <div className={styles.appearanceRole}>{localizeRole(entry?.role, t)}</div>
                     </div>
                   </Link>
                 );
@@ -287,15 +288,29 @@ function CharacterPage({
                   actor?.images?.webp?.image_url ||
                   actor?.images?.jpg?.image_url ||
                   '/logo_no_text.png';
-                return (
-                  <div key={`${actor?.name}-${actor?.mal_id || ''}`} className={styles.voiceCard}>
+                const cardContent = (
+                  <>
                     <div className={styles.voiceAvatar}>
                       <Image src={actorImage} alt={actor?.name || 'VA'} fill sizes="72px" className={styles.posterImg}/>
                     </div>
                     <div className={styles.voiceMeta}>
                       <div className={styles.voiceName}>{actor?.name || t('status.unknown')}</div>
-                      <div className={styles.voiceLang}>{entry?.language || '—'}</div>
+                      <div className={styles.voiceLang}>{localizeLanguage(entry?.language, t)}</div>
                     </div>
+                  </>
+                );
+                const key = `${actor?.name}-${actor?.mal_id || ''}`;
+                return actor?.mal_id ? (
+                  <Link
+                    key={key}
+                    href={`/voices/${actor.mal_id}`}
+                    className={styles.voiceCard}
+                  >
+                    {cardContent}
+                  </Link>
+                ) : (
+                  <div key={key} className={styles.voiceCard}>
+                    {cardContent}
                   </div>
                 );
               })

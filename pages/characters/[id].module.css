@@ -300,6 +300,9 @@
   background: var(--al-ink-3);
   border: 1px solid var(--al-border);
   border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
   transition: all var(--dur-2) var(--ease-standard);
 }
 

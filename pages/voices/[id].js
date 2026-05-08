@@ -9,6 +9,7 @@ import useAuth from '../../hooks/useAuth';
 import useFavoriteToggle from '../../hooks/useFavoriteToggle';
 import useTranslatedText from '../../hooks/useTranslatedText';
 import { getPersonById, getPersonAnime, getPersonVoices } from '../../lib/services/jikan';
+import { localizeRole } from '../../lib/utils/charLocalize';
 import {
   setVoiceFavorite,
   unsetVoiceFavorite,
@@ -239,7 +240,7 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
                       {entry?.anime?.title || '—'}
                     </div>
                     {entry?.role ? (
-                      <div className={styles.roleTag}>{entry.role}</div>
+                      <div className={styles.roleTag}>{localizeRole(entry.role, t)}</div>
                     ) : null}
                   </div>
                 </Link>
