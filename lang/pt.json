@@ -57,6 +57,12 @@
       "signIn": "Iniciar sessão",
       "signUp": "Criar conta",
       "signOut": "Terminar sessão"
+    },
+    "searchSections": {
+      "anime": "Anime",
+      "characters": "Personagens",
+      "voiceActors": "Atores de voz",
+      "studios": "Estúdios"
     }
   },
   "status": {
@@ -621,7 +627,9 @@
       "decade_pre2000": "Antes de 2000",
       "minScoreLabel": "NOTA",
       "minScoreAny": "Todas",
-      "minScoreValue": "{n}+"
+      "minScoreValue": "{n}+",
+      "genreLabel": "GÉNERO",
+      "genreAny": "Todos"
     }
   },
   "anime": {
@@ -701,7 +709,30 @@
     "castEyebrow": "ELENCO",
     "voiceActorsTitle": "Atores de voz",
     "voiceActorsMissing": "Atores de voz indisponíveis.",
-    "listedCount": "{n} LISTADOS"
+    "listedCount": "{n} LISTADOS",
+    "role": {
+      "main": "Principal",
+      "supporting": "Secundário",
+      "background": "De fundo"
+    },
+    "lang": {
+      "japanese": "Japonês",
+      "english": "Inglês",
+      "french": "Francês",
+      "spanish": "Espanhol",
+      "italian": "Italiano",
+      "german": "Alemão",
+      "portuguese": "Português",
+      "portugueseBr": "Português (BR)",
+      "korean": "Coreano",
+      "mandarin": "Mandarim",
+      "cantonese": "Cantonês",
+      "hungarian": "Húngaro",
+      "russian": "Russo",
+      "hebrew": "Hebraico",
+      "polish": "Polaco",
+      "turkish": "Turco"
+    }
   },
   "characters": {
     "metaTitle": "AnimeLegacy · Personagens",
@@ -887,16 +918,13 @@
   "seasonsPage": {
     "metaTitle": "AnimeLegacy · Temporadas {year}",
     "metaDesc": "O alinhamento de anime de cada temporada por ano, com curadoria para descoberta fácil.",
-    "eyebrow": "ARQUIVO SAZONAL",
-    "titleEnd": "temporadas",
-    "subtitle": "Explore todos os lançamentos de inverno, primavera, verão e outono com filtros por género, formato e ordenação.",
-    "year": "ANO",
-    "allSeasons": "Todas as temporadas",
+    "eyebrow": "CRÓNICA · TEMPORADAS",
     "seasons": {
       "winter": "Inverno",
       "spring": "Primavera",
       "summer": "Verão",
-      "fall": "Outono"
+      "fall": "Outono",
+      "all": "Todos"
     },
     "filters": {
       "genre": "GÉNERO",
@@ -909,9 +937,44 @@
       "rating": "Classificação",
       "recent": "Adicionados recentemente"
     },
-    "titlesCount": "{n} títulos",
     "emptyTitle": "Sem resultados",
-    "emptyBody": "Tente remover um filtro ou mudar de temporada."
+    "emptyBody": "Tente remover um filtro ou mudar de temporada.",
+    "volume": "Vol. {n}",
+    "filtersToggle": "Filtros",
+    "kpis": {
+      "titles": "TÍTULOS",
+      "airing": "EM EMISSÃO",
+      "premieres": "ESTREIAS",
+      "daysUntilEnd": "DIAS ATÉ FIM",
+      "daysUntilStart": "DIAS ATÉ INÍCIO",
+      "status": "ESTADO",
+      "statusEnded": "Concluída"
+    },
+    "topThree": {
+      "eyebrow": "DESTAQUES — SELECÇÃO EDITORIAL",
+      "title": "Os três títulos a ver"
+    },
+    "allTitles": {
+      "eyebrow": "TEMPORADA COMPLETA",
+      "title": "Todos os títulos"
+    },
+    "editorPickHeader": "ESCOLHA DOS EDITORES",
+    "editorPickRank": "Nº 01 · RANKING",
+    "tabRanges": {
+      "winter": "Jan-Mar",
+      "spring": "Abr-Jun",
+      "summer": "Jul-Set",
+      "fall": "Out-Dez",
+      "all": "Jan-Dez"
+    },
+    "fullYear": "Ano completo",
+    "editorial": {
+      "winter": "A temporada do arranque a frio. Sequelas de bandeira, comebacks fortes e pelo menos um título silencioso que ninguém viu chegar.",
+      "spring": "A temporada que nos pede paciência. Há sequelas longamente esperadas, estreias silenciosas, e pelo menos um título que vai ficar para a história.",
+      "summer": "A temporada do brilho. Apostas grandes, paletas mais ruidosas, e estreias que vivem do passa-palavra.",
+      "fall": "A temporada do balanço. Candidatas a prémio, finais pesados, e o cours mais ambicioso do ano.",
+      "all": "O ano inteiro num só plano. Estreias, sequelas e finais — todos os títulos do ano em revista."
+    }
   },
   "auth": {
     "newToSite": "Novo no AnimeLegacy?",

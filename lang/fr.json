@@ -57,6 +57,12 @@
       "signIn": "Se connecter",
       "signUp": "S'inscrire",
       "signOut": "Se déconnecter"
+    },
+    "searchSections": {
+      "anime": "Anime",
+      "characters": "Personnages",
+      "voiceActors": "Doubleurs",
+      "studios": "Studios"
     }
   },
   "status": {
@@ -621,7 +627,9 @@
       "decade_pre2000": "Avant 2000",
       "minScoreLabel": "NOTE",
       "minScoreAny": "Toutes",
-      "minScoreValue": "{n}+"
+      "minScoreValue": "{n}+",
+      "genreLabel": "GENRE",
+      "genreAny": "Tous"
     }
   },
   "anime": {
@@ -701,7 +709,30 @@
     "castEyebrow": "DISTRIBUTION",
     "voiceActorsTitle": "Doubleurs",
     "voiceActorsMissing": "Doubleurs indisponibles.",
-    "listedCount": "{n} RÉFÉRENCÉS"
+    "listedCount": "{n} RÉFÉRENCÉS",
+    "role": {
+      "main": "Principal",
+      "supporting": "Secondaire",
+      "background": "À l'arrière-plan"
+    },
+    "lang": {
+      "japanese": "Japonais",
+      "english": "Anglais",
+      "french": "Français",
+      "spanish": "Espagnol",
+      "italian": "Italien",
+      "german": "Allemand",
+      "portuguese": "Portugais",
+      "portugueseBr": "Portugais (BR)",
+      "korean": "Coréen",
+      "mandarin": "Mandarin",
+      "cantonese": "Cantonais",
+      "hungarian": "Hongrois",
+      "russian": "Russe",
+      "hebrew": "Hébreu",
+      "polish": "Polonais",
+      "turkish": "Turc"
+    }
   },
   "characters": {
     "metaTitle": "AnimeLegacy · Personnages",
@@ -887,16 +918,13 @@
   "seasonsPage": {
     "metaTitle": "AnimeLegacy · Saisons {year}",
     "metaDesc": "La programmation anime de chaque saison par année, sélectionnée pour une découverte facile.",
-    "eyebrow": "ARCHIVE SAISONNIÈRE",
-    "titleEnd": "saisons",
-    "subtitle": "Parcourez chaque sortie d'hiver, printemps, été et automne avec des filtres par genre, format et tri.",
-    "year": "ANNÉE",
-    "allSeasons": "Toutes les saisons",
+    "eyebrow": "CHRONIQUE · SAISONS",
     "seasons": {
       "winter": "Hiver",
       "spring": "Printemps",
       "summer": "Été",
-      "fall": "Automne"
+      "fall": "Automne",
+      "all": "Tous"
     },
     "filters": {
       "genre": "GENRE",
@@ -909,9 +937,44 @@
       "rating": "Note",
       "recent": "Récemment ajoutés"
     },
-    "titlesCount": "{n} titres",
     "emptyTitle": "Aucun résultat",
-    "emptyBody": "Essayez de retirer un filtre ou de changer de saison."
+    "emptyBody": "Essayez de retirer un filtre ou de changer de saison.",
+    "volume": "Vol. {n}",
+    "filtersToggle": "Filtres",
+    "kpis": {
+      "titles": "TITRES",
+      "airing": "EN COURS",
+      "premieres": "NOUVEAUTÉS",
+      "daysUntilEnd": "JOURS RESTANTS",
+      "daysUntilStart": "JOURS AVANT DÉBUT",
+      "status": "STATUT",
+      "statusEnded": "Terminée"
+    },
+    "topThree": {
+      "eyebrow": "À LA UNE — SÉLECTION DE LA RÉDACTION",
+      "title": "Les trois à regarder"
+    },
+    "allTitles": {
+      "eyebrow": "SAISON COMPLÈTE",
+      "title": "Tous les titres"
+    },
+    "editorPickHeader": "CHOIX DE LA RÉDACTION",
+    "editorPickRank": "Nº 01 · CLASSEMENT",
+    "tabRanges": {
+      "winter": "Jan-Mar",
+      "spring": "Avr-Juin",
+      "summer": "Juil-Sep",
+      "fall": "Oct-Déc",
+      "all": "Jan-Déc"
+    },
+    "fullYear": "Année complète",
+    "editorial": {
+      "winter": "La saison du démarrage à froid. Suites phares, retours costauds et au moins un titre discret que personne n'a vu venir.",
+      "spring": "La saison qui demande patience. Des suites longuement attendues, des sorties discrètes, et au moins un titre qui restera dans les mémoires.",
+      "summer": "La saison du bruit éclatant. Grands paris, palettes bruyantes et premières qui vivent du bouche-à-oreille.",
+      "fall": "La saison du bilan. Candidats aux prix, finales chargées, et le cour le plus ambitieux de l'année.",
+      "all": "L'année entière en un seul cadre. Premières, suites et finales — tous les titres de l'année passés en revue."
+    }
   },
   "auth": {
     "newToSite": "Nouveau sur AnimeLegacy ?",

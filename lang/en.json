@@ -57,6 +57,12 @@
       "signIn": "Sign in",
       "signUp": "Sign up",
       "signOut": "Sign out"
+    },
+    "searchSections": {
+      "anime": "Anime",
+      "characters": "Characters",
+      "voiceActors": "Voice actors",
+      "studios": "Studios"
     }
   },
   "status": {
@@ -621,7 +627,9 @@
       "decade_pre2000": "Pre-2000",
       "minScoreLabel": "SCORE",
       "minScoreAny": "Any",
-      "minScoreValue": "{n}+"
+      "minScoreValue": "{n}+",
+      "genreLabel": "GENRE",
+      "genreAny": "Any"
     }
   },
   "anime": {
@@ -701,7 +709,30 @@
     "castEyebrow": "CAST",
     "voiceActorsTitle": "Voice actors",
     "voiceActorsMissing": "Voice actors unavailable.",
-    "listedCount": "{n} LISTED"
+    "listedCount": "{n} LISTED",
+    "role": {
+      "main": "Main",
+      "supporting": "Supporting",
+      "background": "Background"
+    },
+    "lang": {
+      "japanese": "Japanese",
+      "english": "English",
+      "french": "French",
+      "spanish": "Spanish",
+      "italian": "Italian",
+      "german": "German",
+      "portuguese": "Portuguese",
+      "portugueseBr": "Portuguese (BR)",
+      "korean": "Korean",
+      "mandarin": "Mandarin",
+      "cantonese": "Cantonese",
+      "hungarian": "Hungarian",
+      "russian": "Russian",
+      "hebrew": "Hebrew",
+      "polish": "Polish",
+      "turkish": "Turkish"
+    }
   },
   "characters": {
     "metaTitle": "AnimeLegacy · Characters",
@@ -887,16 +918,13 @@
   "seasonsPage": {
     "metaTitle": "AnimeLegacy · Seasons {year}",
     "metaDesc": "Every season's anime lineup by year, curated for easy discovery.",
-    "eyebrow": "SEASONAL ARCHIVE",
-    "titleEnd": "seasons",
-    "subtitle": "Browse every winter, spring, summer, and fall release with filters for genre, format, and sort.",
-    "year": "YEAR",
-    "allSeasons": "All seasons",
+    "eyebrow": "CHRONICLE · SEASONS",
     "seasons": {
       "winter": "Winter",
       "spring": "Spring",
       "summer": "Summer",
-      "fall": "Fall"
+      "fall": "Fall",
+      "all": "All"
     },
     "filters": {
       "genre": "GENRE",
@@ -909,9 +937,44 @@
       "rating": "Rating",
       "recent": "Recently added"
     },
-    "titlesCount": "{n} titles",
     "emptyTitle": "No results",
-    "emptyBody": "Try removing a filter or switching seasons."
+    "emptyBody": "Try removing a filter or switching seasons.",
+    "volume": "Vol. {n}",
+    "filtersToggle": "Filters",
+    "kpis": {
+      "titles": "TITLES",
+      "airing": "AIRING",
+      "premieres": "PREMIERES",
+      "daysUntilEnd": "DAYS LEFT",
+      "daysUntilStart": "DAYS TO START",
+      "status": "STATUS",
+      "statusEnded": "Concluded"
+    },
+    "topThree": {
+      "eyebrow": "EDITORIAL — TOP PICKS",
+      "title": "The three to watch"
+    },
+    "allTitles": {
+      "eyebrow": "FULL SEASON",
+      "title": "All titles"
+    },
+    "editorPickHeader": "EDITOR'S PICK",
+    "editorPickRank": "Nº 01 · RANKING",
+    "tabRanges": {
+      "winter": "Jan-Mar",
+      "spring": "Apr-Jun",
+      "summer": "Jul-Sep",
+      "fall": "Oct-Dec",
+      "all": "Jan-Dec"
+    },
+    "fullYear": "Full year",
+    "editorial": {
+      "winter": "The cold-start season. New flagship runs, returning juggernauts, and at least one quiet show that nobody saw coming.",
+      "spring": "The patience season. A handful of long-awaited sequels, a few quiet premieres, and at least one title that will be remembered.",
+      "summer": "The bright-noise season. Big swings, louder palettes, and the kind of debuts that thrive on word of mouth.",
+      "fall": "The reckoning season. Awards bait, finale-heavy continuations, and the year's most ambitious one-cours.",
+      "all": "The full year in one frame. Premieres, sequels, and finales — every title of the year, in review."
+    }
   },
   "auth": {
     "newToSite": "New to AnimeLegacy?",

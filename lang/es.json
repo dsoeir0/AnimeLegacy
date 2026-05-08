@@ -57,6 +57,12 @@
       "signIn": "Iniciar sesión",
       "signUp": "Crear cuenta",
       "signOut": "Cerrar sesión"
+    },
+    "searchSections": {
+      "anime": "Anime",
+      "characters": "Personajes",
+      "voiceActors": "Actores de voz",
+      "studios": "Estudios"
     }
   },
   "status": {
@@ -621,7 +627,9 @@
       "decade_pre2000": "Antes de 2000",
       "minScoreLabel": "PUNT.",
       "minScoreAny": "Todas",
-      "minScoreValue": "{n}+"
+      "minScoreValue": "{n}+",
+      "genreLabel": "GÉNERO",
+      "genreAny": "Todos"
     }
   },
   "anime": {
@@ -701,7 +709,30 @@
     "castEyebrow": "REPARTO",
     "voiceActorsTitle": "Actores de voz",
     "voiceActorsMissing": "Actores de voz no disponibles.",
-    "listedCount": "{n} LISTADOS"
+    "listedCount": "{n} LISTADOS",
+    "role": {
+      "main": "Principal",
+      "supporting": "Secundario",
+      "background": "De fondo"
+    },
+    "lang": {
+      "japanese": "Japonés",
+      "english": "Inglés",
+      "french": "Francés",
+      "spanish": "Español",
+      "italian": "Italiano",
+      "german": "Alemán",
+      "portuguese": "Portugués",
+      "portugueseBr": "Portugués (BR)",
+      "korean": "Coreano",
+      "mandarin": "Mandarín",
+      "cantonese": "Cantonés",
+      "hungarian": "Húngaro",
+      "russian": "Ruso",
+      "hebrew": "Hebreo",
+      "polish": "Polaco",
+      "turkish": "Turco"
+    }
   },
   "characters": {
     "metaTitle": "AnimeLegacy · Personajes",
@@ -887,16 +918,13 @@
   "seasonsPage": {
     "metaTitle": "AnimeLegacy · Temporadas {year}",
     "metaDesc": "El alineamiento de anime de cada temporada por año, seleccionado para un descubrimiento fácil.",
-    "eyebrow": "ARCHIVO DE TEMPORADA",
-    "titleEnd": "temporadas",
-    "subtitle": "Explora todos los lanzamientos de invierno, primavera, verano y otoño con filtros por género, formato y orden.",
-    "year": "AÑO",
-    "allSeasons": "Todas las temporadas",
+    "eyebrow": "CRÓNICA · TEMPORADAS",
     "seasons": {
       "winter": "Invierno",
       "spring": "Primavera",
       "summer": "Verano",
-      "fall": "Otoño"
+      "fall": "Otoño",
+      "all": "Todos"
     },
     "filters": {
       "genre": "GÉNERO",
@@ -909,9 +937,44 @@
       "rating": "Puntuación",
       "recent": "Añadidos recientemente"
     },
-    "titlesCount": "{n} títulos",
     "emptyTitle": "Sin resultados",
-    "emptyBody": "Prueba a quitar un filtro o cambiar de temporada."
+    "emptyBody": "Prueba a quitar un filtro o cambiar de temporada.",
+    "volume": "Vol. {n}",
+    "filtersToggle": "Filtros",
+    "kpis": {
+      "titles": "TÍTULOS",
+      "airing": "EN EMISIÓN",
+      "premieres": "ESTRENOS",
+      "daysUntilEnd": "DÍAS RESTANTES",
+      "daysUntilStart": "DÍAS HASTA EL INICIO",
+      "status": "ESTADO",
+      "statusEnded": "Finalizada"
+    },
+    "topThree": {
+      "eyebrow": "DESTACADOS — SELECCIÓN EDITORIAL",
+      "title": "Los tres a ver"
+    },
+    "allTitles": {
+      "eyebrow": "TEMPORADA COMPLETA",
+      "title": "Todos los títulos"
+    },
+    "editorPickHeader": "ELECCIÓN DEL EDITOR",
+    "editorPickRank": "Nº 01 · RANKING",
+    "tabRanges": {
+      "winter": "Ene-Mar",
+      "spring": "Abr-Jun",
+      "summer": "Jul-Sep",
+      "fall": "Oct-Dic",
+      "all": "Ene-Dic"
+    },
+    "fullYear": "Año completo",
+    "editorial": {
+      "winter": "La temporada del arranque en frío. Secuelas de buque insignia, regresos sólidos y al menos un título silencioso que nadie vio venir.",
+      "spring": "La temporada que nos pide paciencia. Secuelas largamente esperadas, estrenos silenciosos, y al menos un título que quedará para la historia.",
+      "summer": "La temporada del ruido brillante. Apuestas grandes, paletas más ruidosas y estrenos que viven del boca a boca.",
+      "fall": "La temporada del balance. Candidatas a premio, finales pesados, y el cour más ambicioso del año.",
+      "all": "El año entero en un solo lugar. Estrenos, secuelas y finales — todos los títulos del año en revista."
+    }
   },
   "auth": {
     "newToSite": "¿Nuevo en AnimeLegacy?",
