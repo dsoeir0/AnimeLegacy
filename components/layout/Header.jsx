@@ -1,15 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { Search, Bell, Sparkles, ArrowLeft } from 'lucide-react';
+import { Bell, Sparkles, ArrowLeft } from 'lucide-react';
 import { translate } from 'react-switch-lang';
-import { filterOutHentai } from '../../lib/utils/anime';
-import { searchAnime } from '../../lib/services/jikan';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
 import IconButton from '../ui/IconButton';
 import LanguageSwitcher from './LanguageSwitcher';
+import HeaderSearch from './HeaderSearch';
 import styles from './Header.module.css';
 
 const BREADCRUMBS = [
@@ -39,58 +37,12 @@ const shouldShowBack = (path) => BACK_PATHS.some((p) => p.test(path));
 function Header({ variant = 'default', t }) {
   const router = useRouter();
   const path = router.asPath.split('?')[0];
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const trimmedQuery = useMemo(() => query.trim(), [query]);
-  const searchRef = useRef(null);
   const profileRef = useRef(null);
-  const searchResultsId = 'global-search-results';
   const { user, loading: authLoading, signOutUser } = useAuth();
   const profile = useUserProfile(user?.uid);
   const displayName = profile?.username || user?.displayName || 'AnimeLegacy User';
   const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL || '';
-
-  useEffect(() => {
-    let isActive = true;
-    if (trimmedQuery.length < 2) {
-      setResults([]);
-      setIsOpen(false);
-      setIsLoading(false);
-      return () => {
-        isActive = false;
-      };
-    }
-    setIsLoading(true);
-    const timer = setTimeout(async () => {
-      const payload = await searchAnime(trimmedQuery, 1, 6);
-      if (!isActive) return;
-      const safeData = !payload?.error && Array.isArray(payload?.data) ? payload.data : [];
-      setResults(filterOutHentai(safeData));
-      setIsOpen(true);
-      setIsLoading(false);
-    }, 350);
-    return () => {
-      isActive = false;
-      clearTimeout(timer);
-    };
-  }, [trimmedQuery]);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const handlePointerDown = (e) => {
-      if (!searchRef.current) return;
-      if (!searchRef.current.contains(e.target)) setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('touchstart', handlePointerDown);
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('touchstart', handlePointerDown);
-    };
-  }, [isOpen]);
 
   useEffect(() => {
     if (!isProfileOpen) return undefined;
@@ -119,76 +71,7 @@ function Header({ variant = 'default', t }) {
         <div className={styles.eyebrow}>{breadcrumb}</div>
       </div>
 
-      <div className={styles.searchWrap} ref={searchRef}>
-        <Search size={16} className={styles.searchIcon} />
-        <input
-          className={styles.searchInput}
-          type="search"
-          placeholder={t('header.searchPlaceholder')}
-          aria-label={t('header.searchPlaceholder')}
-          role="combobox"
-          aria-expanded={isOpen}
-          aria-controls={searchResultsId}
-          aria-autocomplete="list"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            if (trimmedQuery.length >= 2) setIsOpen(true);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setIsOpen(false);
-              e.currentTarget.blur();
-              return;
-            }
-            if (e.key === 'Enter' && trimmedQuery.length >= 2) {
-              e.preventDefault();
-              setIsOpen(false);
-              router.push(`/search?q=${encodeURIComponent(trimmedQuery)}&page=1`);
-            }
-          }}
-        />
-        <kbd className={styles.kbd}>⌘K</kbd>
-        {isOpen ? (
-          <div className={styles.searchResults} role="listbox" id={searchResultsId}>
-            {isLoading ? (
-              <div className={styles.searchEmpty}>{t('header.searching')}</div>
-            ) : results.length === 0 ? (
-              <div className={styles.searchEmpty}>{t('header.noResults')}</div>
-            ) : (
-              results.map((item) => (
-                <Link
-                  key={item.mal_id}
-                  href={`/anime/${item.mal_id}`}
-                  className={styles.searchItem}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <div className={styles.searchThumb}>
-                    <Image
-                      src={item?.images?.webp?.image_url || item?.images?.jpg?.image_url || '/logo_no_text.png'}
-                      alt={item.title}
-                      width={40}
-                      height={52}
-                      sizes="40px"
-                      quality={85}
-                    />
-                  </div>
-                  <div className={styles.searchMeta}>
-                    <div className={styles.searchTitle}>{item.title}</div>
-                    <div className={styles.searchSub}>
-                      <span>{item.type || t('header.breadcrumb.anime')}</span>
-                      <span>·</span>
-                      <span>{item.year || item?.aired?.prop?.from?.year || '—'}</span>
-                      <span>·</span>
-                      <span>{item.score ? `★ ${item.score}` : t('movies.noRating')}</span>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-        ) : null}
-      </div>
+      <HeaderSearch />
 
       <div className={styles.right}>
         <LanguageSwitcher />
