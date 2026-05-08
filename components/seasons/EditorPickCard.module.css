@@ -1,0 +1,126 @@
+.editorPickWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.editorPickHeader {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--al-fg-3);
+}
+
+.editorPick {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--al-border);
+  background: var(--al-ink-2);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.editorPick:hover {
+  border-color: var(--al-border-strong);
+}
+
+.editorPickImg {
+  object-fit: cover;
+  transition: transform var(--dur-3) var(--ease-out);
+}
+
+.editorPick:hover .editorPickImg {
+  transform: scale(1.04);
+}
+
+.editorPickGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--al-ink-0) 94%, transparent) 100%);
+  pointer-events: none;
+}
+
+.editorPickEyebrow {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--al-ink-0) 70%, transparent);
+  border: 1px solid var(--al-border-strong);
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--al-warm-ink);
+  backdrop-filter: blur(8px);
+}
+
+.editorPickContent {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 2;
+}
+
+.editorPickTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--al-white);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.editorPickMeta {
+  display: flex;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--al-fg-1) 78%, transparent);
+  margin-top: 4px;
+}
+
+.editorPickScore {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--al-warm-ink);
+  margin-top: 8px;
+}
+
+.editorPickScoreSuffix {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--al-fg-3);
+}
+
+@media (max-width: 1100px) {
+  .editorPick {
+    max-width: 480px;
+  }
+}

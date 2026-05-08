@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ChevronLeft, ChevronRight, LayoutGrid, List, SlidersHorizontal } from 'lucide-react';
 import { translate } from 'react-switch-lang';
@@ -9,20 +7,22 @@ import Button from '../../components/ui/Button';
 import IconButton from '../../components/ui/IconButton';
 import Dropdown from '../../components/ui/Dropdown';
 import PosterCard from '../../components/cards/PosterCard';
+import EditorPickCard from '../../components/seasons/EditorPickCard';
+import KpiRow from '../../components/seasons/KpiRow';
+import SeasonTabs from '../../components/seasons/SeasonTabs';
+import TopThreeSection from '../../components/seasons/TopThreeSection';
 import styles from './[year].module.css';
 import useMyList from '../../hooks/useMyList';
 import { dedupeByMalId, filterOutHentai } from '../../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
 import { getSeasonByYearAll } from '../../lib/services/jikan';
-import { getSeasonFromDate } from '../../lib/utils/season';
-import { getAnimeImageUrl } from '../../lib/utils/media';
-
-const SEASONS = [
-  { key: 'winter', labelKey: 'seasonsPage.seasons.winter' },
-  { key: 'spring', labelKey: 'seasonsPage.seasons.spring' },
-  { key: 'summer', labelKey: 'seasonsPage.seasons.summer' },
-  { key: 'fall', labelKey: 'seasonsPage.seasons.fall' },
-];
+import { computePeriodKpi, getSeasonFromDate, SEASON_KEYS } from '../../lib/utils/season';
+import {
+  hasScoreSignal,
+  isSparseHero,
+  pickEditor,
+  pickTopThree,
+} from '../../lib/utils/seasonHero';
 
 const SORT_OPTIONS = [
   { id: 'popularity', labelKey: 'seasonsPage.sort.popularity' },
@@ -30,12 +30,9 @@ const SORT_OPTIONS = [
   { id: 'recent', labelKey: 'seasonsPage.sort.recent' },
 ];
 
-const SEASON_START_DAY = { winter: [0, 1], spring: [3, 1], summer: [6, 1], fall: [9, 1] };
-const SEASON_END_DAY = { winter: [2, 31], spring: [5, 30], summer: [8, 30], fall: [11, 31] };
-
 const VOLUME_BASE_YEAR = 2019;
 
-const isValidSeasonKey = (k) => k === 'all' || SEASONS.some((s) => s.key === k);
+const isValidSeasonScope = (k) => k === 'all' || SEASON_KEYS.includes(k);
 const isValidSort = (k) => SORT_OPTIONS.some((o) => o.id === k);
 
 function Seasons({
@@ -62,10 +59,11 @@ function Seasons({
   }, [winterResposta, springResposta, summerResposta, fallResposta]);
 
   const numericYear = Number(year);
-  const currentSeasonKey = getSeasonFromDate();
-  const initialSeason = SEASONS.find((s) => s.key === currentSeasonKey)?.key || 'spring';
+  const initialSeason = SEASON_KEYS.includes(getSeasonFromDate())
+    ? getSeasonFromDate()
+    : 'spring';
 
-  const initialScope = isValidSeasonKey(initialQuery?.s) ? initialQuery.s : initialSeason;
+  const initialScope = isValidSeasonScope(initialQuery?.s) ? initialQuery.s : initialSeason;
   const [activeSeason, setActiveSeason] = useState(
     initialScope === 'all' ? initialSeason : initialScope,
   );
@@ -115,27 +113,7 @@ function Seasons({
       String(i?.status || '').toLowerCase().includes('currently airing'),
     ).length;
     const premieres = source.filter((i) => Number(i?.year) === numericYear).length;
-    const [startMonth, startDay] = gridScope === 'all' ? [0, 1] : SEASON_START_DAY[activeSeason];
-    const [endMonth, endDay] = gridScope === 'all' ? [11, 31] : SEASON_END_DAY[activeSeason];
-    const periodStart = new Date(numericYear, startMonth, startDay);
-    const periodEnd = new Date(numericYear, endMonth, endDay, 23, 59, 59);
-    const today = new Date();
-    let periodKpi;
-    if (today.getTime() > periodEnd.getTime()) {
-      periodKpi = { kind: 'ended' };
-    } else if (today.getTime() < periodStart.getTime()) {
-      const days = Math.max(
-        0,
-        Math.ceil((periodStart.getTime() - today.getTime()) / 86400000),
-      );
-      periodKpi = { kind: 'upcoming', days };
-    } else {
-      const days = Math.max(
-        0,
-        Math.ceil((periodEnd.getTime() - today.getTime()) / 86400000),
-      );
-      periodKpi = { kind: 'active', days };
-    }
+    const periodKpi = computePeriodKpi(gridScope, activeSeason, numericYear);
     return { total, airing, premieres, periodKpi };
   }, [seasonItems, gridItems, gridScope, numericYear, activeSeason]);
 
@@ -182,27 +160,13 @@ function Seasons({
   );
 
   const heroItems = gridScope === 'all' ? gridItems : seasonItems;
-  const hasScoreSignal = useMemo(
-    () => heroItems.some((i) => Number(i?.score) > 0),
-    [heroItems],
+  const editorPick = useMemo(() => pickEditor(heroItems), [heroItems]);
+  const topThree = useMemo(
+    () => pickTopThree(heroItems, editorPick?.mal_id),
+    [heroItems, editorPick],
   );
-  const sortHero = (arr) => {
-    if (hasScoreSignal) {
-      return arr.sort((a, b) => (Number(b?.score) || 0) - (Number(a?.score) || 0));
-    }
-    return arr.sort((a, b) => (a?.popularity || 999999) - (b?.popularity || 999999));
-  };
-
-  const editorPick = useMemo(() => {
-    if (heroItems.length === 0) return null;
-    return sortHero([...heroItems])[0];
-  }, [heroItems, hasScoreSignal]);
-
-  const topThree = useMemo(() => {
-    return sortHero([...heroItems].filter((i) => i?.mal_id !== editorPick?.mal_id)).slice(0, 3);
-  }, [heroItems, editorPick, hasScoreSignal]);
-
-  const isSparse = heroItems.length <= 4;
+  const heroHasScores = hasScoreSignal(heroItems);
+  const sparse = isSparseHero(heroItems);
   const editorPickScore = Number(editorPick?.score) > 0 ? Number(editorPick.score) : null;
   const editorPickStudio = editorPick?.studios?.[0]?.name || null;
 
@@ -264,10 +228,6 @@ function Seasons({
     [t],
   );
 
-  const editorPosterUrl = editorPick
-    ? getAnimeImageUrl(editorPick, aniListMap?.[editorPick.mal_id])
-    : null;
-
   return (
     <Layout
       title={t('seasonsPage.metaTitle', { year })}
@@ -283,38 +243,7 @@ function Seasons({
               {seasonName}{' '}
               <span className={styles.titleAccent}>{year}</span>
             </h1>
-            <div className={styles.kpis}>
-              <div className={styles.kpi}>
-                <div className={styles.kpiLabel}>{t('seasonsPage.kpis.titles')}</div>
-                <div className={styles.kpiValue}>{stats.total}</div>
-              </div>
-              <div className={styles.kpi}>
-                <div className={styles.kpiLabel}>{t('seasonsPage.kpis.airing')}</div>
-                <div className={styles.kpiValue}>{stats.airing}</div>
-              </div>
-              <div className={styles.kpi}>
-                <div className={styles.kpiLabel}>{t('seasonsPage.kpis.premieres')}</div>
-                <div className={styles.kpiValue}>{stats.premieres}</div>
-              </div>
-              {stats.periodKpi.kind === 'ended' ? (
-                <div className={styles.kpi}>
-                  <div className={styles.kpiLabel}>{t('seasonsPage.kpis.status')}</div>
-                  <div className={styles.kpiValueText}>
-                    {t('seasonsPage.kpis.statusEnded')}
-                  </div>
-                </div>
-              ) : stats.periodKpi.kind === 'upcoming' ? (
-                <div className={styles.kpi}>
-                  <div className={styles.kpiLabel}>{t('seasonsPage.kpis.daysUntilStart')}</div>
-                  <div className={styles.kpiValue}>{stats.periodKpi.days}</div>
-                </div>
-              ) : (
-                <div className={styles.kpi}>
-                  <div className={styles.kpiLabel}>{t('seasonsPage.kpis.daysUntilEnd')}</div>
-                  <div className={styles.kpiValue}>{stats.periodKpi.days}</div>
-                </div>
-              )}
-            </div>
+            <KpiRow stats={stats} />
             <p className={styles.subtitle}>
               {t(`seasonsPage.editorial.${editorialKey}`)}
             </p>
@@ -330,97 +259,26 @@ function Seasons({
             </div>
           </div>
 
-          {editorPick ? (
-            <div className={styles.editorPickWrap}>
-              <div className={styles.editorPickHeader}>
-                {t('seasonsPage.editorPickHeader')}
-              </div>
-              <Link
-                href={`/anime/${editorPick.mal_id}`}
-                className={styles.editorPick}
-              >
-                {editorPosterUrl ? (
-                  <Image
-                    src={editorPosterUrl}
-                    alt={editorPick.title || ''}
-                    fill
-                    sizes="(max-width: 1100px) 100vw, 320px"
-                    className={styles.editorPickImg}
-                  />
-                ) : null}
-                <div className={styles.editorPickGradient} />
-                {hasScoreSignal && !isSparse ? (
-                  <div className={styles.editorPickEyebrow}>
-                    {t('seasonsPage.editorPickRank')}
-                  </div>
-                ) : null}
-                <div className={styles.editorPickContent}>
-                  <div className={styles.editorPickTitle}>{editorPick.title}</div>
-                  <div className={styles.editorPickMeta}>
-                    {editorPickStudio ? <span>{editorPickStudio}</span> : null}
-                    {editorPick.episodes ? (
-                      <>
-                        {editorPickStudio ? <span>·</span> : null}
-                        <span>{editorPick.episodes} ep</span>
-                      </>
-                    ) : null}
-                  </div>
-                  {editorPickScore !== null ? (
-                    <div className={styles.editorPickScore}>
-                      ★ {editorPickScore.toFixed(2)}{' '}
-                      <span className={styles.editorPickScoreSuffix}>MAL</span>
-                    </div>
-                  ) : null}
-                </div>
-              </Link>
-            </div>
-          ) : null}
+          <EditorPickCard
+            pick={editorPick}
+            media={editorPick ? aniListMap?.[editorPick.mal_id] : null}
+            studio={editorPickStudio}
+            score={editorPickScore}
+            showRanking={heroHasScores && !sparse}
+          />
         </header>
 
         <div className={styles.tabRow}>
-          <div className={styles.tabs}>
-            {SEASONS.map((s) => {
-              const count = seasonMap[s.key]?.length || 0;
-              const empty = count === 0;
-              return (
-                <button
-                  key={s.key}
-                  type="button"
-                  disabled={empty}
-                  aria-disabled={empty}
-                  className={`${styles.tab} ${gridScope === s.key ? styles.tabActive : ''} ${
-                    empty ? styles.tabEmpty : ''
-                  }`}
-                  onClick={() => {
-                    if (empty) return;
-                    setActiveSeason(s.key);
-                    setGridScope(s.key);
-                  }}
-                >
-                  <span className={styles.tabLabel}>
-                    {t(s.labelKey)}
-                    <span className={styles.tabCount}>{count}</span>
-                  </span>
-                  <span className={styles.tabRange}>
-                    {t(`seasonsPage.tabRanges.${s.key}`)}
-                  </span>
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              className={`${styles.tab} ${gridScope === 'all' ? styles.tabActive : ''}`}
-              onClick={() => setGridScope('all')}
-            >
-              <span className={styles.tabLabel}>
-                {t('seasonsPage.seasons.all')}
-                <span className={styles.tabCount}>{totalAcrossYear}</span>
-              </span>
-              <span className={styles.tabRange}>
-                {t('seasonsPage.tabRanges.all')}
-              </span>
-            </button>
-          </div>
+          <SeasonTabs
+            seasonMap={seasonMap}
+            gridScope={gridScope}
+            totalAcrossYear={totalAcrossYear}
+            onSelectSeason={(key) => {
+              setActiveSeason(key);
+              setGridScope(key);
+            }}
+            onSelectAll={() => setGridScope('all')}
+          />
           <div className={styles.tabRowControls}>
             <div className={styles.yearStepper}>
               <IconButton
@@ -464,64 +322,8 @@ function Seasons({
           </div>
         ) : null}
 
-        {topThree.length > 0 && !isSparse ? (
-          <section className={styles.topThree}>
-            <div className={styles.sectionHead}>
-              <div>
-                <div className={styles.sectionEyebrow}>
-                  {t('seasonsPage.topThree.eyebrow')}
-                </div>
-                <h2 className={styles.sectionTitle}>
-                  {t('seasonsPage.topThree.title')}
-                </h2>
-              </div>
-            </div>
-            <div className={styles.topThreeGrid}>
-              {topThree.map((item, idx) => {
-                const banner = getAnimeImageUrl(item, aniListMap?.[item.mal_id]);
-                const studio = item.studios?.[0]?.name || '—';
-                return (
-                  <Link
-                    key={item.mal_id}
-                    href={`/anime/${item.mal_id}`}
-                    className={styles.topThreeCard}
-                  >
-                    <div className={styles.topThreeBanner}>
-                      {banner ? (
-                        <Image
-                          src={banner}
-                          alt={item.title || ''}
-                          fill
-                          sizes="(max-width: 1100px) 100vw, 420px"
-                          quality={90}
-                          className={styles.topThreeImg}
-                        />
-                      ) : null}
-                      <div className={styles.topThreeGradient} />
-                      <div className={styles.topThreeRank}>
-                        {String(idx + 1).padStart(2, '0')}
-                      </div>
-                    </div>
-                    <div className={styles.topThreeBody}>
-                      <div className={styles.topThreeMeta}>
-                        <span>{studio}</span>
-                        {item.year ? (
-                          <>
-                            <span>·</span>
-                            <span>{item.year}</span>
-                          </>
-                        ) : null}
-                      </div>
-                      <div className={styles.topThreeTitle}>{item.title}</div>
-                      {Number(item?.score) > 0 ? (
-                        <div className={styles.topThreeScore}>★ {Number(item.score).toFixed(2)}</div>
-                      ) : null}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
+        {!sparse ? (
+          <TopThreeSection items={topThree} aniListMap={aniListMap} />
         ) : null}
 
         <section className={styles.allTitles}>

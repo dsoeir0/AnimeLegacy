@@ -1,0 +1,77 @@
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: var(--al-fg-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -14px;
+  transition: color var(--dur-2) var(--ease-standard),
+    border-color var(--dur-2) var(--ease-standard);
+}
+
+.tabLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.tabRange {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--al-fg-3);
+}
+
+.tabActive .tabRange {
+  color: var(--al-fg-2);
+}
+
+.tab:hover {
+  color: var(--al-fg-1);
+}
+
+.tabActive {
+  color: var(--al-fg-1);
+  border-bottom-color: var(--al-primary-1);
+}
+
+.tabEmpty {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tabEmpty:hover {
+  color: var(--al-fg-3);
+}
+
+.tabCount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  background: var(--al-ink-3);
+  border-radius: 999px;
+  color: var(--al-fg-3);
+}
+
+.tabActive .tabCount {
+  background: color-mix(in srgb, var(--al-primary-2) 18%, transparent);
+  color: var(--al-primary-ink);
+}
