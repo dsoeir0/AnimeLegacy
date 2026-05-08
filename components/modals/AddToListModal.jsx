@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import { AlertTriangle, Check, ChevronDown, Minus, Plus, Star } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Modal from './Modal';
@@ -172,11 +173,15 @@ function AddToListModal({
       <div className={styles.body}>
         <div className={styles.posterWrap}>
           {anime?.image ? (
-            <img
-              src={anime.image}
-              alt={anime?.title || 'Anime poster'}
-              className={styles.poster}
-            />
+            <div className={styles.poster}>
+              <Image
+                src={anime.image}
+                alt={anime?.title || 'Anime poster'}
+                fill
+                sizes="120px"
+                className={styles.posterImg}
+              />
+            </div>
           ) : (
             <div className={styles.posterFallback} />
           )}
