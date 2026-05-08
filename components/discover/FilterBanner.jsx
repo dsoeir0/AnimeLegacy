@@ -2,6 +2,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Star, TrendingUp, LayoutGrid, List, X } from 'lucide-react';
 import { translate } from 'react-switch-lang';
+import Dropdown from '../ui/Dropdown';
+import MultiDropdown from '../ui/MultiDropdown';
 import {
   DECADE_KEYS,
   SCORE_KEYS,
@@ -27,7 +29,7 @@ const SCORE_OPTIONS = SCORE_KEYS;
 
 function FilterBanner({
   activeMood,
-  activeGenre,
+  activeGenres,
   count,
   sort,
   view,
@@ -35,6 +37,7 @@ function FilterBanner({
   status,
   decade,
   minScore,
+  genres,
   accent,
   t,
 }) {
@@ -52,31 +55,48 @@ function FilterBanner({
     router.push(target);
   };
 
+  const setGenres = (idArray) => {
+    const next = { ...router.query, page: 1 };
+    delete next.genre;
+    if (Array.isArray(idArray) && idArray.length > 0) {
+      next.genres = idArray.join(',');
+    } else {
+      delete next.genres;
+    }
+    delete next.mood;
+    router.push({ pathname: '/search', query: next });
+  };
+
+  const safeGenres = Array.isArray(activeGenres) ? activeGenres : [];
   const eyebrow = activeMood
     ? t('discoverPage.filter.eyebrowMood', { count })
     : t('discoverPage.filter.eyebrowGenre', { count });
 
-  const title = activeMood ? t(activeMood.labelKey) : activeGenre?.name || '';
+  const title = activeMood
+    ? t(activeMood.labelKey)
+    : safeGenres.map((g) => g.name).join(' + ');
   const sub = activeMood ? t(activeMood.subKey) : null;
 
-  const Select = ({ name, current, options, labelFor }) => (
-    <label className={styles.filterSelect}>
-      <span className={styles.filterSelectLabel}>
-        {t(`discoverPage.filter.${name}Label`)}
-      </span>
-      <select
-        value={current || ''}
-        onChange={(e) => goTo(name === 'minScore' ? 'min' : name, e.target.value)}
-        className={styles.filterSelectInput}
-      >
-        {options.map((opt) => (
-          <option key={opt || 'any'} value={opt}>
-            {labelFor(opt)}
-          </option>
-        ))}
-      </select>
-    </label>
+  const buildOptions = (keys, labelFor) =>
+    keys.map((value) => ({ value, label: labelFor(value) }));
+
+  const typeOptions = buildOptions(TYPE_OPTIONS, (opt) =>
+    opt ? t(`discoverPage.filter.type_${opt}`) : t('discoverPage.filter.typeAny'),
   );
+  const statusOptions = buildOptions(STATUS_OPTIONS, (opt) =>
+    opt ? t(`discoverPage.filter.status_${opt}`) : t('discoverPage.filter.statusAny'),
+  );
+  const decadeOptions = buildOptions(DECADE_OPTIONS, (opt) =>
+    opt ? t(`discoverPage.filter.decade_${opt}`) : t('discoverPage.filter.decadeAny'),
+  );
+  const scoreOptions = buildOptions(SCORE_OPTIONS, (opt) =>
+    opt ? t('discoverPage.filter.minScoreValue', { n: opt }) : t('discoverPage.filter.minScoreAny'),
+  );
+
+  const genreOptions = (Array.isArray(genres) ? genres : [])
+    .slice()
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)))
+    .map((g) => ({ value: String(g.mal_id), label: g.name }));
 
   return (
     <div
@@ -140,45 +160,36 @@ function FilterBanner({
         </div>
       </div>
       <div className={styles.filterStrip}>
-        <Select
-          name="type"
-          current={type}
-          options={TYPE_OPTIONS}
-          labelFor={(opt) =>
-            opt
-              ? t(`discoverPage.filter.type_${opt}`)
-              : t('discoverPage.filter.typeAny')
-          }
+        <MultiDropdown
+          label={t('discoverPage.filter.genreLabel')}
+          values={safeGenres.map((g) => String(g.mal_id))}
+          options={genreOptions}
+          onChange={setGenres}
+          placeholder={t('discoverPage.filter.genreAny')}
         />
-        <Select
-          name="status"
-          current={status}
-          options={STATUS_OPTIONS}
-          labelFor={(opt) =>
-            opt
-              ? t(`discoverPage.filter.status_${opt}`)
-              : t('discoverPage.filter.statusAny')
-          }
+        <Dropdown
+          label={t('discoverPage.filter.typeLabel')}
+          value={type || ''}
+          options={typeOptions}
+          onChange={(v) => goTo('type', v)}
         />
-        <Select
-          name="decade"
-          current={decade}
-          options={DECADE_OPTIONS}
-          labelFor={(opt) =>
-            opt
-              ? t(`discoverPage.filter.decade_${opt}`)
-              : t('discoverPage.filter.decadeAny')
-          }
+        <Dropdown
+          label={t('discoverPage.filter.statusLabel')}
+          value={status || ''}
+          options={statusOptions}
+          onChange={(v) => goTo('status', v)}
         />
-        <Select
-          name="minScore"
-          current={minScore}
-          options={SCORE_OPTIONS}
-          labelFor={(opt) =>
-            opt
-              ? t('discoverPage.filter.minScoreValue', { n: opt })
-              : t('discoverPage.filter.minScoreAny')
-          }
+        <Dropdown
+          label={t('discoverPage.filter.decadeLabel')}
+          value={decade || ''}
+          options={decadeOptions}
+          onChange={(v) => goTo('decade', v)}
+        />
+        <Dropdown
+          label={t('discoverPage.filter.minScoreLabel')}
+          value={minScore || ''}
+          options={scoreOptions}
+          onChange={(v) => goTo('min', v)}
         />
       </div>
     </div>

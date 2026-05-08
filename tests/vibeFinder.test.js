@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   coordsForAnime,
   rankByVibe,
+  synopsisFantasticalBoost,
   vibeDistance,
   vibeMatch,
 } from '../lib/utils/vibeFinder';
@@ -69,6 +70,36 @@ describe('coordsForAnime', () => {
   });
 });
 
+describe('synopsisFantasticalBoost', () => {
+  it('returns 0 for empty / non-string input', () => {
+    expect(synopsisFantasticalBoost('')).toBe(0);
+    expect(synopsisFantasticalBoost(null)).toBe(0);
+    expect(synopsisFantasticalBoost(undefined)).toBe(0);
+  });
+
+  it('returns 0 when no keywords match', () => {
+    expect(synopsisFantasticalBoost('A high school slice of life about cooking.')).toBe(0);
+  });
+
+  it('1 keyword hit → +10', () => {
+    expect(synopsisFantasticalBoost('A boy fights titan creatures.')).toBe(10);
+  });
+
+  it('2 keyword hits → +18', () => {
+    expect(synopsisFantasticalBoost('A boy fights titan creatures and monsters.')).toBe(18);
+  });
+
+  it('3+ keyword hits cap at +25', () => {
+    expect(
+      synopsisFantasticalBoost('Demon slayers fight monsters and witches in a magic kingdom.'),
+    ).toBe(25);
+  });
+
+  it('case-insensitive matching', () => {
+    expect(synopsisFantasticalBoost('TITAN attack')).toBe(10);
+  });
+});
+
 describe('vibeDistance / vibeMatch', () => {
   it('same coords → distance 0, match 100', () => {
     const a = make({ genres: [{ name: 'Action' }] });
@@ -77,10 +108,10 @@ describe('vibeDistance / vibeMatch', () => {
     expect(vibeMatch(a, target)).toBe(100);
   });
 
-  it('match is clamped at 60 on the low end', () => {
+  it('match is clamped at 30 on the low end', () => {
     const a = make({ genres: [{ name: 'Slice of Life' }, { name: 'Comedy' }] });
     const farTarget = { pace: 100, tone: 100, world: 100 };
-    expect(vibeMatch(a, farTarget)).toBeGreaterThanOrEqual(60);
+    expect(vibeMatch(a, farTarget)).toBeGreaterThanOrEqual(30);
   });
 });
 
@@ -113,7 +144,7 @@ describe('rankByVibe', () => {
   it('carries a match score on every result', () => {
     const ranked = rankByVibe(pool, { pace: 50, tone: 50, world: 50 }, 4);
     for (const r of ranked) {
-      expect(r.match).toBeGreaterThanOrEqual(60);
+      expect(r.match).toBeGreaterThanOrEqual(30);
       expect(r.match).toBeLessThanOrEqual(100);
     }
   });

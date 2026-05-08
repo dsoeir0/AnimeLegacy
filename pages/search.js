@@ -25,6 +25,7 @@ import {
   filterOutHentai,
   filterUnreleased,
   normalizeAnime,
+  slimAnimeForDiscover,
 } from '../lib/utils/anime';
 import { buildDiscoverPayload } from '../lib/utils/discoverPayload';
 import {
@@ -57,7 +58,7 @@ function DiscoverPage({
   page,
   results,
   pagination,
-  activeGenre,
+  activeGenres,
   activeMood,
   editorial,
   genres,
@@ -81,15 +82,35 @@ function DiscoverPage({
     setInputValue(query || '');
   }, [query]);
 
+  useEffect(() => {
+    const value = inputValue.trim();
+    if (value === (query || '')) return undefined;
+    const timer = setTimeout(() => {
+      router.replace(
+        {
+          pathname: '/search',
+          query: value ? { q: value, page: 1 } : {},
+        },
+        undefined,
+        { scroll: false },
+      );
+    }, 350);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue]);
+
   const items = Array.isArray(results?.data) ? results.data : [];
   const total = pagination?.items?.total || items.length;
   const lastPage = pagination?.last_visible_page || 1;
 
+  const safeGenres = Array.isArray(activeGenres) ? activeGenres : [];
   const buildResultsLink = (nextPage) => ({
     pathname: '/search',
     query: {
       ...(query ? { q: query } : {}),
-      ...(activeGenre ? { genre: activeGenre.mal_id } : {}),
+      ...(safeGenres.length > 0
+        ? { genres: safeGenres.map((g) => g.mal_id).join(',') }
+        : {}),
       ...(activeMood ? { mood: activeMood.id } : {}),
       ...(sort && sort !== 'top' ? { sort } : {}),
       ...(view && view !== 'grid' ? { view } : {}),
@@ -119,15 +140,6 @@ function DiscoverPage({
   };
 
   const entryFor = (mal_id) => list.find((e) => e.id === mal_id) || null;
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const value = inputValue.trim();
-    router.push({
-      pathname: '/search',
-      query: value ? { q: value } : {},
-    });
-  };
 
   const clearOne = (key) => {
     const nextQuery = { ...router.query };
@@ -176,10 +188,10 @@ function DiscoverPage({
             )}
           </div>
 
-          <form className={styles.searchBox} onSubmit={handleSubmit}>
+          <div className={styles.searchBox}>
             <Search size={18} className={styles.searchIcon} aria-hidden="true" />
             <input
-              type="text"
+              type="search"
               className={styles.searchInput}
               placeholder={t('discoverPage.searchPlaceholder')}
               value={inputValue}
@@ -187,7 +199,7 @@ function DiscoverPage({
               aria-label={t('discoverPage.searchLabel')}
             />
             <kbd className={styles.searchKbd}>⌘K</kbd>
-          </form>
+          </div>
         </header>
 
         {query ? (
@@ -225,19 +237,19 @@ function DiscoverPage({
                 </button>
               </span>
             ) : null}
-            {activeGenre ? (
-              <span className={styles.chip}>
-                {activeGenre.name}
+            {safeGenres.map((g) => (
+              <span key={g.mal_id} className={styles.chip}>
+                {g.name}
                 <button
                   type="button"
                   className={styles.chipClear}
-                  onClick={() => clearOne('genre')}
+                  onClick={() => clearOne('genres')}
                   aria-label={t('actions.clear')}
                 >
                   <X size={11} />
                 </button>
               </span>
-            ) : null}
+            ))}
             <button type="button" className={styles.clearAll} onClick={clearAll}>
               {t('discoverPage.clearAll')}
             </button>
@@ -252,11 +264,11 @@ function DiscoverPage({
             </div>
           ) : (
             <>
-              {activeMood || activeGenre ? (
+              {activeMood || safeGenres.length > 0 ? (
                 <div className={styles.filterBannerWrap}>
                   <FilterBanner
                     activeMood={activeMood}
-                    activeGenre={activeGenre}
+                    activeGenres={safeGenres}
                     count={total}
                     sort={sort}
                     view={view}
@@ -264,6 +276,7 @@ function DiscoverPage({
                     status={status}
                     decade={decade}
                     minScore={minScore}
+                    genres={genres}
                     accent={activeMood?.accent}
                   />
                 </div>
@@ -418,8 +431,11 @@ export default translate(DiscoverPage);
 export async function getServerSideProps(context) {
   const query = typeof context.query?.q === 'string' ? context.query.q.trim() : '';
   const page = Number.parseInt(context.query?.page, 10) || 1;
-  const genreIdRaw = context.query?.genre;
-  const genreId = Number.parseInt(genreIdRaw, 10);
+  const genresRaw = context.query?.genres ?? context.query?.genre ?? '';
+  const genreIds = String(genresRaw)
+    .split(',')
+    .map((s) => Number.parseInt(s.trim(), 10))
+    .filter(Number.isFinite);
   const moodId = typeof context.query?.mood === 'string' ? context.query.mood : null;
   const sort = normalizeSort(context.query?.sort);
   const view = normalizeView(context.query?.view);
@@ -434,11 +450,12 @@ export async function getServerSideProps(context) {
     name: g.name,
     count: g.count || 0,
   }));
-  const activeGenre =
-    Number.isFinite(genreId) ? genres.find((g) => g.mal_id === genreId) || null : null;
+  const activeGenres = genreIds
+    .map((id) => genres.find((g) => g.mal_id === id))
+    .filter(Boolean);
   const activeMood = moodId ? findMood(moodId) : null;
 
-  const isResultsMode = Boolean(query || activeGenre || activeMood);
+  const isResultsMode = Boolean(query || activeGenres.length > 0 || activeMood);
   if (isResultsMode) {
     let response;
     if (query) {
@@ -450,7 +467,7 @@ export async function getServerSideProps(context) {
     } else {
       const baseParams = activeMood
         ? overrideSort(activeMood.query, sort)
-        : buildGenreQuery(activeGenre.mal_id, sort);
+        : buildGenreQuery(activeGenres.map((g) => g.mal_id).join(','), sort);
       const params = applyExtraFilters(baseParams, {
         type,
         status,
@@ -473,7 +490,7 @@ export async function getServerSideProps(context) {
         page,
         results,
         pagination,
-        activeGenre,
+        activeGenres,
         activeMood: activeMood
           ? {
               id: activeMood.id,
@@ -498,6 +515,22 @@ export async function getServerSideProps(context) {
   const topRes = await getTopAnime('', 1);
   const topList = Array.isArray(topRes?.data) ? filterOutHentai(topRes.data) : [];
   const editorial = buildDiscoverPayload(topList);
+
+  if (editorial.moodPosters) {
+    const sparse = DISCOVER_MOODS.filter(
+      (m) => (editorial.moodPosters[m.id] || []).length < 6,
+    );
+    if (sparse.length > 0) {
+      const fills = await Promise.all(
+        sparse.map((m) => getAnimeByFilter({ params: m.query, page: 1 })),
+      );
+      sparse.forEach((mood, i) => {
+        const data = Array.isArray(fills[i]?.data) ? fills[i].data : [];
+        const cleaned = filterOutHentai(data).slice(0, 6).map(slimAnimeForDiscover);
+        if (cleaned.length > 0) editorial.moodPosters[mood.id] = cleaned;
+      });
+    }
+  }
 
   const moodPosterIds = editorial.moodPosters
     ? Object.values(editorial.moodPosters).flat().map((a) => a?.mal_id)
@@ -558,7 +591,7 @@ export async function getServerSideProps(context) {
       page: 1,
       results: { data: [] },
       pagination: {},
-      activeGenre: null,
+      activeGenres: [],
       activeMood: null,
       editorial,
       genres,
