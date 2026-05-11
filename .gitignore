@@ -2,8 +2,6 @@
 
 # dependencies
 /node_modules
-/.pnp
-.pnp.js
 
 # testing
 /coverage
@@ -11,9 +9,6 @@
 # next.js
 /.next/
 /out/
-
-# production
-/build
 
 # misc
 .DS_Store
@@ -35,22 +30,8 @@ firestore-debug.log*
 # secrets
 /config/firebase-admin.json
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Claude Code local session data
-.claude/
-CLAUDE.md
-
-# Local-only operator notes (planning / roadmap)
-docs/improvements.md
