@@ -133,7 +133,6 @@
   line-height: 1.5;
 }
 
-/* ────────── Preview ────────── */
 .previewHead {
   display: flex;
   align-items: center;
@@ -288,7 +287,6 @@
   flex-wrap: wrap;
 }
 
-/* ────────── Importing / Done ────────── */
 .loadingRow {
   display: inline-flex;
   align-items: center;

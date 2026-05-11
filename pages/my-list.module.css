@@ -109,7 +109,6 @@
   color: var(--al-fg-3);
 }
 
-/* =========================== TABS =========================== */
 .tabs {
   display: flex;
   gap: 4px;
@@ -166,7 +165,6 @@
   color: var(--al-primary-ink);
 }
 
-/* =========================== TOOLBAR =========================== */
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -185,7 +183,6 @@
   border-radius: 8px;
 }
 
-/* =========================== WARNING =========================== */
 .warning {
   display: flex;
   align-items: center;
@@ -199,7 +196,6 @@
   margin-bottom: 16px;
 }
 
-/* =========================== EMPTY =========================== */
 .emptyCard {
   padding: 64px 32px;
   text-align: center;
@@ -274,7 +270,6 @@
   background: var(--al-ink-3);
 }
 
-/* =========================== LIST VIEW =========================== */
 .listStack {
   display: flex;
   flex-direction: column;
@@ -451,7 +446,6 @@
   gap: 4px;
 }
 
-/* =========================== GRID VIEW =========================== */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -571,7 +565,6 @@
   font-weight: 600;
 }
 
-/* =========================== PAGINATION =========================== */
 .pagination {
   display: flex;
   align-items: center;
@@ -613,7 +606,6 @@
   font-family: var(--font-mono);
 }
 
-/* =========================== RESPONSIVE =========================== */
 @media (max-width: 900px) {
   .page {
     padding: 28px 20px 80px;

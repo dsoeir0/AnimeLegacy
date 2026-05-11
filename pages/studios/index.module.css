@@ -1,7 +1,3 @@
-/* Page-level layout for /studios. Sub-component styles (header, featured
-   block, filter bar, card) live in components/studios/studios.module.css
-   so they travel with their JSX. */
-
 .page {
   padding: 40px 48px 80px;
 }

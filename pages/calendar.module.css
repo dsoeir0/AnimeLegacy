@@ -54,7 +54,6 @@
   margin-bottom: 16px;
 }
 
-/* ────────────── Timetable grid ────────────── */
 .grid {
   display: grid;
   grid-template-columns: 60px repeat(7, minmax(0, 1fr));
@@ -126,7 +125,6 @@
   margin-top: 2px;
 }
 
-/* Hours + slots */
 .hourLabel {
   padding: 10px;
   border-right: 1px solid var(--al-border);
@@ -178,7 +176,6 @@
   background: var(--al-ink-2);
 }
 
-/* ────────────── Legend ────────────── */
 .legend {
   display: flex;
   gap: 20px;
@@ -217,7 +214,6 @@
   letter-spacing: 0.02em;
 }
 
-/* ────────────── Responsive ────────────── */
 @media (max-width: 900px) {
   .page {
     padding: 28px 20px 80px;

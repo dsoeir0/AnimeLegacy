@@ -1,7 +1,3 @@
-/* Compact schedule entry that sits inside a (day × hour) slot of the
-   timetable. 44px poster thumb on the left, time + title on the right,
-   optional "in your list" dot in the top-right. */
-
 .entry {
   position: relative;
   display: grid;

@@ -2,7 +2,6 @@
   padding-bottom: 80px;
 }
 
-/* =========================== HERO BANNER =========================== */
 .hero {
   position: relative;
   height: 480px;
@@ -60,7 +59,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* =========================== OVERLAPPING CONTENT =========================== */
 .content {
   padding: 0 48px;
   margin-top: -220px;
@@ -190,7 +188,6 @@
   white-space: nowrap;
 }
 
-/* =========================== MAIN GRID =========================== */
 .mainGrid {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -260,7 +257,6 @@
   background: var(--al-ink-2);
 }
 
-/* =========================== TRAILER =========================== */
 .videoFrame {
   position: relative;
   aspect-ratio: 16 / 9;
@@ -276,7 +272,6 @@
   border: none;
 }
 
-/* =========================== CAST =========================== */
 .castGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -368,7 +363,6 @@
   border: 1px solid var(--al-border);
 }
 
-/* =========================== SIDE COLUMN =========================== */
 .sideColumn {
   display: flex;
   flex-direction: column;
@@ -467,7 +461,6 @@
   white-space: nowrap;
 }
 
-/* =========================== RESPONSIVE =========================== */
 @media (max-width: 1100px) {
   .mainGrid {
     grid-template-columns: 1fr;

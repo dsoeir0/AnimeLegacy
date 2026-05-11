@@ -2,7 +2,6 @@
   padding: 40px 48px 80px;
 }
 
-/* =========================== HERO =========================== */
 .hero {
   display: grid;
   grid-template-columns: 360px 1fr;
@@ -169,7 +168,6 @@
   margin-bottom: 0;
 }
 
-/* =========================== SECTIONS =========================== */
 .section {
   margin-top: 56px;
 }
@@ -201,7 +199,6 @@
   color: var(--al-fg-1);
 }
 
-/* =========================== APPEARANCES =========================== */
 .appearanceGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -285,7 +282,6 @@
   margin-top: 4px;
 }
 
-/* =========================== VOICE ACTORS =========================== */
 .voiceGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));

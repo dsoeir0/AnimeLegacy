@@ -118,7 +118,6 @@
   background: var(--al-ink-2);
 }
 
-/* Shared footer button styles used by all modals. */
 .btnSecondary {
   height: 38px;
   padding: 0 18px;

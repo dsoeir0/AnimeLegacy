@@ -16,7 +16,6 @@
 
 .empty p { color: var(--al-fg-2); margin: 0 0 16px; }
 
-/* Hero */
 .hero {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -170,7 +169,6 @@
 
 .bioText:last-child { margin-bottom: 0; }
 
-/* Section heads */
 .section { margin-top: 56px; }
 
 .sectionHead {
@@ -200,7 +198,6 @@
   margin: 0;
 }
 
-/* Roles */
 .rolesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -269,7 +266,6 @@
   border: 1px solid rgba(132, 217, 255, 0.25);
 }
 
-/* Anime filmography */
 .animeGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));

@@ -1,4 +1,3 @@
-/* =========================== TOP BAR =========================== */
 .topBar {
   display: flex;
   justify-content: flex-end;
@@ -11,7 +10,6 @@
   color: var(--al-fg-3);
 }
 
-/* =========================== FORM AREA =========================== */
 .formArea {
   flex: 1;
   display: flex;
@@ -53,7 +51,6 @@
   max-width: 380px;
 }
 
-/* =========================== GOOGLE BUTTON =========================== */
 .googleBtn {
   width: 100%;
   height: 48px;
@@ -81,7 +78,6 @@
   cursor: not-allowed;
 }
 
-/* =========================== DIVIDER =========================== */
 .divider {
   display: flex;
   align-items: center;
@@ -104,7 +100,6 @@
   color: var(--al-fg-2);
 }
 
-/* =========================== FIELDS =========================== */
 .field {
   margin-bottom: 18px;
 }
@@ -226,7 +221,6 @@
   color: var(--al-danger);
 }
 
-/* =========================== RULES =========================== */
 .ruleList {
   list-style: none;
   padding: 0;
@@ -263,7 +257,6 @@
   background: var(--al-success);
 }
 
-/* =========================== CHECKBOX =========================== */
 .checkRow {
   display: flex;
   align-items: center;
@@ -286,7 +279,6 @@
   height: 14px;
 }
 
-/* =========================== FEEDBACK =========================== */
 .error {
   background: var(--al-danger-soft);
   color: var(--al-danger);
@@ -307,7 +299,6 @@
   margin-top: 14px;
 }
 
-/* =========================== LEGAL =========================== */
 .legal {
   font-size: 11.5px;
   color: var(--al-fg-3);
@@ -327,7 +318,6 @@
   color: var(--al-fg-1);
 }
 
-/* =========================== SIGNED-IN CARD =========================== */
 .signedIn {
   padding: 18px 20px;
   background: var(--al-ink-3);
@@ -342,7 +332,6 @@
   font-size: 14px;
 }
 
-/* =========================== ALT LINK =========================== */
 .altLink {
   display: flex;
   gap: 6px;
@@ -377,7 +366,6 @@
   text-decoration: underline;
 }
 
-/* =========================== AVATAR =========================== */
 .avatarCenter {
   display: flex;
   justify-content: center;
@@ -452,7 +440,6 @@
   cursor: not-allowed;
 }
 
-/* =========================== FORM ACTIONS =========================== */
 .formActions {
   display: flex;
   gap: 8px;
@@ -463,7 +450,6 @@
   flex: 1;
 }
 
-/* =========================== FOOTER =========================== */
 .footer {
   display: flex;
   justify-content: space-between;
@@ -492,7 +478,6 @@
   color: var(--al-fg-1);
 }
 
-/* =========================== MODAL (Google new-user) =========================== */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -546,7 +531,6 @@
   color: var(--al-fg-3);
 }
 
-/* =========================== BACK LINK =========================== */
 .backLink {
   display: inline-flex;
   align-items: center;

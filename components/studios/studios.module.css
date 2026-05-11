@@ -1,14 +1,3 @@
-/* Shared styles for the studios index sub-components. Kept in one file
-   because every class below is used by at least two of the sub-components
-   (the featured block's stats reuse the grid card's stat palette, the
-   grid header's stat labels reuse the hero stats styles, etc). Splitting
-   per-component would just force each file to re-declare the same tokens.
-
-   Page-level classes (.page, .grid layout, .pagination) stay in
-   `pages/studios/index.module.css` since they orchestrate the layout
-   rather than describe a sub-component. */
-
-/* ─────────── Page header ─────────── */
 .head {
   margin-bottom: 32px;
   padding-bottom: 28px;
@@ -86,7 +75,6 @@
   color: var(--al-fg-1);
 }
 
-/* ─────────── Featured studio ─────────── */
 .featured {
   margin-bottom: 24px;
   display: grid;
@@ -206,7 +194,6 @@
   text-decoration: none;
 }
 
-/* Portfolio side */
 .portfolio {
   padding: 22px;
   background: rgba(6, 7, 9, 0.35);
@@ -298,7 +285,6 @@
   min-height: 0;
 }
 
-/* ─────────── Filter bar ─────────── */
 .filterBar {
   display: flex;
   align-items: center;
@@ -413,7 +399,6 @@
   letter-spacing: 0.1em;
 }
 
-/* ─────────── Grid card ─────────── */
 .card {
   position: relative;
   padding: 0;
@@ -539,7 +524,6 @@
   font-style: italic;
 }
 
-/* Mini-poster strip — narrow thumbnails of the studio's top titles. */
 .posterRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -605,7 +589,6 @@
   color: var(--al-warm-ink);
 }
 
-/* ─────────── Responsive ─────────── */
 @media (max-width: 900px) {
   .headGrid {
     grid-template-columns: 1fr;

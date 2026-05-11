@@ -5,7 +5,6 @@
   background: var(--al-ink-1);
 }
 
-/* =========================== LEFT (editorial) =========================== */
 .left {
   position: relative;
   overflow: hidden;
@@ -130,7 +129,6 @@
   max-width: 440px;
 }
 
-/* =========================== RIGHT (form) =========================== */
 .right {
   display: flex;
   flex-direction: column;
@@ -166,7 +164,6 @@
   font-size: 10px;
 }
 
-/* =========================== RESPONSIVE =========================== */
 @media (max-width: 900px) {
   .shell {
     grid-template-columns: 1fr;
