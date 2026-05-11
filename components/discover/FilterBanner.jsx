@@ -33,6 +33,7 @@ function FilterBanner({
   count,
   sort,
   view,
+  onViewChange,
   type,
   status,
   decade,
@@ -146,14 +147,15 @@ function FilterBanner({
               const Icon = key === 'grid' ? LayoutGrid : List;
               const active = view === key;
               return (
-                <Link
+                <button
                   key={key}
-                  href={setQueryParam('view', key === 'grid' ? '' : key)}
+                  type="button"
+                  onClick={() => onViewChange?.(key)}
                   className={`${styles.filterViewBtn} ${active ? styles.filterViewBtnActive : ''}`}
                   aria-label={t(`discoverPage.filter.view${key === 'grid' ? 'Grid' : 'List'}`)}
                 >
                   <Icon size={14} strokeWidth={2.2} />
-                </Link>
+                </button>
               );
             })}
           </div>

@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { collection, doc, getDoc, limit, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
 import { getFirebaseClient } from '../lib/firebase/client';
+import { peekUserProfile, subscribeToUserProfile } from '../lib/firebase/userProfileStore';
 import { getAnimeById } from '../lib/services/jikan';
 import { ensureAnimeCatalog } from '../lib/services/animeCatalog';
 import { computeGenres, computeStats } from '../lib/utils/profileStats';
 import { FAVORITE_LIMIT } from '../lib/constants';
 
 export default function useProfileData(uid) {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(() => peekUserProfile(uid));
   const [animeItems, setAnimeItems] = useState([]);
   const [listItems, setListItems] = useState([]);
   const [activity, setActivity] = useState([]);
@@ -53,9 +54,8 @@ export default function useProfileData(uid) {
       return undefined;
     }
 
-    const profileRef = doc(db, 'users', uid);
-    const unsubscribeProfile = onSnapshot(profileRef, (snapshot) => {
-      setProfile(snapshot.exists() ? snapshot.data() : null);
+    const unsubscribeProfile = subscribeToUserProfile(uid, (data) => {
+      setProfile(data);
       setLoadedProfile(true);
     });
 
@@ -164,9 +164,7 @@ export default function useProfileData(uid) {
           if (genres && genres.length > 0) next[id] = genres;
         });
         setCatalogGenres(next);
-      } catch {
-        // retry next run
-      }
+      } catch {}
     };
 
     fetchGenres();
@@ -221,9 +219,7 @@ export default function useProfileData(uid) {
               setDoc(doc(db, 'users', uid, 'anime', id), { genres }, { merge: true }),
               ensureAnimeCatalog(data),
             ]);
-          } catch {
-            // retry next load
-          }
+          } catch {}
         }),
       );
     };

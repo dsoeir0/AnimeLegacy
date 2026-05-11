@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getFirebaseClient } from '../lib/firebase/client';
+import { peekAuthState, subscribeToAuthState } from '../lib/firebase/authStateStore';
 import {
   confirmPasswordReset,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -12,21 +12,11 @@ import {
 } from 'firebase/auth';
 
 export default function useAuth() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState(() => peekAuthState());
 
-  useEffect(() => {
-    const { auth } = getFirebaseClient();
-    if (!auth) {
-      setLoading(false);
-      return undefined;
-    }
-    const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
-      setUser(nextUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+  useEffect(() => subscribeToAuthState(setState), []);
+
+  const { user, loading } = state;
 
   const signInWithGoogle = useCallback(async () => {
     const { auth, googleProvider, enabled } = getFirebaseClient();

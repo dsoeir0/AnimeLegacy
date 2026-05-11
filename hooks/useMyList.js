@@ -2,15 +2,12 @@ import { useEffect, useState } from 'react';
 import useAuth from './useAuth';
 import { getFirebaseClient } from '../lib/firebase/client';
 import {
-  collection,
   deleteDoc,
   doc,
-  onSnapshot,
-  orderBy,
-  query,
   setDoc,
   serverTimestamp,
 } from 'firebase/firestore';
+import { peekUserList, subscribeToUserList } from '../lib/firebase/userListStore';
 import { ensureAnimeCatalog } from '../lib/services/animeCatalog';
 import { addUserActivity, upsertUserAnime, updateUserAnime } from '../lib/services/userAnime';
 import { isAiringAnime } from '../lib/utils/anime';
@@ -23,34 +20,23 @@ import {
 
 export default function useMyList() {
   const { user } = useAuth();
-  const [list, setList] = useState([]);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [list, setList] = useState(() => peekUserList(user?.uid) || []);
+  const [hasLoaded, setHasLoaded] = useState(() =>
+    user?.uid ? peekUserList(user.uid) !== null : true,
+  );
   const canEdit = Boolean(user?.uid);
 
   useEffect(() => {
-    let unsubscribe = null;
-
-    const loadRemote = async () => {
-      const { db } = getFirebaseClient();
-      if (!db || !user?.uid) {
-        setList([]);
-        setHasLoaded(true);
-        return;
-      }
-      const listRef = collection(db, 'users', user.uid, 'list');
-      const listQuery = query(listRef, orderBy('addedAt', 'desc'));
-      unsubscribe = onSnapshot(listQuery, (snapshot) => {
-        const items = snapshot.docs.map((docItem) => docItem.data());
-        setList(items);
-        setHasLoaded(true);
-      });
-    };
-
-    loadRemote();
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    if (!user?.uid) {
+      setList([]);
+      setHasLoaded(true);
+      return undefined;
+    }
+    setHasLoaded(peekUserList(user.uid) !== null);
+    return subscribeToUserList(user.uid, (items) => {
+      setList(items);
+      setHasLoaded(true);
+    });
   }, [user?.uid]);
 
   const addItem = async (item, options = {}) => {

@@ -77,10 +77,28 @@ function DiscoverPage({
   const [pendingAnime, setPendingAnime] = useState(null);
   const [pendingEntry, setPendingEntry] = useState(null);
   const [inputValue, setInputValue] = useState(query || '');
+  const [viewMode, setViewMode] = useState(view || 'grid');
 
   useEffect(() => {
     setInputValue(query || '');
   }, [query]);
+
+  useEffect(() => {
+    if (view && view !== viewMode) setViewMode(view);
+  }, [view]);
+
+  const handleViewChange = (next) => {
+    if (next === viewMode) return;
+    setViewMode(next);
+    const nextQuery = { ...router.query };
+    if (next === 'grid') delete nextQuery.view;
+    else nextQuery.view = next;
+    router.replace(
+      { pathname: '/search', query: nextQuery },
+      undefined,
+      { shallow: true, scroll: false },
+    );
+  };
 
   useEffect(() => {
     const value = inputValue.trim();
@@ -96,7 +114,6 @@ function DiscoverPage({
       );
     }, 350);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue]);
 
   const items = Array.isArray(results?.data) ? results.data : [];
@@ -113,7 +130,7 @@ function DiscoverPage({
         : {}),
       ...(activeMood ? { mood: activeMood.id } : {}),
       ...(sort && sort !== 'top' ? { sort } : {}),
-      ...(view && view !== 'grid' ? { view } : {}),
+      ...(viewMode && viewMode !== 'grid' ? { view: viewMode } : {}),
       ...(type ? { type } : {}),
       ...(status ? { status } : {}),
       ...(decade ? { decade } : {}),
@@ -271,7 +288,8 @@ function DiscoverPage({
                     activeGenres={safeGenres}
                     count={total}
                     sort={sort}
-                    view={view}
+                    view={viewMode}
+                    onViewChange={handleViewChange}
                     type={type}
                     status={status}
                     decade={decade}
@@ -291,7 +309,7 @@ function DiscoverPage({
                   </span>
                 </div>
               )}
-              {view === 'grid' ? (
+              {viewMode === 'grid' ? (
                 <div className={styles.gridResults}>
                   {items.map((element) => (
                     <PosterCard

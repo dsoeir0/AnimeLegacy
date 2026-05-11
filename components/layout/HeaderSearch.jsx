@@ -11,9 +11,30 @@ import {
   searchPeople,
   searchProducers,
 } from '../../lib/services/jikan';
+import { createSessionCache } from '../../lib/utils/sessionCache';
 import styles from './Header.module.css';
 
 const EMPTY_RESULTS = { anime: [], characters: [], people: [], studios: [] };
+
+const cache = createSessionCache({ ttlMs: 5 * 60 * 1000, max: 50 });
+
+const fetchHeaderResults = (q) =>
+  cache.withInflight(q, async () => {
+    const [animeRes, charRes, peopleRes, prodRes] = await Promise.all([
+      searchAnime(q, 1, 4),
+      searchCharacters(q, 1, 4),
+      searchPeople(q, 1, 4),
+      searchProducers(q, 1, 4),
+    ]);
+    const safeArray = (res) =>
+      !res?.error && Array.isArray(res?.data) ? res.data : [];
+    return {
+      anime: filterOutHentai(safeArray(animeRes)),
+      characters: safeArray(charRes),
+      people: safeArray(peopleRes),
+      studios: safeArray(prodRes),
+    };
+  });
 
 function HeaderSearch({ t }) {
   const router = useRouter();
@@ -37,21 +58,9 @@ function HeaderSearch({ t }) {
     }
     setIsLoading(true);
     const timer = setTimeout(async () => {
-      const [animeRes, charRes, peopleRes, prodRes] = await Promise.all([
-        searchAnime(trimmedQuery, 1, 4),
-        searchCharacters(trimmedQuery, 1, 4),
-        searchPeople(trimmedQuery, 1, 4),
-        searchProducers(trimmedQuery, 1, 4),
-      ]);
+      const value = await fetchHeaderResults(trimmedQuery);
       if (!isActive) return;
-      const safeArray = (res) =>
-        !res?.error && Array.isArray(res?.data) ? res.data : [];
-      setResults({
-        anime: filterOutHentai(safeArray(animeRes)),
-        characters: safeArray(charRes),
-        people: safeArray(peopleRes),
-        studios: safeArray(prodRes),
-      });
+      setResults(value);
       setIsOpen(true);
       setIsLoading(false);
     }, 350);
