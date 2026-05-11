@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { updateProfile } from 'firebase/auth';
 import { X } from 'lucide-react';
 import { translate } from 'react-switch-lang';
@@ -131,9 +132,19 @@ function EditProfileModal({
           <div className={styles.modalAvatarRow}>
             <div className={styles.modalAvatarCircle}>
               {editPreview ? (
-                <img src={editPreview} alt="" />
+                <Image
+                  src={editPreview}
+                  alt=""
+                  width={88}
+                  height={88}
+                />
               ) : avatar ? (
-                <img src={avatar} alt={displayName} />
+                <Image
+                  src={avatar}
+                  alt={displayName}
+                  width={88}
+                  height={88}
+                />
               ) : (
                 <span>{initials}</span>
               )}

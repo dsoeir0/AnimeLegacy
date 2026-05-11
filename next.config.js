@@ -10,6 +10,8 @@ const nextConfig = {
       { protocol: 'https', hostname: 's3.anilist.co' },
       { protocol: 'https', hostname: 's2.anilist.co' },
       { protocol: 'https', hostname: 's1.anilist.co' },
+      { protocol: 'https', hostname: 'flagcdn.com' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
   async headers() {

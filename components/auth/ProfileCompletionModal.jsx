@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { Plus } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Button from '../ui/Button';
@@ -85,7 +86,12 @@ function ProfileCompletionModal({
           <div className={styles.avatarCenter}>
             <div className={styles.avatarCircle}>
               {avatarPreview ? (
-                <img src={avatarPreview} alt="Avatar preview" />
+                <Image
+                  src={avatarPreview}
+                  alt="Avatar preview"
+                  width={120}
+                  height={120}
+                />
               ) : (
                 <Plus size={24} />
               )}

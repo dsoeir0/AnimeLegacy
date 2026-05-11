@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Bell, Sparkles, ArrowLeft } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
+import { currentPath } from '../../lib/utils/router';
+import { userInitials } from '../../lib/utils/userDisplay';
 import IconButton from '../ui/IconButton';
 import LanguageSwitcher from './LanguageSwitcher';
 import HeaderSearch from './HeaderSearch';
@@ -36,7 +39,7 @@ const shouldShowBack = (path) => BACK_PATHS.some((p) => p.test(path));
 
 function Header({ variant = 'default', t }) {
   const router = useRouter();
-  const path = router.asPath.split('?')[0];
+  const path = currentPath(router);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const { user, loading: authLoading, signOutUser } = useAuth();
@@ -91,10 +94,16 @@ function Header({ variant = 'default', t }) {
             }}
           >
             {avatar ? (
-              <img className={styles.profileAvatar} src={avatar} alt={displayName || 'Profile'} />
+              <Image
+                className={styles.profileAvatar}
+                src={avatar}
+                alt={displayName || 'Profile'}
+                width={32}
+                height={32}
+              />
             ) : (
               <span className={styles.profileInitials}>
-                {(displayName || 'U').slice(0, 1).toUpperCase()}
+                {userInitials(displayName)}
               </span>
             )}
           </button>

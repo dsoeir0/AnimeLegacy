@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { setLanguage, getLanguage, translate } from 'react-switch-lang';
 import { flags, SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE } from '../../lib/constants/flags';
@@ -36,10 +37,7 @@ function LanguageSwitcher({ t }) {
     setCurrentLang(code);
     try {
       localStorage.setItem('lang', code);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.warn('Unable to persist language preference:', error);
-    }
+    } catch {}
   };
 
   return (
@@ -52,7 +50,13 @@ function LanguageSwitcher({ t }) {
         aria-label="Change language"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <img src={flags[currentLang]} alt="" className={styles.flag} />
+        <Image
+          src={flags[currentLang]}
+          alt=""
+          width={20}
+          height={14}
+          className={styles.flag}
+        />
         <span className={styles.label}>{t(`lang.${currentLang}`)}</span>
         <ChevronDown size={14} className={styles.caret} aria-hidden="true" />
       </button>
@@ -69,7 +73,13 @@ function LanguageSwitcher({ t }) {
                 className={`${styles.option} ${active ? styles.optionActive : ''}`}
                 onClick={() => handleSelect(code)}
               >
-                <img src={flags[code]} alt="" className={styles.flag} />
+                <Image
+                  src={flags[code]}
+                  alt=""
+                  width={20}
+                  height={14}
+                  className={styles.flag}
+                />
                 <span>{t(`lang.${code}`)}</span>
               </button>
             );

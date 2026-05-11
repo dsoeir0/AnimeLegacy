@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
@@ -20,6 +21,8 @@ import { translate } from 'react-switch-lang';
 import Logo from '../ui/Logo';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
+import { currentPath } from '../../lib/utils/router';
+import { userInitials } from '../../lib/utils/userDisplay';
 import styles from './Sidebar.module.css';
 
 const STORAGE_KEY = 'animeLegacy.sidebar.collapsed';
@@ -81,7 +84,7 @@ function Sidebar({ t }) {
     });
   };
 
-  const path = router.asPath.split('?')[0];
+  const path = currentPath(router);
   const isActive = (item) => item.match(path);
 
   return (
@@ -123,9 +126,15 @@ function Sidebar({ t }) {
           className={`${styles.userRow} ${collapsed ? styles.userRowCollapsed : ''}`}
         >
           {avatar ? (
-            <img src={avatar} alt="" className={styles.avatar} />
+            <Image
+              src={avatar}
+              alt=""
+              width={36}
+              height={36}
+              className={styles.avatar}
+            />
           ) : (
-            <div className={styles.avatarFallback}>{(displayName || 'U').slice(0, 1).toUpperCase()}</div>
+            <div className={styles.avatarFallback}>{userInitials(displayName)}</div>
           )}
           {!collapsed ? (
             <div className={styles.userMeta}>

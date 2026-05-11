@@ -20,6 +20,7 @@ import useProfileData from '../hooks/useProfileData';
 import { FAVORITE_LIMIT } from '../lib/constants';
 import { isAiringAnime } from '../lib/utils/anime';
 import { resolveStatus } from '../lib/utils/listTransitions';
+import { userInitials } from '../lib/utils/userDisplay';
 import {
   buildStreakDots,
   computeGenreBars,
@@ -56,7 +57,7 @@ function ProfilePage({ t }) {
   } = useProfileData(user?.uid);
   const displayName = profile?.username || user?.displayName || 'Guest';
   const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL;
-  const initials = useMemo(() => displayName.slice(0, 1).toUpperCase(), [displayName]);
+  const initials = useMemo(() => userInitials(displayName), [displayName]);
   const bio = profile?.bio || t('profile.bioDefault');
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);

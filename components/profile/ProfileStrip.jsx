@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Pencil, LogOut } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Button from '../ui/Button';
@@ -20,7 +21,16 @@ function ProfileStrip({
   return (
     <section className={styles.strip}>
       <div className={styles.stripAvatar}>
-        {avatar ? <img src={avatar} alt={displayName} /> : <span>{initials}</span>}
+        {avatar ? (
+          <Image
+            src={avatar}
+            alt={displayName}
+            width={88}
+            height={88}
+          />
+        ) : (
+          <span>{initials}</span>
+        )}
       </div>
       <div className={styles.stripIdent}>
         <div className={styles.stripNameRow}>

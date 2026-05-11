@@ -13,6 +13,7 @@ import {
   setCharacterFavorite,
 } from '../../lib/services/favoriteCharacters';
 import { healMissingAddedAt } from '../../lib/services/userList';
+import { chunk } from '../../lib/utils/chunk';
 import {
   planFavoriteImport,
   summarizeImport,
@@ -23,10 +24,11 @@ import styles from './mal.module.css';
 const IMPORT_CONCURRENCY = 3;
 
 async function runInBatches(items, size, worker, onTick) {
-  for (let i = 0; i < items.length; i += size) {
-    const slice = items.slice(i, i + size);
+  let processed = 0;
+  for (const slice of chunk(items, size)) {
     await Promise.all(slice.map(worker));
-    onTick?.(Math.min(i + size, items.length));
+    processed += slice.length;
+    onTick?.(processed);
   }
 }
 
