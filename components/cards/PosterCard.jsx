@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Check, TrendingUp, Star } from 'lucide-react';
 import { toCardShape } from '../../lib/utils/cardShape';
+import { formatFivePoint } from '../../lib/utils/rating';
 import styles from './PosterCard.module.css';
 
 export default function PosterCard({ anime, media, inList, onClick, width = 200, showMeta = true, href }) {
@@ -36,7 +37,7 @@ export default function PosterCard({ anime, media, inList, onClick, width = 200,
         ) : null}
         <div className={styles.scorePill}>
           <Star size={10} strokeWidth={1.5} className={styles.scoreStar} />
-          <span className={styles.scoreNum}>{card.score ? card.score.toFixed(2) : 'NR'}</span>
+          <span className={styles.scoreNum}>{formatFivePoint(card.score) ?? 'NR'}</span>
         </div>
       </div>
       {showMeta ? (

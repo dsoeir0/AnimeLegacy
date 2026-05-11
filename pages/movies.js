@@ -9,6 +9,7 @@ import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
 import { getTopAnimeMovies } from '../lib/services/jikan';
 import { dedupeByMalId, filterOutHentai } from '../lib/utils/anime';
 import { getAnimeImageUrl } from '../lib/utils/media';
+import { formatFivePoint } from '../lib/utils/rating';
 import styles from './movies.module.css';
 
 function MoviesPage({ items, pagination, page, aniListMap, t }) {
@@ -58,7 +59,7 @@ function MoviesPage({ items, pagination, page, aniListMap, t }) {
                     {score !== null ? (
                       <div className={styles.scoreBadge}>
                         <Star size={11} fill="currentColor" strokeWidth={0} />
-                        {score.toFixed(1)}
+                        {formatFivePoint(score)}
                       </div>
                     ) : null}
                   </div>

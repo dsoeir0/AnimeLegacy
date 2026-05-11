@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Bell } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Button from '../ui/Button';
 import { getAnimeBannerUrl } from '../../lib/utils/media';
+import { formatFivePoint } from '../../lib/utils/rating';
 import { pickStudioName, studioInitial } from '../../lib/utils/studio';
 import { accentForStudio } from '../../lib/utils/studioAccent';
 import styles from './studios.module.css';
@@ -108,9 +109,6 @@ function FeaturedStudio({ studio, portfolio, t }) {
               {t('studios.featured.openCatalog')}
             </Button>
           </Link>
-          <Button variant="ghost" size="md" icon={Bell} disabled>
-            {t('studios.featured.follow')}
-          </Button>
         </div>
       </div>
 
@@ -142,7 +140,7 @@ function FeaturedStudio({ studio, portfolio, t }) {
                   </div>
                   {typeof anime.score === 'number' ? (
                     <div className={styles.portfolioScore}>
-                      ★ {anime.score.toFixed(2)}
+                      ★ {formatFivePoint(anime.score)}
                     </div>
                   ) : null}
                 </div>

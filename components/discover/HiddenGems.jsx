@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import { primaryStudioName } from '../../lib/utils/anime';
+import { formatFivePoint } from '../../lib/utils/rating';
 import styles from './discover.module.css';
 
 function HiddenGems({ gems, t }) {
@@ -40,7 +41,7 @@ function HiddenGems({ gems, t }) {
                 ) : null}
                 <div className={styles.gemBannerGradient} />
                 {typeof a.score === 'number' ? (
-                  <div className={styles.gemScore}>★ {a.score.toFixed(2)}</div>
+                  <div className={styles.gemScore}>★ {formatFivePoint(a.score)}</div>
                 ) : null}
               </div>
               <div className={styles.gemBody}>

@@ -5,6 +5,7 @@ import { Sparkles, Star } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import { primaryStudioName } from '../../lib/utils/anime';
 import { getAnimeBannerUrl, getAnimeImageUrl } from '../../lib/utils/media';
+import { formatFivePoint } from '../../lib/utils/rating';
 import styles from './discover.module.css';
 
 const HISTORY_MAX = 4;
@@ -199,7 +200,7 @@ function SurpriseMe({ pool, t }) {
                 <div className={styles.surpriseResultScore}>
                   <Star size={12} className={styles.surpriseResultStarIcon} />
                   <span className={styles.surpriseResultScoreNum}>
-                    {pick.score.toFixed(2)}
+                    {formatFivePoint(pick.score)}
                   </span>
                 </div>
               ) : null}

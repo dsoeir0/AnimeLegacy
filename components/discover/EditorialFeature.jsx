@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Button from '../ui/Button';
 import { primaryStudioName } from '../../lib/utils/anime';
+import { formatFivePoint } from '../../lib/utils/rating';
 import styles from './discover.module.css';
 
 function EditorialFeature({ primary, secondary, t }) {
@@ -36,7 +37,7 @@ function EditorialFeature({ primary, secondary, t }) {
             <span className={styles.editorialTopDot} aria-hidden="true" />
             <span className={styles.editorialTopMeta}>
               {primary.year ?? primary?.aired?.prop?.from?.year ?? '—'}
-              {typeof primary.score === 'number' ? ` · ★ ${primary.score.toFixed(2)}` : ''}
+              {typeof primary.score === 'number' ? ` · ★ ${formatFivePoint(primary.score)}` : ''}
             </span>
           </div>
           <div className={styles.editorialBody}>
@@ -94,7 +95,7 @@ function EditorialFeature({ primary, secondary, t }) {
                   {typeof a.score === 'number' ? (
                     <>
                       <span className={styles.metaDot} aria-hidden="true" />
-                      <span>★ {a.score.toFixed(2)}</span>
+                      <span>★ {formatFivePoint(a.score)}</span>
                     </>
                   ) : null}
                 </div>
