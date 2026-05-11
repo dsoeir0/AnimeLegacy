@@ -130,9 +130,20 @@ function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit, t })
   );
 }
 
-function ScrollRow({ title, eyebrow, cta, onCta, children, cardWidth = 200, t }) {
+function ScrollRow({
+  title,
+  eyebrow,
+  cta,
+  onCta,
+  children,
+  cardWidth = 200,
+  variant = 'scroll',
+  columns,
+  t,
+}) {
   const ref = useRef(null);
   const scroll = (dir) => ref.current?.scrollBy({ left: dir * (cardWidth + 16) * 3, behavior: 'smooth' });
+  const isGrid = variant === 'grid';
   return (
     <section className={styles.row}>
       <div className={styles.rowHead}>
@@ -146,13 +157,26 @@ function ScrollRow({ title, eyebrow, cta, onCta, children, cardWidth = 200, t })
               {cta}
             </Button>
           ) : null}
-          <IconButton icon={ChevronLeft} tooltip={t('actions.scrollLeft')} onClick={() => scroll(-1)} />
-          <IconButton icon={ChevronRight} tooltip={t('actions.scrollRight')} onClick={() => scroll(1)} />
+          {!isGrid ? (
+            <>
+              <IconButton icon={ChevronLeft} tooltip={t('actions.scrollLeft')} onClick={() => scroll(-1)} />
+              <IconButton icon={ChevronRight} tooltip={t('actions.scrollRight')} onClick={() => scroll(1)} />
+            </>
+          ) : null}
         </div>
       </div>
-      <div ref={ref} className={styles.rowTrack}>
-        {children}
-      </div>
+      {isGrid ? (
+        <div
+          className={styles.rowGrid}
+          style={columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : undefined}
+        >
+          {children}
+        </div>
+      ) : (
+        <div ref={ref} className={styles.rowTrack}>
+          {children}
+        </div>
+      )}
     </section>
   );
 }
@@ -378,19 +402,19 @@ function Home({ currentResposta, moviesResposta, aniListMap, topMovies, t }) {
           title={t('home.filmsTitle')}
           cta={t('actions.shufflePicks')}
           onCta={refreshMovies}
-          cardWidth={200}
+          variant="grid"
+          columns={moviePicks.length}
           t={t}
         >
           {moviePicks.map((item) => (
-            <div key={item.mal_id} style={{ flexShrink: 0 }}>
-              <PosterCard
-                anime={item}
-                media={aniListMap?.[item.mal_id]}
-                inList={isInList(item.mal_id)}
-                href={`/anime/${item.mal_id}`}
-                width={200}
-              />
-            </div>
+            <PosterCard
+              key={item.mal_id}
+              anime={item}
+              media={aniListMap?.[item.mal_id]}
+              inList={isInList(item.mal_id)}
+              href={`/anime/${item.mal_id}`}
+              width="100%"
+            />
           ))}
         </ScrollRow>
 
