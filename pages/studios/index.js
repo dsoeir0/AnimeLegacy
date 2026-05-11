@@ -8,7 +8,11 @@ import StudiosHeader from '../../components/studios/StudiosHeader';
 import FeaturedStudio from '../../components/studios/FeaturedStudio';
 import StudioFilterBar from '../../components/studios/StudioFilterBar';
 import StudioCard from '../../components/studios/StudioCard';
+import useAuth from '../../hooks/useAuth';
+import useFavoriteIds from '../../hooks/useFavoriteIds';
 import { getAnimeByProducer, getProducers } from '../../lib/services/jikan';
+import { setStudioFavorite, unsetStudioFavorite } from '../../lib/services/favoriteStudios';
+import { FAVORITE_LIMIT } from '../../lib/constants';
 import { filterOutHentai } from '../../lib/utils/anime';
 import { classifyProducerRole, pickStudioName } from '../../lib/utils/studio';
 import styles from './index.module.css';
@@ -42,8 +46,28 @@ const matchesFilter = (founded, filter) => {
 
 function StudiosIndexPage({ items, portfolio, featuredIndex = 0, pagination, page, totals, t }) {
   const router = useRouter();
+  const { user } = useAuth();
+  const { isFavorite, count: favCount, canEdit } = useFavoriteIds('favoriteStudios');
   const lastPage = pagination?.last_visible_page || 1;
   const go = (p) => router.push({ pathname: '/studios', query: { page: p } });
+
+  const toggleStudioFavorite = (studio) => {
+    if (!canEdit || !user?.uid) return;
+    const id = String(studio.mal_id);
+    if (isFavorite(id)) {
+      unsetStudioFavorite({ uid: user.uid, studioId: id });
+    } else if (favCount < FAVORITE_LIMIT) {
+      setStudioFavorite({
+        uid: user.uid,
+        studio: {
+          id,
+          name: pickStudioName(studio) || '',
+          established: studio?.established || '',
+          imageUrl: studio?.images?.jpg?.image_url || '',
+        },
+      });
+    }
+  };
 
   const featured = items[featuredIndex];
   const rest = items.filter((_, i) => i !== featuredIndex);
@@ -170,6 +194,8 @@ function StudiosIndexPage({ items, portfolio, featuredIndex = 0, pagination, pag
                       studio={s}
                       posters={postersEntry || []}
                       postersLoading={postersEntry === undefined}
+                      isFavorite={isFavorite(s.mal_id)}
+                      onToggleFavorite={canEdit ? toggleStudioFavorite : undefined}
                     />
                   );
                 })}

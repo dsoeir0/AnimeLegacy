@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bookmark } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import { getAnimeThumbUrl } from '../../lib/utils/media';
 import { pickStudioName, studioInitials } from '../../lib/utils/studio';
@@ -24,7 +24,7 @@ const shortenBio = (about, max = 150) => {
   return `${sliced.slice(0, cut > 80 ? cut : max)}…`;
 };
 
-function StudioCard({ studio, posters, postersLoading, t }) {
+function StudioCard({ studio, posters, postersLoading, isFavorite, onToggleFavorite, t }) {
   const name = pickStudioName(studio);
   const accent = accentForStudio(studio.mal_id);
   const founded = yearOf(studio.established);
@@ -73,9 +73,21 @@ function StudioCard({ studio, posters, postersLoading, t }) {
               )}
             </div>
           </div>
-          <span className={styles.cardBookmark} aria-hidden="true">
-            <Bookmark size={12} />
-          </span>
+          {onToggleFavorite ? (
+            <button
+              type="button"
+              className={`${styles.cardFavorite} ${isFavorite ? styles.cardFavoriteActive : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleFavorite(studio);
+              }}
+              aria-label={t(isFavorite ? 'actions.favorited' : 'actions.favorite')}
+              aria-pressed={isFavorite}
+            >
+              <Star size={14} fill={isFavorite ? 'currentColor' : 'none'} strokeWidth={2} />
+            </button>
+          ) : null}
         </div>
 
         {studio.about ? (

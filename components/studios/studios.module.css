@@ -489,7 +489,7 @@
   background: var(--al-fg-4);
 }
 
-.cardBookmark {
+.cardFavorite {
   width: 30px;
   height: 30px;
   border-radius: 8px;
@@ -500,6 +500,21 @@
   justify-content: center;
   color: var(--al-fg-3);
   flex-shrink: 0;
+  cursor: pointer;
+  transition: color var(--dur-2) var(--ease-standard),
+    border-color var(--dur-2) var(--ease-standard),
+    background var(--dur-2) var(--ease-standard);
+}
+
+.cardFavorite:hover {
+  color: var(--al-warm-ink);
+  border-color: var(--al-warm-ink);
+}
+
+.cardFavoriteActive {
+  color: var(--al-warm-ink);
+  border-color: var(--al-warm-ink);
+  background: color-mix(in srgb, var(--al-warm-ink) 12%, transparent);
 }
 
 .cardBio {
