@@ -339,7 +339,6 @@
       "hours": "HEURES",
       "episodes": "ÉPISODES",
       "meanScore": "NOTE MOYENNE",
-      "streak": "SÉRIE",
       "sub": {
         "completed": "Anime terminés",
         "airingNow": "{n} en diffusion",
@@ -347,9 +346,10 @@
         "hours": "Temps de visionnage",
         "episodes": "Dans votre liste",
         "meanScore": "{n} notés",
-        "streakOn": "Continuez",
-        "streakOff": "Commencez une nouvelle série aujourd'hui",
-        "streakUnit": "j"
+        "completedDelta": "+{n} ce mois-ci",
+        "epsPerWeek": "moy. {n}/sem",
+        "meanScoreSigma": "σ {sigma} · {n} notés",
+        "meanScoreEmpty": "aucune note"
       }
     },
     "topGenres": "GENRES PRINCIPAUX",
@@ -375,12 +375,7 @@
     "activityUpdates": "{n} mises à jour",
     "activityEmpty": "Ajoutez des anime à votre liste pour suivre les mises à jour.",
     "noActivity": "Pas encore d'activité.",
-    "reviewsTitle": "Vos avis",
-    "reviewsWritten": "{n} écrits",
     "reviewsEmpty": "Partagez votre ressenti sur les séries terminées pour construire votre étagère d'avis.",
-    "noRating": "Pas de note",
-    "noRatingReview": "Pas encore d'avis écrit.",
-    "ratingFraction": "{n}/5",
     "favoritesTitle": "Favoris de tous les temps",
     "favoritesEmpty": "Marquez un anime terminé comme favori pour le mettre en avant ici.",
     "favoriteCharactersTitle": "Personnages favoris",
@@ -418,7 +413,76 @@
       "manualTitle": "La suppression automatisée n'est pas encore disponible",
       "manualBody": "Cette instance n'est pas encore configurée pour la suppression en libre-service. Demandez la suppression via la page de confidentialité — votre compte sera supprimé manuellement sous 30 jours, conformément au RGPD.",
       "goToPrivacy": "Aller à la page de confidentialité"
-    }
+    },
+    "editCta": "Modifier le profil",
+    "yearInReview": "Année en revue",
+    "yearInReviewSoon": "Bientôt — un récap annuel de ce que tu as regardé, noté et découvert.",
+    "comingSoonTag": "Bientôt",
+    "ratingDistributionEmpty": "Note quelques entrées pour voir ta courbe de notes.",
+    "moveUp": "Déplacer vers le haut",
+    "moveDown": "Déplacer vers le bas",
+    "tabsAriaLabel": "Sections du profil",
+    "empty": {
+      "title": "Ta chronique commence ici",
+      "body": "Ajoute un anime à ta liste pour débloquer stats, séries et classements. Tu peux aussi importer ton historique MyAnimeList.",
+      "discover": "Découvrir des anime",
+      "import": "Importer depuis MAL"
+    },
+    "listEntriesCount": "{n} entrées dans la liste",
+    "ratingDistribution": "Répartition des notes",
+    "ratingDistributionMeta": "{n} notés · pic à {peak}",
+    "activityHeatmap": "Carte d’activité",
+    "heatmapMeta": "26 dernières semaines",
+    "heatmapLess": "moins",
+    "heatmapMore": "plus",
+    "recentEntries": "Entrées récentes",
+    "recentEntriesMeta": "{shown} sur {total}",
+    "recentEntriesEmpty": "Aucune entrée. Ajoutez des animes pour remplir cette section.",
+    "viewAll": "Tout voir →",
+    "col": {
+      "title": "TITRE",
+      "status": "STATUT",
+      "progress": "PROGRÈS",
+      "score": "SCORE"
+    },
+    "topFavorites": "Top {n} favoris",
+    "topFavoritesMeta": "classés · tous temps",
+    "reviewsTitle": "Critiques",
+    "reviewsMeta": "{n} publiées · depuis {year}",
+    "reviewKpi": {
+      "published": "PUBLIÉES",
+      "total": "TOTAL",
+      "sinceYear": "depuis {year}",
+      "allTime": "tous temps",
+      "avgLength": "TAILLE MOY.",
+      "wordsAvg": "mots par critique",
+      "meanScore": "NOTE MOYENNE",
+      "ratedCount": "{n} notées",
+      "totalWords": "MOTS TOTAL",
+      "totalWordsSub": "sur vos critiques"
+    },
+    "reviewOn": "sur {title}",
+    "reviewsSearchPlaceholder": "Rechercher dans {n} critiques par titre ou texte…",
+    "sort": "TRIER",
+    "year": "ANNÉE",
+    "yearAll": "Toutes",
+    "sortMode": {
+      "newest": "Plus récent",
+      "highest": "Mieux notée",
+      "lowest": "Moins notée",
+      "longest": "Plus longue"
+    },
+    "sentiment": {
+      "loved": "Adoré",
+      "liked": "Aimé",
+      "mixed": "Mitigé",
+      "disliked": "Pas aimé",
+      "unrated": "Sans note"
+    },
+    "reviewsGroupCount": "{n} critiques",
+    "reviewsNoMatches": "Aucune critique ne correspond à ces filtres.",
+    "fullLog": "Journal complet",
+    "fullLogMeta": "{n} événements"
   },
   "privacy": {
     "metaTitle": "AnimeLegacy · Confidentialité",
@@ -502,6 +566,7 @@
     "moods": {
       "eyebrow": "PARCOURIR PAR HUMEUR",
       "heading": "De quelle humeur êtes-vous ?",
+      "shuffle": "Mélanger",
       "slow": {
         "label": "Lents et profonds",
         "sub": "Patience récompensée"
@@ -549,8 +614,7 @@
       "mecha": {
         "label": "Acier géant",
         "sub": "Drame en cabine"
-      },
-      "shuffle": "Mélanger"
+      }
     },
     "vibe": {
       "eyebrow": "VIBE FINDER · EXPÉRIMENTAL",
@@ -798,7 +862,6 @@
     "featured": {
       "eyebrow": "STUDIO À L'HONNEUR",
       "openCatalog": "Voir le catalogue complet",
-      "follow": "Suivre",
       "recentWork": "ŒUVRES EMBLÉMATIQUES"
     },
     "filters": {

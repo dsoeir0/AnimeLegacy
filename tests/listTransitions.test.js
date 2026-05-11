@@ -1,14 +1,10 @@
-// Pure tests for the state-machine pieces lifted out of useMyList.
-// These cover the corruption-prone corners: progress overflow, favourite
-// limit enforcement, status normalisation for airing shows, and every
-// branch of activity-label derivation.
-
 import { describe, expect, it } from 'vitest';
 import { FAVORITE_LIMIT } from '../lib/constants';
 import {
   canReviewStatus,
   clampProgress,
   deriveActivityLabel,
+  deriveActivityVerb,
   REVIEWABLE_STATUSES,
   resolveFavorite,
   resolveStatus,
@@ -256,6 +252,53 @@ describe('deriveActivityLabel', () => {
       totalEpisodes: 12,
     });
     expect(label).toBe('Watching (3/12)');
+  });
+});
+
+describe('deriveActivityVerb', () => {
+  it('returns review when a new review is written', () => {
+    expect(
+      deriveActivityVerb({
+        prev: { status: 'watching', review: '' },
+        next: { status: 'watching', review: 'great show' },
+      }),
+    ).toBe('review');
+  });
+
+  it('returns complete when status transitions to completed', () => {
+    expect(
+      deriveActivityVerb({
+        prev: { status: 'watching' },
+        next: { status: 'completed', progress: 12 },
+      }),
+    ).toBe('complete');
+  });
+
+  it('returns rate when a rating is added or changed', () => {
+    expect(
+      deriveActivityVerb({
+        prev: { status: 'watching', rating: null },
+        next: { status: 'watching', hasRating: true, rating: 4 },
+      }),
+    ).toBe('rate');
+  });
+
+  it('falls back to watch for plain progress updates', () => {
+    expect(
+      deriveActivityVerb({
+        prev: { status: 'watching', progress: 2 },
+        next: { status: 'watching', progress: 5 },
+      }),
+    ).toBe('watch');
+  });
+
+  it('does not classify an unchanged review as review', () => {
+    expect(
+      deriveActivityVerb({
+        prev: { status: 'completed', review: 'same' },
+        next: { status: 'completed', review: 'same', progress: 12 },
+      }),
+    ).toBe('watch');
   });
 });
 

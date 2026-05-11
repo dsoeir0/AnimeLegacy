@@ -1,44 +1,31 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { Heart, Star } from 'lucide-react';
 import { translate } from 'react-switch-lang';
-import styles from './profile.module.css';
+import { getAnimeImageUrl } from '../../lib/utils/media';
+import FavoritePosterGrid from './FavoritePosterGrid';
 
-function FavoritesStrip({ favorites, limit, t }) {
-  const slice = typeof limit === 'number' ? favorites.slice(0, limit) : favorites;
-  if (!slice.length) {
-    return <div className={styles.emptyInline}>{t('profile.favoritesEmpty')}</div>;
-  }
+const getId = (item) => String(item?.animeId || item?.id || '');
+const getHref = (item) => `/anime/${getId(item)}`;
+const getTitle = (item) => item?.title || 'Untitled';
+const buildGetImageUrl = (aniListMap) => (item) =>
+  getAnimeImageUrl(item, aniListMap?.[getId(item)]);
+const getMeta = (item) => {
+  const year = item?.year || null;
+  const type = (item?.type || 'TV').toUpperCase();
+  return year ? `${year} · ${type}` : type;
+};
+
+function FavoritesStrip({ favorites, limit, aniListMap, onReorder, t }) {
+  const slice = typeof limit === 'number' ? (favorites || []).slice(0, limit) : favorites || [];
   return (
-    <div className={styles.favStrip}>
-      {slice.map((favorite, idx) => {
-        const favoriteId = favorite.animeId || favorite.id;
-        const poster = favorite.posterUrl || favorite.image || '/logo_no_text.png';
-        return (
-          <Link key={favoriteId} href={`/anime/${favoriteId}`} className={styles.favCard}>
-            <div className={styles.favPoster}>
-              <Image src={poster} alt={favorite.title || 'Favorite'} fill sizes="200px" />
-              <span className={styles.favRank}>{String(idx + 1).padStart(2, '0')}</span>
-              <span className={styles.favHeart}>
-                <Heart size={14} fill="currentColor" strokeWidth={0} />
-              </span>
-            </div>
-            <div className={styles.favMeta}>
-              <div className={styles.favTitle}>{favorite.title || 'Untitled'}</div>
-              <div className={styles.favSub}>
-                {favorite.year || '—'} · {(favorite.type || 'TV').toUpperCase()}
-              </div>
-              {typeof favorite.malScore === 'number' ? (
-                <div className={styles.favScore}>
-                  <Star size={11} fill="currentColor" strokeWidth={0} />
-                  {favorite.malScore.toFixed(1)}
-                </div>
-              ) : null}
-            </div>
-          </Link>
-        );
-      })}
-    </div>
+    <FavoritePosterGrid
+      items={slice}
+      getId={getId}
+      getHref={getHref}
+      getTitle={getTitle}
+      getMeta={getMeta}
+      getImageUrl={buildGetImageUrl(aniListMap)}
+      onReorder={onReorder}
+      emptyMessage={t('profile.favoritesEmpty')}
+    />
   );
 }
 

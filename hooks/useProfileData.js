@@ -263,9 +263,39 @@ export default function useProfileData(uid) {
       });
     return computeGenres(watchedItems);
   }, [listItems, animeItems, catalogGenres]);
-  const favorites = useMemo(
-    () => animeItems.filter((item) => item.isFavorite).slice(0, FAVORITE_LIMIT),
-    [animeItems],
+  const favorites = useMemo(() => {
+    const list = animeItems.filter((item) => item.isFavorite);
+    list.sort((a, b) => {
+      const ar = typeof a?.personalRank === 'number' ? a.personalRank : Number.POSITIVE_INFINITY;
+      const br = typeof b?.personalRank === 'number' ? b.personalRank : Number.POSITIVE_INFINITY;
+      if (ar !== br) return ar - br;
+      const arate = typeof a?.rating === 'number' ? a.rating : -Infinity;
+      const brate = typeof b?.rating === 'number' ? b.rating : -Infinity;
+      return brate - arate;
+    });
+    return list.slice(0, FAVORITE_LIMIT);
+  }, [animeItems]);
+
+  const sortByPersonalRank = (list) => {
+    const sorted = [...(list || [])];
+    sorted.sort((a, b) => {
+      const ar = typeof a?.personalRank === 'number' ? a.personalRank : Number.POSITIVE_INFINITY;
+      const br = typeof b?.personalRank === 'number' ? b.personalRank : Number.POSITIVE_INFINITY;
+      return ar - br;
+    });
+    return sorted;
+  };
+  const orderedFavoriteCharacters = useMemo(
+    () => sortByPersonalRank(favoriteCharacters),
+    [favoriteCharacters],
+  );
+  const orderedFavoriteVoices = useMemo(
+    () => sortByPersonalRank(favoriteVoices),
+    [favoriteVoices],
+  );
+  const orderedFavoriteStudios = useMemo(
+    () => sortByPersonalRank(favoriteStudios),
+    [favoriteStudios],
   );
   const filteredActivity = useMemo(() => {
     const listIds = new Set(
@@ -301,9 +331,9 @@ export default function useProfileData(uid) {
     stats,
     genres: watchedGenres,
     favorites,
-    favoriteCharacters,
-    favoriteVoices,
-    favoriteStudios,
+    favoriteCharacters: orderedFavoriteCharacters,
+    favoriteVoices: orderedFavoriteVoices,
+    favoriteStudios: orderedFavoriteStudios,
     activity: filteredActivity,
     activityAll: filteredActivityAll,
     profile,

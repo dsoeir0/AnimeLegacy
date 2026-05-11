@@ -339,7 +339,6 @@
       "hours": "HORAS",
       "episodes": "EPISODIOS",
       "meanScore": "PUNTUACIÓN MEDIA",
-      "streak": "RACHA",
       "sub": {
         "completed": "Anime terminado",
         "airingNow": "{n} en emisión",
@@ -347,9 +346,10 @@
         "hours": "Tiempo de visionado",
         "episodes": "En tu lista",
         "meanScore": "{n} puntuados",
-        "streakOn": "Sigue así",
-        "streakOff": "Empieza una nueva racha hoy",
-        "streakUnit": "d"
+        "completedDelta": "+{n} este mes",
+        "epsPerWeek": "media {n}/sem",
+        "meanScoreSigma": "σ {sigma} · {n} valorados",
+        "meanScoreEmpty": "sin puntuaciones"
       }
     },
     "topGenres": "GÉNEROS PRINCIPALES",
@@ -375,12 +375,7 @@
     "activityUpdates": "{n} actualizaciones",
     "activityEmpty": "Añade anime a tu lista para empezar a seguir las actualizaciones.",
     "noActivity": "Todavía sin actividad.",
-    "reviewsTitle": "Tus reseñas",
-    "reviewsWritten": "{n} escritas",
     "reviewsEmpty": "Comparte tu opinión sobre las series terminadas para construir tu estantería de reseñas.",
-    "noRating": "Sin puntuar",
-    "noRatingReview": "Aún sin reseña escrita.",
-    "ratingFraction": "{n}/5",
     "favoritesTitle": "Favoritos de siempre",
     "favoritesEmpty": "Marca un anime terminado como favorito para destacarlo aquí.",
     "favoriteCharactersTitle": "Personajes favoritos",
@@ -418,7 +413,76 @@
       "manualTitle": "La eliminación automática aún no está disponible",
       "manualBody": "Esta instancia aún no está configurada para la eliminación en autoservicio. Solicita la eliminación a través de la página de privacidad — tu cuenta será eliminada manualmente en un plazo de 30 días, como exige el RGPD.",
       "goToPrivacy": "Ir a la página de privacidad"
-    }
+    },
+    "editCta": "Editar perfil",
+    "yearInReview": "Año en revista",
+    "yearInReviewSoon": "Próximamente — un resumen anual de lo que viste, valoraste y descubriste.",
+    "comingSoonTag": "Pronto",
+    "ratingDistributionEmpty": "Valora algunas entradas para ver tu curva de puntuaciones.",
+    "moveUp": "Mover arriba",
+    "moveDown": "Mover abajo",
+    "tabsAriaLabel": "Secciones del perfil",
+    "empty": {
+      "title": "Tu crónica empieza aquí",
+      "body": "Añade un anime a tu lista para desbloquear estadísticas, rachas y rankings. También puedes importar tu historial de MyAnimeList.",
+      "discover": "Descubrir anime",
+      "import": "Importar de MAL"
+    },
+    "listEntriesCount": "{n} entradas en la lista",
+    "ratingDistribution": "Distribución de puntuaciones",
+    "ratingDistributionMeta": "{n} valorados · máx en {peak}",
+    "activityHeatmap": "Mapa de actividad",
+    "heatmapMeta": "últimas 26 semanas",
+    "heatmapLess": "menos",
+    "heatmapMore": "más",
+    "recentEntries": "Entradas recientes",
+    "recentEntriesMeta": "{shown} de {total}",
+    "recentEntriesEmpty": "Sin entradas. Añade anime a tu lista para llenarlo.",
+    "viewAll": "Ver todos →",
+    "col": {
+      "title": "TÍTULO",
+      "status": "ESTADO",
+      "progress": "PROGRESO",
+      "score": "SCORE"
+    },
+    "topFavorites": "Top {n} favoritos",
+    "topFavoritesMeta": "ordenados · históricos",
+    "reviewsTitle": "Reseñas",
+    "reviewsMeta": "{n} publicadas · desde {year}",
+    "reviewKpi": {
+      "published": "PUBLICADAS",
+      "total": "TOTAL",
+      "sinceYear": "desde {year}",
+      "allTime": "históricos",
+      "avgLength": "TAM. MEDIO",
+      "wordsAvg": "palabras por reseña",
+      "meanScore": "PUNTUACIÓN MEDIA",
+      "ratedCount": "{n} puntuadas",
+      "totalWords": "PALABRAS TOTAL",
+      "totalWordsSub": "en tus reseñas"
+    },
+    "reviewOn": "en {title}",
+    "reviewsSearchPlaceholder": "Buscar entre {n} reseñas por título o texto…",
+    "sort": "ORDENAR",
+    "year": "AÑO",
+    "yearAll": "Todos",
+    "sortMode": {
+      "newest": "Más reciente",
+      "highest": "Mayor nota",
+      "lowest": "Menor nota",
+      "longest": "Más larga"
+    },
+    "sentiment": {
+      "loved": "Encantó",
+      "liked": "Gustó",
+      "mixed": "Mixta",
+      "disliked": "No gustó",
+      "unrated": "Sin nota"
+    },
+    "reviewsGroupCount": "{n} reseñas",
+    "reviewsNoMatches": "Ninguna reseña coincide con estos filtros.",
+    "fullLog": "Registro completo",
+    "fullLogMeta": "{n} eventos"
   },
   "privacy": {
     "metaTitle": "AnimeLegacy · Privacidad",
@@ -798,7 +862,6 @@
     "featured": {
       "eyebrow": "ESTUDIO EN FOCO",
       "openCatalog": "Ver catálogo completo",
-      "follow": "Seguir",
       "recentWork": "OBRAS EMBLEMÁTICAS"
     },
     "filters": {

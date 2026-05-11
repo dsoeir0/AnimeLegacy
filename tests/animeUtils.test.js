@@ -1,9 +1,6 @@
-// Unit tests for the anime list utilities — mostly dedupeByMalId, which
-// defends grids from Jikan's habit of returning the same show multiple
-// times in one response (schedules with multiple broadcast rows, etc.).
-
 import { describe, expect, it } from 'vitest';
 import {
+  classifyAnimeFormat,
   dedupeByMalId,
   filterOutHentai,
   isAiringAnime,
@@ -324,5 +321,34 @@ describe('normalizeAnime', () => {
     expect(normalizeAnime({ mal_id: 1 }).type).toBe('Series');
     expect(normalizeAnime({ mal_id: 1, format: 'Movie' }).type).toBe('Movie');
     expect(normalizeAnime({ mal_id: 1, type: 'TV', format: 'Movie' }).type).toBe('TV');
+  });
+});
+
+describe('classifyAnimeFormat', () => {
+  it('returns MOVIE for type movie regardless of episodes', () => {
+    expect(classifyAnimeFormat({ type: 'Movie', episodesTotal: 1 }).key).toBe('movie');
+  });
+
+  it('returns SLICE for TV with episodes <= 13', () => {
+    const c = classifyAnimeFormat({ type: 'TV', episodesTotal: 12 });
+    expect(c.key).toBe('slice');
+    expect(c.label).toBe('SLICE / 12 EP');
+  });
+
+  it('returns LONG-FORM for TV with episodes > 13', () => {
+    const c = classifyAnimeFormat({ type: 'TV', episodesTotal: 26 });
+    expect(c.key).toBe('longform');
+    expect(c.label).toBe('LONG-FORM / 26 EP');
+  });
+
+  it('returns OVA/ONA/SPECIAL/MUSIC for their respective types', () => {
+    expect(classifyAnimeFormat({ type: 'OVA', episodesTotal: 4 }).key).toBe('ova');
+    expect(classifyAnimeFormat({ type: 'ONA', episodesTotal: 6 }).key).toBe('ona');
+    expect(classifyAnimeFormat({ type: 'Special' }).key).toBe('special');
+    expect(classifyAnimeFormat({ type: 'Music' }).key).toBe('music');
+  });
+
+  it('falls back to series when type and episodes are unknown', () => {
+    expect(classifyAnimeFormat({}).key).toBe('series');
   });
 });

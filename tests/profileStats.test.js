@@ -1,9 +1,12 @@
-// Pure unit tests for profile aggregators. Guards the headline numbers on
-// the profile page (completed count, hours watched via totalEpisodes, mean
-// score) against silent regressions in the reducer logic.
-
 import { describe, expect, it } from 'vitest';
-import { computeGenres, computeStats } from '../lib/utils/profileStats';
+import {
+  computeGenres,
+  computeMeanScoreWithSigma,
+  computeRatingHistogram,
+  computeRecentEntries,
+  computeStats,
+  countCompletedInDays,
+} from '../lib/utils/profileStats';
 
 describe('computeStats', () => {
   it('returns zero stats for empty or non-array input', () => {
@@ -113,3 +116,110 @@ describe('computeGenres', () => {
     expect(computeGenres(items)).toEqual(['Fantasy']);
   });
 });
+
+describe('computeMeanScoreWithSigma', () => {
+  it('returns null mean/sigma for empty input', () => {
+    expect(computeMeanScoreWithSigma([])).toEqual({ mean: null, sigma: null, count: 0 });
+    expect(computeMeanScoreWithSigma([{}, { rating: null }])).toEqual({
+      mean: null,
+      sigma: null,
+      count: 0,
+    });
+  });
+
+  it('computes population mean and standard deviation', () => {
+    const result = computeMeanScoreWithSigma([
+      { rating: 8 },
+      { rating: 9 },
+      { rating: 7 },
+    ]);
+    expect(result.mean).toBeCloseTo(8, 5);
+    expect(result.sigma).toBeCloseTo(Math.sqrt(2 / 3), 5);
+    expect(result.count).toBe(3);
+  });
+
+  it('ignores non-finite ratings', () => {
+    const result = computeMeanScoreWithSigma([
+      { rating: 9 },
+      { rating: 'high' },
+      { rating: null },
+      { rating: 7 },
+    ]);
+    expect(result.count).toBe(2);
+    expect(result.mean).toBe(8);
+  });
+});
+
+describe('computeRatingHistogram', () => {
+  it('returns 5 bins by default, all zero for empty input', () => {
+    const h = computeRatingHistogram([]);
+    expect(h).toHaveLength(5);
+    expect(h.every((b) => b.count === 0)).toBe(true);
+    expect(h.map((b) => b.score)).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it('bins ratings by integer score on a 1-5 scale', () => {
+    const h = computeRatingHistogram([
+      { rating: 4 },
+      { rating: 4.5 },
+      { rating: 3 },
+      { rating: 4.2 },
+    ]);
+    expect(h[2].count).toBe(1);
+    expect(h[3].count).toBe(2);
+    expect(h[4].count).toBe(1);
+  });
+
+  it('skips zero / non-positive ratings and clamps high values to bin 5', () => {
+    const h = computeRatingHistogram([{ rating: 0 }, { rating: 9 }, { rating: 0.5 }]);
+    expect(h[0].count).toBe(1);
+    expect(h[4].count).toBe(1);
+    expect(h.reduce((sum, b) => sum + b.count, 0)).toBe(2);
+  });
+});
+
+describe('computeRecentEntries', () => {
+  it('sorts by updatedAt desc and slices to limit', () => {
+    const a = { id: 'a', updatedAt: '2026-05-01' };
+    const b = { id: 'b', updatedAt: '2026-05-10' };
+    const c = { id: 'c', updatedAt: '2026-05-05' };
+    expect(computeRecentEntries([a, b, c], 2).map((e) => e.id)).toEqual(['b', 'c']);
+  });
+
+  it('falls back to addedAt when updatedAt missing', () => {
+    const a = { id: 'a', addedAt: '2026-05-01' };
+    const b = { id: 'b', updatedAt: '2026-05-10' };
+    expect(computeRecentEntries([a, b], 2).map((e) => e.id)).toEqual(['b', 'a']);
+  });
+
+  it('supports Firestore Timestamp via toMillis', () => {
+    const a = { id: 'a', updatedAt: { toMillis: () => 100 } };
+    const b = { id: 'b', updatedAt: { toMillis: () => 200 } };
+    expect(computeRecentEntries([a, b], 1).map((e) => e.id)).toEqual(['b']);
+  });
+});
+
+describe('countCompletedInDays', () => {
+  const NOW = Date.parse('2026-05-11T00:00:00Z');
+
+  it('counts only items completed within the window', () => {
+    const items = [
+      { status: 'completed', updatedAt: '2026-05-08' },
+      { status: 'completed', updatedAt: '2026-03-01' },
+      { status: 'watching', updatedAt: '2026-05-10' },
+    ];
+    expect(countCompletedInDays(items, 30, NOW)).toBe(1);
+  });
+
+  it('returns 0 for empty input', () => {
+    expect(countCompletedInDays([], 30, NOW)).toBe(0);
+  });
+
+  it('treats airing-completed as not completed (matches normalizeStatus)', () => {
+    const items = [
+      { status: 'completed', airing: true, updatedAt: '2026-05-10' },
+    ];
+    expect(countCompletedInDays(items, 30, NOW)).toBe(0);
+  });
+});
+

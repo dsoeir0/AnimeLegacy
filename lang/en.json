@@ -339,7 +339,6 @@
       "hours": "HOURS",
       "episodes": "EPISODES",
       "meanScore": "MEAN SCORE",
-      "streak": "STREAK",
       "sub": {
         "completed": "Finished anime",
         "airingNow": "{n} airing now",
@@ -347,9 +346,10 @@
         "hours": "Watch time",
         "episodes": "Across your list",
         "meanScore": "{n} rated",
-        "streakOn": "Keep it going",
-        "streakOff": "Start a new run today",
-        "streakUnit": "d"
+        "completedDelta": "+{n} this mo",
+        "epsPerWeek": "avg {n}/wk",
+        "meanScoreSigma": "σ {sigma} · {n} rated",
+        "meanScoreEmpty": "no ratings yet"
       }
     },
     "topGenres": "TOP GENRES",
@@ -375,12 +375,7 @@
     "activityUpdates": "{n} updates",
     "activityEmpty": "Add anime to your list to start tracking updates.",
     "noActivity": "No activity yet.",
-    "reviewsTitle": "Your reviews",
-    "reviewsWritten": "{n} written",
     "reviewsEmpty": "Share your thoughts on finished shows to build your review shelf.",
-    "noRating": "No rating",
-    "noRatingReview": "No written review — yet.",
-    "ratingFraction": "{n}/5",
     "favoritesTitle": "All-time favorites",
     "favoritesEmpty": "Mark a completed anime as favorite to feature it here.",
     "favoriteCharactersTitle": "Favorite characters",
@@ -418,7 +413,76 @@
       "manualTitle": "Automated deletion is not yet available",
       "manualBody": "This instance hasn't been configured for self-service deletion. Request removal via the privacy page — your account will be erased manually within 30 days, as required by GDPR.",
       "goToPrivacy": "Go to privacy page"
-    }
+    },
+    "editCta": "Edit profile",
+    "yearInReview": "Year in review",
+    "yearInReviewSoon": "Coming soon — a yearly recap of what you watched, rated, and discovered.",
+    "comingSoonTag": "Soon",
+    "ratingDistributionEmpty": "Rate a few entries to see your score curve.",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "tabsAriaLabel": "Profile sections",
+    "empty": {
+      "title": "Your chronicle starts here",
+      "body": "Add an anime to your list to unlock stats, streaks, and rankings. You can also import your MyAnimeList history.",
+      "discover": "Discover anime",
+      "import": "Import from MAL"
+    },
+    "listEntriesCount": "{n} list entries",
+    "ratingDistribution": "Rating distribution",
+    "ratingDistributionMeta": "{n} rated · peak at {peak}",
+    "activityHeatmap": "Activity heatmap",
+    "heatmapMeta": "last 26 weeks",
+    "heatmapLess": "less",
+    "heatmapMore": "more",
+    "recentEntries": "Recent entries",
+    "recentEntriesMeta": "{shown} of {total}",
+    "recentEntriesEmpty": "No entries yet. Add anime to your list to populate this.",
+    "viewAll": "View all →",
+    "col": {
+      "title": "TITLE",
+      "status": "STATUS",
+      "progress": "PROGRESS",
+      "score": "SCORE"
+    },
+    "topFavorites": "Top {n} favorites",
+    "topFavoritesMeta": "ranked · all-time",
+    "reviewsTitle": "Reviews",
+    "reviewsMeta": "{n} published · since {year}",
+    "reviewKpi": {
+      "published": "PUBLISHED",
+      "total": "TOTAL",
+      "sinceYear": "since {year}",
+      "allTime": "all-time",
+      "avgLength": "AVG LENGTH",
+      "wordsAvg": "words per review",
+      "meanScore": "MEAN SCORE",
+      "ratedCount": "{n} rated",
+      "totalWords": "TOTAL WORDS",
+      "totalWordsSub": "across your reviews"
+    },
+    "reviewOn": "on {title}",
+    "reviewsSearchPlaceholder": "Search {n} reviews by title or quote…",
+    "sort": "SORT",
+    "year": "YEAR",
+    "yearAll": "All",
+    "sortMode": {
+      "newest": "Newest",
+      "highest": "Highest",
+      "lowest": "Lowest",
+      "longest": "Longest"
+    },
+    "sentiment": {
+      "loved": "Loved",
+      "liked": "Liked",
+      "mixed": "Mixed",
+      "disliked": "Disliked",
+      "unrated": "Unrated"
+    },
+    "reviewsGroupCount": "{n} reviews",
+    "reviewsNoMatches": "No reviews match these filters.",
+    "fullLog": "Full log",
+    "fullLogMeta": "{n} events"
   },
   "privacy": {
     "metaTitle": "AnimeLegacy · Privacy",
@@ -798,7 +862,6 @@
     "featured": {
       "eyebrow": "STUDIO IN FOCUS",
       "openCatalog": "Open full catalogue",
-      "follow": "Follow",
       "recentWork": "SIGNATURE WORKS"
     },
     "filters": {

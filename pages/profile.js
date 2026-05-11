@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowRight } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
-import ActivityGroups from '../components/profile/ActivityGroups';
+import ActivityTimeline from '../components/profile/ActivityTimeline';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import FavoriteCharactersStrip from '../components/profile/FavoriteCharactersStrip';
 import FavoriteStudiosStrip from '../components/profile/FavoriteStudiosStrip';
@@ -11,16 +10,27 @@ import FavoriteVoicesStrip from '../components/profile/FavoriteVoicesStrip';
 import FavoritesStrip from '../components/profile/FavoritesStrip';
 import GenreBars from '../components/profile/GenreBars';
 import KpiRow from '../components/profile/KpiRow';
-import ProfileStrip from '../components/profile/ProfileStrip';
-import ReviewCard from '../components/profile/ReviewCard';
+import ProfileEmptyState from '../components/profile/ProfileEmptyState';
+import ProfileHeader from '../components/profile/ProfileHeader';
+import RatingDistribution from '../components/profile/RatingDistribution';
+import RecentEntriesTable from '../components/profile/RecentEntriesTable';
+import ReviewsPanel from '../components/profile/ReviewsPanel';
 import SeasonRing from '../components/profile/SeasonRing';
 import StreakCard from '../components/profile/StreakCard';
+import TopFavoritesCards from '../components/profile/TopFavoritesCards';
+import WatchHeatmap from '../components/profile/WatchHeatmap';
 import useAuth from '../hooks/useAuth';
 import useProfileData from '../hooks/useProfileData';
 import { FAVORITE_LIMIT } from '../lib/constants';
+import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
+import { setCharacterFavoritesOrder } from '../lib/services/favoriteCharacters';
+import { setStudioFavoritesOrder } from '../lib/services/favoriteStudios';
+import { setVoiceFavoritesOrder } from '../lib/services/favoriteVoices';
+import { setFavoritesOrder } from '../lib/services/userAnime';
 import { isAiringAnime } from '../lib/utils/anime';
+import { buildHeatmap } from '../lib/utils/heatmap';
+import { debounce } from '../lib/utils/debounce';
 import { resolveStatus } from '../lib/utils/listTransitions';
-import { userInitials } from '../lib/utils/userDisplay';
 import {
   buildStreakDots,
   computeGenreBars,
@@ -28,7 +38,14 @@ import {
   groupActivityByDay,
   toJsDate,
 } from '../lib/utils/profileActivity';
+import {
+  computeMeanScoreWithSigma,
+  computeRatingHistogram,
+  computeRecentEntries,
+  countCompletedInDays,
+} from '../lib/utils/profileStats';
 import { formatSeasonLabel, getSeasonFromDate } from '../lib/utils/season';
+import { userInitials } from '../lib/utils/userDisplay';
 import styles from '../components/profile/profile.module.css';
 
 const TABS = [
@@ -42,7 +59,7 @@ const normalizeSeasonStatus = (item) =>
   resolveStatus(item?.status, isAiringAnime(item));
 
 function ProfilePage({ t }) {
-  const { user, loading: authLoading, signOutUser } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const {
     stats,
@@ -55,16 +72,35 @@ function ProfilePage({ t }) {
     animeItems,
     loading: profileLoading,
   } = useProfileData(user?.uid);
+
   const displayName = profile?.username || user?.displayName || 'Guest';
   const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL;
   const initials = useMemo(() => userInitials(displayName), [displayName]);
-  const bio = profile?.bio || t('profile.bioDefault');
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);
 
   const currentSeason = getSeasonFromDate();
   const currentYear = new Date().getFullYear();
   const seasonLabel = formatSeasonLabel(currentSeason, currentYear);
+
+  const listEntries = (animeItems || []).length;
+  const handle = profile?.usernameLower || profile?.username?.toLowerCase() || null;
+
+  const joinYear = useMemo(() => {
+    const candidate =
+      profile?.createdAt || profile?.joinedAt || user?.metadata?.creationTime || null;
+    const date = toJsDate(candidate);
+    return date ? date.getFullYear() : null;
+  }, [profile?.createdAt, profile?.joinedAt, user?.metadata?.creationTime]);
+
+  const weeksActive = useMemo(() => {
+    const candidate =
+      profile?.createdAt || profile?.joinedAt || user?.metadata?.creationTime || null;
+    const date = toJsDate(candidate);
+    if (!date) return 1;
+    const diffMs = Date.now() - date.getTime();
+    return Math.max(1, Math.round(diffMs / (7 * 86400000)));
+  }, [profile?.createdAt, profile?.joinedAt, user?.metadata?.creationTime]);
 
   const seasonalItems = useMemo(
     () =>
@@ -90,36 +126,111 @@ function ProfilePage({ t }) {
     ? Math.round((seasonalCompleted.length / seasonalPlanned.length) * 100)
     : 0;
 
-  const reviews = useMemo(
+  const writtenReviews = useMemo(
     () =>
-      (animeItems || []).filter((item) => {
-        const hasRating = typeof item?.rating === 'number';
-        const hasReview = Boolean(item?.review && String(item.review).trim().length > 0);
-        return hasRating || hasReview;
-      }),
+      (animeItems || []).filter(
+        (item) => typeof item?.review === 'string' && item.review.trim().length > 0,
+      ),
     [animeItems],
   );
-
   const streak = useMemo(() => computeStreak(activityAll), [activityAll]);
   const streakDots = useMemo(() => buildStreakDots(activityAll), [activityAll]);
   const genreBars = useMemo(() => computeGenreBars(animeItems), [animeItems]);
   const activityGroups = useMemo(() => groupActivityByDay(activityAll), [activityAll]);
-  const recentActivityGroups = useMemo(() => activityGroups.slice(0, 4), [activityGroups]);
 
-  const joinYear = useMemo(() => {
-    const candidate =
-      profile?.createdAt ||
-      profile?.joinedAt ||
-      user?.metadata?.creationTime ||
-      null;
-    const date = toJsDate(candidate);
-    return date ? date.getFullYear() : null;
-  }, [profile?.createdAt, profile?.joinedAt, user?.metadata?.creationTime]);
+  const meanWithSigma = useMemo(() => computeMeanScoreWithSigma(animeItems), [animeItems]);
+  const completedDelta30d = useMemo(
+    () => countCompletedInDays(animeItems, 30),
+    [animeItems],
+  );
+  const ratingHistogram = useMemo(() => computeRatingHistogram(animeItems), [animeItems]);
+  const ratedCount = useMemo(
+    () => ratingHistogram.reduce((sum, b) => sum + b.count, 0),
+    [ratingHistogram],
+  );
+  const peakRating = useMemo(() => {
+    let peak = 0;
+    let max = 0;
+    for (const b of ratingHistogram) {
+      if (b.count > max) {
+        max = b.count;
+        peak = b.score;
+      }
+    }
+    return peak;
+  }, [ratingHistogram]);
+
+  const recentEntries = useMemo(() => computeRecentEntries(animeItems, 6), [animeItems]);
+
+  const activityTimestamps = useMemo(
+    () => (activityAll || []).map((entry) => entry?.createdAt),
+    [activityAll],
+  );
+  const activityHeatmap = useMemo(() => buildHeatmap(activityTimestamps), [activityTimestamps]);
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) router.replace('/sign-in');
   }, [authLoading, router, user]);
+
+  const handleReorderFavorites = useMemo(
+    () =>
+      debounce((orderedIds) => {
+        if (!user?.uid) return;
+        setFavoritesOrder({ uid: user.uid, orderedIds }).catch(() => {});
+      }, 400),
+    [user?.uid],
+  );
+  const handleReorderCharacters = useMemo(
+    () =>
+      debounce((orderedIds) => {
+        if (!user?.uid) return;
+        setCharacterFavoritesOrder({ uid: user.uid, orderedIds }).catch(() => {});
+      }, 400),
+    [user?.uid],
+  );
+  const handleReorderVoices = useMemo(
+    () =>
+      debounce((orderedIds) => {
+        if (!user?.uid) return;
+        setVoiceFavoritesOrder({ uid: user.uid, orderedIds }).catch(() => {});
+      }, 400),
+    [user?.uid],
+  );
+  const handleReorderStudios = useMemo(
+    () =>
+      debounce((orderedIds) => {
+        if (!user?.uid) return;
+        setStudioFavoritesOrder({ uid: user.uid, orderedIds }).catch(() => {});
+      }, 400),
+    [user?.uid],
+  );
+
+  const [aniListMap, setAniListMap] = useState({});
+  const favoriteIdsKey = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          favorites.map((fav) => String(fav.animeId || fav.id || '')).filter(Boolean),
+        ),
+      )
+        .sort()
+        .join('|'),
+    [favorites],
+  );
+  useEffect(() => {
+    if (!favoriteIdsKey) return undefined;
+    const ids = favoriteIdsKey.split('|');
+    let cancelled = false;
+    fetchAniListMediaByMalIds(ids)
+      .then((map) => {
+        if (!cancelled) setAniListMap(map || {});
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [favoriteIdsKey]);
 
   return (
     <Layout title={t('profile.metaTitle')} description={t('profile.metaDesc')}>
@@ -131,24 +242,26 @@ function ProfilePage({ t }) {
           </div>
         ) : (
           <>
-            <ProfileStrip
+            <ProfileHeader
               avatar={avatar}
-              displayName={displayName}
               initials={initials}
-              profile={profile}
-              email={user.email}
+              displayName={displayName}
+              handle={handle}
               joinYear={joinYear}
-              reviewsCount={reviews.length}
-              listEntries={(animeItems || []).length}
-              bio={bio}
+              reviewsCount={writtenReviews.length}
+              listEntries={listEntries}
+              bio={profile?.bio}
               onEdit={() => setIsEditing(true)}
-              onSignOut={signOutUser}
             />
+
+            {!profileLoading && listEntries === 0 ? <ProfileEmptyState /> : null}
 
             <KpiRow
               animeItems={animeItems}
               stats={stats}
-              streak={streak}
+              completedDelta30d={completedDelta30d}
+              mean={meanWithSigma}
+              weeksActive={weeksActive}
               loading={profileLoading}
             />
 
@@ -165,20 +278,40 @@ function ProfilePage({ t }) {
               </aside>
 
               <section className={styles.content}>
-                <div className={styles.tabs} role="tablist">
+                <div
+                  className={styles.tabs}
+                  role="tablist"
+                  aria-label={t('profile.tabsAriaLabel')}
+                  onKeyDown={(event) => {
+                    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+                    event.preventDefault();
+                    const idx = TABS.findIndex((tab) => tab.id === activeTab);
+                    const dir = event.key === 'ArrowRight' ? 1 : -1;
+                    const nextIdx = (idx + dir + TABS.length) % TABS.length;
+                    const nextTab = TABS[nextIdx];
+                    setActiveTab(nextTab.id);
+                    const el = document.getElementById(`profile-tab-${nextTab.id}`);
+                    if (el) el.focus();
+                  }}
+                >
                   {TABS.map((tab) => {
+                    const isActive = tab.id === activeTab;
                     const count =
                       tab.id === 'Favorites'
                         ? favorites.length
                         : tab.id === 'Reviews'
-                          ? reviews.length
+                          ? writtenReviews.length
                           : null;
                     return (
                       <button
                         key={tab.id}
+                        id={`profile-tab-${tab.id}`}
                         type="button"
                         role="tab"
-                        className={`${styles.tab} ${tab.id === activeTab ? styles.tabActive : ''}`}
+                        aria-selected={isActive}
+                        aria-controls={`profile-panel-${tab.id}`}
+                        tabIndex={isActive ? 0 : -1}
+                        className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
                         onClick={() => setActiveTab(tab.id)}
                       >
                         {t(tab.labelKey)}
@@ -190,245 +323,104 @@ function ProfilePage({ t }) {
                   })}
                 </div>
 
-                <div className={styles.contentBody}>
+                <div
+                  className={styles.contentBody}
+                  role="tabpanel"
+                  id={`profile-panel-${activeTab}`}
+                  aria-labelledby={`profile-tab-${activeTab}`}
+                  tabIndex={0}
+                >
                   {activeTab === 'Overview' ? (
                     <>
-                      <div className={styles.section}>
-                        <div className={styles.sectionHead}>
-                          <div className={styles.titleGroup}>
-                            <h3 className={styles.sectionTitle}>{t('profile.recentActivity')}</h3>
-                            <span className={styles.kicker}>{t('profile.lastDaysKicker')}</span>
-                          </div>
-                          <button
-                            type="button"
-                            className={styles.sectionLink}
-                            onClick={() => setActiveTab('Activity')}
-                          >
-                            {t('profile.seeAll')} <ArrowRight size={14} />
-                          </button>
-                        </div>
-                        <ActivityGroups
-                          groups={recentActivityGroups}
-                          loading={profileLoading}
-                        />
-                      </div>
-
-                      <div className={styles.section}>
-                        <div className={styles.sectionHead}>
-                          <div className={styles.titleGroup}>
-                            <h3 className={styles.sectionTitle}>{t('profile.favoritesTitle')}</h3>
-                            <span className={styles.kicker}>
-                              {t('profile.favoritesRankedKicker', {
-                                n: favorites.length,
-                                limit: FAVORITE_LIMIT,
-                              })}
-                            </span>
-                          </div>
-                          {favorites.length > 0 ? (
-                            <button
-                              type="button"
-                              className={styles.sectionLink}
-                              onClick={() => setActiveTab('Favorites')}
-                            >
-                              {t('profile.seeAll')} <ArrowRight size={14} />
-                            </button>
-                          ) : null}
-                        </div>
-                        <FavoritesStrip favorites={favorites} limit={6} />
-                      </div>
-
-                      <div className={styles.section}>
-                        <div className={styles.sectionHead}>
-                          <div className={styles.titleGroup}>
-                            <h3 className={styles.sectionTitle}>{t('profile.latestReviews')}</h3>
-                            <span className={styles.kicker}>
-                              {t('profile.reviewsWritten', { n: reviews.length })}
-                            </span>
-                          </div>
-                          {reviews.length > 0 ? (
-                            <button
-                              type="button"
-                              className={styles.sectionLink}
-                              onClick={() => setActiveTab('Reviews')}
-                            >
-                              {t('profile.allReviewsLink')} <ArrowRight size={14} />
-                            </button>
-                          ) : null}
-                        </div>
-                        {reviews.length === 0 ? (
-                          <div className={styles.emptyInline}>{t('profile.reviewsEmpty')}</div>
-                        ) : (
-                          <div className={styles.reviewsList}>
-                            {reviews.slice(0, 2).map((entry) => (
-                              <ReviewCard key={entry.animeId || entry.id} entry={entry} />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {favoriteCharacters.length > 0 ? (
-                        <div className={styles.section}>
-                          <div className={styles.sectionHead}>
-                            <div className={styles.titleGroup}>
-                              <h3 className={styles.sectionTitle}>
-                                {t('profile.favoriteCharactersTitle')}
-                              </h3>
-                              <span className={styles.kicker}>
-                                {t('profile.favoritesCount', {
-                                  n: favoriteCharacters.length,
-                                  limit: FAVORITE_LIMIT,
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                          <FavoriteCharactersStrip favorites={favoriteCharacters} limit={6} />
-                        </div>
-                      ) : null}
-
-                      {favoriteVoices.length > 0 ? (
-                        <div className={styles.section}>
-                          <div className={styles.sectionHead}>
-                            <div className={styles.titleGroup}>
-                              <h3 className={styles.sectionTitle}>
-                                {t('profile.favoriteVoicesTitle')}
-                              </h3>
-                              <span className={styles.kicker}>
-                                {t('profile.favoritesCount', {
-                                  n: favoriteVoices.length,
-                                  limit: FAVORITE_LIMIT,
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                          <FavoriteVoicesStrip favorites={favoriteVoices} limit={6} />
-                        </div>
-                      ) : null}
-
-                      {favoriteStudios.length > 0 ? (
-                        <div className={styles.section}>
-                          <div className={styles.sectionHead}>
-                            <div className={styles.titleGroup}>
-                              <h3 className={styles.sectionTitle}>
-                                {t('profile.favoriteStudiosTitle')}
-                              </h3>
-                              <span className={styles.kicker}>
-                                {t('profile.favoritesCount', {
-                                  n: favoriteStudios.length,
-                                  limit: FAVORITE_LIMIT,
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                          <FavoriteStudiosStrip favorites={favoriteStudios} limit={6} />
-                        </div>
-                      ) : null}
+                      <RatingDistribution
+                        histogram={ratingHistogram}
+                        rated={ratedCount}
+                        peak={peakRating}
+                      />
+                      <RecentEntriesTable
+                        entries={recentEntries}
+                        total={listEntries}
+                        onSeeAll={() => router.push('/my-list')}
+                      />
+                      <TopFavoritesCards
+                        favorites={favorites}
+                        aniListMap={aniListMap}
+                        onReorder={handleReorderFavorites}
+                      />
                     </>
                   ) : null}
 
                   {activeTab === 'Favorites' ? (
                     <>
                       <div className={styles.section}>
-                        <div className={styles.sectionHead}>
-                          <div className={styles.titleGroup}>
-                            <h3 className={styles.sectionTitle}>{t('profile.favoritesTitle')}</h3>
-                            <span className={styles.kicker}>
-                              {t('profile.favoritesCount', {
-                                n: favorites.length,
-                                limit: FAVORITE_LIMIT,
-                              })}
-                            </span>
-                          </div>
+                        <div className={styles.distroHead}>
+                          <h3 className={styles.sectionTitle}>{t('profile.favoritesTitle')}</h3>
+                          <span className={styles.kicker}>
+                            {t('profile.favoritesCount', { n: favorites.length, limit: FAVORITE_LIMIT })}
+                          </span>
                         </div>
-                        <FavoritesStrip favorites={favorites} />
+                        <FavoritesStrip
+                          favorites={favorites}
+                          aniListMap={aniListMap}
+                          onReorder={handleReorderFavorites}
+                        />
                       </div>
-
                       <div className={styles.section}>
-                        <div className={styles.sectionHead}>
-                          <div className={styles.titleGroup}>
-                            <h3 className={styles.sectionTitle}>
-                              {t('profile.favoriteCharactersTitle')}
-                            </h3>
-                            <span className={styles.kicker}>
-                              {t('profile.favoritesCount', {
-                                n: favoriteCharacters.length,
-                                limit: FAVORITE_LIMIT,
-                              })}
-                            </span>
-                          </div>
+                        <div className={styles.distroHead}>
+                          <h3 className={styles.sectionTitle}>{t('profile.favoriteCharactersTitle')}</h3>
+                          <span className={styles.kicker}>
+                            {t('profile.favoritesCount', { n: favoriteCharacters.length, limit: FAVORITE_LIMIT })}
+                          </span>
                         </div>
-                        <FavoriteCharactersStrip favorites={favoriteCharacters} />
+                        <FavoriteCharactersStrip
+                          favorites={favoriteCharacters}
+                          onReorder={handleReorderCharacters}
+                        />
                       </div>
-
                       <div className={styles.section}>
-                        <div className={styles.sectionHead}>
-                          <div className={styles.titleGroup}>
-                            <h3 className={styles.sectionTitle}>
-                              {t('profile.favoriteVoicesTitle')}
-                            </h3>
-                            <span className={styles.kicker}>
-                              {t('profile.favoritesCount', {
-                                n: favoriteVoices.length,
-                                limit: FAVORITE_LIMIT,
-                              })}
-                            </span>
-                          </div>
+                        <div className={styles.distroHead}>
+                          <h3 className={styles.sectionTitle}>{t('profile.favoriteVoicesTitle')}</h3>
+                          <span className={styles.kicker}>
+                            {t('profile.favoritesCount', { n: favoriteVoices.length, limit: FAVORITE_LIMIT })}
+                          </span>
                         </div>
-                        <FavoriteVoicesStrip favorites={favoriteVoices} />
+                        <FavoriteVoicesStrip
+                          favorites={favoriteVoices}
+                          onReorder={handleReorderVoices}
+                        />
                       </div>
-
                       <div className={styles.section}>
-                        <div className={styles.sectionHead}>
-                          <div className={styles.titleGroup}>
-                            <h3 className={styles.sectionTitle}>
-                              {t('profile.favoriteStudiosTitle')}
-                            </h3>
-                            <span className={styles.kicker}>
-                              {t('profile.favoritesCount', {
-                                n: favoriteStudios.length,
-                                limit: FAVORITE_LIMIT,
-                              })}
-                            </span>
-                          </div>
+                        <div className={styles.distroHead}>
+                          <h3 className={styles.sectionTitle}>{t('profile.favoriteStudiosTitle')}</h3>
+                          <span className={styles.kicker}>
+                            {t('profile.favoritesCount', { n: favoriteStudios.length, limit: FAVORITE_LIMIT })}
+                          </span>
                         </div>
-                        <FavoriteStudiosStrip favorites={favoriteStudios} />
+                        <FavoriteStudiosStrip
+                          favorites={favoriteStudios}
+                          onReorder={handleReorderStudios}
+                        />
                       </div>
                     </>
                   ) : null}
 
                   {activeTab === 'Reviews' ? (
-                    <div className={styles.section}>
-                      <div className={styles.sectionHead}>
-                        <div className={styles.titleGroup}>
-                          <h3 className={styles.sectionTitle}>{t('profile.reviewsTitle')}</h3>
-                          <span className={styles.kicker}>
-                            {t('profile.reviewsWritten', { n: reviews.length })}
-                          </span>
-                        </div>
-                      </div>
-                      {reviews.length === 0 ? (
-                        <div className={styles.emptyInline}>{t('profile.reviewsEmpty')}</div>
-                      ) : (
-                        <div className={styles.reviewsList}>
-                          {reviews.map((entry) => (
-                            <ReviewCard key={entry.animeId || entry.id} entry={entry} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <ReviewsPanel reviews={writtenReviews} joinYear={joinYear} />
                   ) : null}
 
                   {activeTab === 'Activity' ? (
-                    <div className={styles.section}>
-                      <div className={styles.sectionHead}>
-                        <div className={styles.titleGroup}>
-                          <h3 className={styles.sectionTitle}>{t('profile.allActivity')}</h3>
-                          <span className={styles.kicker}>
-                            {t('profile.activityGroupedBy', { n: activityAll.length })}
-                          </span>
-                        </div>
-                      </div>
-                      <ActivityGroups groups={activityGroups} />
-                    </div>
+                    <>
+                      <WatchHeatmap
+                        heatmap={activityHeatmap}
+                        title={t('profile.activityHeatmap')}
+                        meta={t('profile.heatmapMeta')}
+                      />
+                      <ActivityTimeline
+                        groups={activityGroups}
+                        total={activityAll.length}
+                        animeItems={animeItems}
+                      />
+                    </>
                   ) : null}
                 </div>
               </section>

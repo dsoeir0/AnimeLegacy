@@ -1,8 +1,3 @@
-// Pure unit tests for the profile-activity helpers. Covers the temporal
-// edge cases that are easy to regress silently — streaks across day
-// boundaries, Firestore Timestamp vs Date vs ISO-string normalisation,
-// and the genre-bar tally.
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   buildStreakDots,
@@ -10,6 +5,7 @@ import {
   computeStreak,
   dateKey,
   deriveVerb,
+  formatMonthAbbr,
   groupActivityByDay,
   toJsDate,
 } from '../lib/utils/profileActivity';
@@ -218,7 +214,7 @@ describe('groupActivityByDay', () => {
     const apr30 = groups.find((g) => g.key === '2026-04-30');
     expect(apr30.items).toEqual([a, b]); // source order preserved
     expect(apr30.day).toBe('30');
-    expect(apr30.mo).toBe('APR');
+    expect(apr30.monthIndex).toBe(3);
     const apr29 = groups.find((g) => g.key === '2026-04-29');
     expect(apr29.items).toEqual([c]);
   });
@@ -237,14 +233,21 @@ describe('groupActivityByDay', () => {
     expect(groupActivityByDay([])).toEqual([]);
   });
 
-  it('uses month abbreviations from the MONTH_ABBR table', () => {
+  it('formats month abbreviations via Intl for the requested locale', () => {
+    expect(formatMonthAbbr(0, 'en')).toMatch(/^JAN/);
+    expect(formatMonthAbbr(11, 'en')).toMatch(/^DEC/);
+    expect(formatMonthAbbr(0, 'fr')).toMatch(/^JAN/);
+    expect(formatMonthAbbr(undefined, 'en')).toBe('');
+  });
+
+  it('records the month index (0-based) for each group', () => {
     const groups = groupActivityByDay([
       { createdAt: localNoon(2026, 1, 5) },
       { createdAt: localNoon(2026, 7, 4) },
       { createdAt: localNoon(2026, 12, 25) },
     ]);
-    const months = groups.map((g) => g.mo).sort();
-    expect(months).toEqual(['DEC', 'JAN', 'JUL']);
+    const months = groups.map((g) => g.monthIndex).sort((a, b) => a - b);
+    expect(months).toEqual([0, 6, 11]);
   });
 });
 

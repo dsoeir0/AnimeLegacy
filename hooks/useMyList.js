@@ -14,6 +14,7 @@ import { isAiringAnime } from '../lib/utils/anime';
 import {
   clampProgress,
   deriveActivityLabel,
+  deriveActivityVerb,
   resolveFavorite,
   resolveStatus,
 } from '../lib/utils/listTransitions';
@@ -93,7 +94,7 @@ export default function useMyList() {
         },
       });
       const previousStatus = resolveStatus(existingEntry?.status, isAiring);
-      const activityLabel = deriveActivityLabel({
+      const transition = {
         prev: {
           status: previousStatus,
           progress: existingEntry?.progress,
@@ -107,8 +108,9 @@ export default function useMyList() {
           rating: ratingInput,
           review: reviewInput,
         },
-        totalEpisodes,
-      });
+      };
+      const activityLabel = deriveActivityLabel({ ...transition, totalEpisodes });
+      const activityVerb = deriveActivityVerb(transition);
       await addUserActivity({
         uid: user.uid,
         activity: {
@@ -116,6 +118,7 @@ export default function useMyList() {
           title: item.title || item.title_english || 'Untitled',
           posterUrl: item.image || item.posterUrl || '',
           type: 'status',
+          verb: activityVerb,
           label: activityLabel,
         },
       });

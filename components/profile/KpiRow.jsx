@@ -4,11 +4,10 @@ import Skeleton from '../ui/Skeleton';
 import { isAiringAnime } from '../../lib/utils/anime';
 import styles from './profile.module.css';
 
-// airing shows can't be "completed" — auto-downgrade
 const normalizeWatchingStatus = (item) =>
   isAiringAnime(item) && item?.status === 'completed' ? 'watching' : item?.status;
 
-function KpiRow({ animeItems, stats, streak, loading, t }) {
+function KpiRow({ animeItems, stats, completedDelta30d, mean, weeksActive, loading, t }) {
   const watchingCount = useMemo(
     () =>
       (animeItems || []).filter((item) => normalizeWatchingStatus(item) === 'watching').length,
@@ -25,19 +24,22 @@ function KpiRow({ animeItems, stats, streak, loading, t }) {
     () => Math.round((stats?.daysSpent || 0) * 24),
     [stats?.daysSpent],
   );
-  const ratedCount = useMemo(
-    () => (animeItems || []).filter((item) => typeof item?.rating === 'number').length,
-    [animeItems],
-  );
+  const epsPerWeek = useMemo(() => {
+    const eps = stats?.totalEpisodes || 0;
+    const w = Math.max(1, weeksActive || 1);
+    return Math.round(eps / w);
+  }, [stats?.totalEpisodes, weeksActive]);
 
   const kpiCards = useMemo(
     () => [
       {
         key: 'completed',
         label: t('profile.kpi.completed'),
-        value: stats?.watchedCount ?? 0,
-        sub: t('profile.kpi.sub.completed'),
-        tone: 'primary',
+        value: (stats?.watchedCount ?? 0).toLocaleString(),
+        sub:
+          completedDelta30d > 0
+            ? t('profile.kpi.sub.completedDelta', { n: completedDelta30d })
+            : t('profile.kpi.sub.completed'),
       },
       {
         key: 'watching',
@@ -47,50 +49,42 @@ function KpiRow({ animeItems, stats, streak, loading, t }) {
           airingNow > 0
             ? t('profile.kpi.sub.airingNow', { n: airingNow })
             : t('profile.kpi.sub.noAiring'),
-        tone: 'primary',
       },
       {
         key: 'hours',
         label: t('profile.kpi.hours'),
         value: hoursWatched.toLocaleString(),
         sub: t('profile.kpi.sub.hours'),
-        tone: 'warm',
       },
       {
         key: 'episodes',
         label: t('profile.kpi.episodes'),
         value: (stats?.totalEpisodes ?? 0).toLocaleString(),
-        sub: t('profile.kpi.sub.episodes'),
-        tone: 'primary',
+        sub:
+          epsPerWeek > 0
+            ? t('profile.kpi.sub.epsPerWeek', { n: epsPerWeek })
+            : t('profile.kpi.sub.episodes'),
       },
       {
         key: 'meanScore',
         label: t('profile.kpi.meanScore'),
-        value: stats?.myAvgScore ? stats.myAvgScore.toFixed(1) : '—',
-        sub: t('profile.kpi.sub.meanScore', { n: ratedCount }),
-        tone: 'warm',
-      },
-      {
-        key: 'streak',
-        label: t('profile.kpi.streak'),
-        value: (
-          <>
-            {streak}
-            <span className={styles.kpiUnit}>{t('profile.kpi.sub.streakUnit')}</span>
-          </>
-        ),
-        sub: streak > 0 ? t('profile.kpi.sub.streakOn') : t('profile.kpi.sub.streakOff'),
-        tone: 'green',
+        value: mean?.mean !== null && mean?.mean !== undefined ? mean.mean.toFixed(1) : '—',
+        sub:
+          mean?.mean !== null && mean?.sigma !== null
+            ? t('profile.kpi.sub.meanScoreSigma', {
+                sigma: mean.sigma.toFixed(1),
+                n: mean.count,
+              })
+            : t('profile.kpi.sub.meanScoreEmpty'),
       },
     ],
-    [t, stats?.watchedCount, stats?.totalEpisodes, stats?.myAvgScore, watchingCount, airingNow, hoursWatched, ratedCount, streak],
+    [t, stats, completedDelta30d, mean, watchingCount, airingNow, hoursWatched, epsPerWeek],
   );
 
   return (
     <section className={styles.kpiRow}>
       {kpiCards.map((k) => (
-        <div key={k.key} className={`${styles.kpi} ${styles[`kpi_${k.tone}`]}`}>
-          <span className={styles.kpiAccent} />
+        <div key={k.key} className={styles.kpi}>
           <div className={styles.kpiLabel}>{k.label}</div>
           {loading ? (
             <>
