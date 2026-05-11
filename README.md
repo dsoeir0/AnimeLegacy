@@ -24,6 +24,9 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 - **Profile** — live stats (episodes watched, days spent, mean score), top genres, seasonal progress, and activity feed.
 - **Global search** — debounced Jikan search with cover preview, keyboard navigation, and ⌘K shortcut.
 - **Auth** — email/password + Google OAuth with password strength rules and account deletion.
+- **Calendar** — weekly schedule grid (day × hour) of currently airing anime, rebucketed to viewer timezone post-hydration so a JST 23:00 broadcast lands in the right cell for PT viewers.
+- **Voice actor pages** — top voice actors index + per-actor detail with filmography and signature roles, links cross-wired from character pages.
+- **Multilingual** — `react-switch-lang` HOC with `en` / `pt` / `es` / `fr`. Synopses and biographies are translated on-demand via MyMemory and cached in Firestore per `(docId, lang)`.
 
 ---
 
@@ -38,6 +41,9 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 | Typography | Space Grotesk (display) · Plus Jakarta Sans (body) · JetBrains Mono (numerics) |
 | Auth & DB | Firebase Auth + Firestore |
 | Anime data | [Jikan v4](https://jikan.moe) (MyAnimeList) + [AniList GraphQL](https://anilist.gitbook.io) for higher-res covers |
+| Translations | [MyMemory](https://mymemory.translated.net/) (free tier, no key) — cached per `(text, lang)` in Firestore |
+| i18n | [`react-switch-lang`](https://github.com/MaximeMaillet/react-switch-lang) — en/pt/es/fr, dot-notation keys, flag CDN via [flagcdn.com](https://flagcdn.com) |
+| Error tracking | [Sentry](https://sentry.io) (via `@sentry/nextjs` + instrumentation files) — silent transactions (sample rate 0), unhandled exceptions only |
 | Deployment | Hetzner Cloud (CX23) + Caddy reverse proxy + systemd |
 
 ---
@@ -75,6 +81,11 @@ NEXT_PUBLIC_FIREBASE_APP_ID=
 # With an email the daily quota is 50 000 words/day; anonymous is 5 000.
 # MyMemory does not validate this — it is only used as a quota bucket.
 MYMEMORY_EMAIL=
+
+# Optional — Sentry error tracking. Leave blank to disable.
+# When set, instrumentation-client.js + instrumentation.js initialise Sentry
+# with sample rate 0 (no transactions/replays) — only unhandled exceptions.
+NEXT_PUBLIC_SENTRY_DSN=
 ```
 
 ### Run locally
@@ -96,7 +107,7 @@ pnpm test                  # Vitest against the Firestore emulator (needs Java 1
 pnpm test:watch            # Same, in watch mode
 pnpm analyze               # Build with @next/bundle-analyzer — opens treemap
 pnpm seed:firestore        # Seed anime catalog (requires service-account JSON)
-pnpm gen-trans             # Regenerate pt/es/fr from lang/en.json via MyMemory
+pnpm gen-trans             # Auto-translate new en.json keys into pt/es/fr via MyMemory
 ```
 
 ---
@@ -106,31 +117,47 @@ pnpm gen-trans             # Regenerate pt/es/fr from lang/en.json via MyMemory
 ```
 AnimeLegacy/
 ├── components/
-│   ├── auth/            # Shared auth page (sign-in / sign-up)
-│   ├── cards/           # PosterCard, DetailedCard, HorizontalRow
-│   ├── layout/          # Sidebar, Header, Layout shell
-│   ├── modals/          # AddToListModal, RatingReviewModal
-│   └── ui/              # Button, IconButton, Logo, StatusBadge, etc.
-├── hooks/               # useAuth, useMyList, useProfileData, useUserProfile
+│   ├── auth/                # AuthShell, AuthPage, EmailAuthForm, GoogleAuthButton, ProfileCompletionModal
+│   ├── calendar/            # CalendarCell — single (day × hour) slot entry
+│   ├── cards/               # PosterCard, DetailedCard, HorizontalRow
+│   ├── discover/            # EditorialFeature, MoodGrid, VibeFinder, HiddenGems, GenreRail, BecauseYouLiked, SurpriseMe, AiringThisWeek, FilterBanner
+│   ├── layout/              # Sidebar, Header, HeaderSearch, LanguageSwitcher, Layout
+│   ├── modals/              # Modal, AddToListModal, RatingReviewModal
+│   ├── profile/             # ProfileStrip, KpiRow, ActivityGroups, FavoriteCharactersStrip, FavoriteVoicesStrip, FavoriteStudiosStrip, ReviewCard, SeasonRing, StreakCard, EditProfileModal, DangerZone, GenreBars
+│   ├── seasons/             # EditorPickCard, KpiRow, SeasonTabs, TopThreeSection
+│   ├── studios/             # StudioCard, FeaturedStudio, StudioFilterBar, StudiosHeader
+│   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon, Dropdown, MultiDropdown
+│   └── ErrorBoundary.jsx    # Sentry-wired top-level boundary (wraps `<App>`)
+├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useBodyScrollLock
 ├── lib/
-│   ├── firebase/        # client.js (browser) + admin.js (server)
-│   ├── services/        # jikan, anilist, userProfile, userAnime, animeCatalog
-│   └── utils/           # anime, season, media, time, cardShape
+│   ├── firebase/            # client.js + admin.js + authStateStore, userProfileStore, userListStore (subscriber stores for listener consolidation) + createSubscriberStore factory
+│   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios
+│   ├── utils/               # anime, season, media, time, cardShape, synopsis, listTransitions, profileActivity, profileStats, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay, chunk
+│   ├── constants/           # flags.js (SUPPORTED_LANGUAGES, flagcdn URLs)
+│   └── constants.js         # FAVORITE_LIMIT, MAX_AVATAR_SIZE_*, PASSWORD_RULES, isValidEmail
 ├── pages/
-│   ├── api/             # delete-account
-│   ├── anime/[id]       # Anime detail
-│   ├── characters/[id]  # Character detail
-│   ├── seasons/[year]   # Seasonal browse
-│   ├── index.js         # Home
-│   ├── my-list.js       # Personal list
-│   ├── profile.js       # User profile
-│   ├── search.js        # Discover
-│   └── sign-in|sign-up|forgot-password|reset-password
-├── styles/              # Global tokens + per-page CSS modules
-├── tests/               # Vitest suite (runs against Firestore emulator)
-├── firestore.rules      # Firestore security rules
+│   ├── api/                 # delete-account, anime-recs, studio-posters, translate-synopsis, mal-import
+│   ├── anime/[id]           # Anime detail (hero, characters, recs)
+│   ├── characters/          # index + [id] detail
+│   ├── voices/              # index + [id] detail (voice actors)
+│   ├── studios/             # index + [id] detail
+│   ├── seasons/             # index (redirect) + [year] (cinematic browse)
+│   ├── import/mal.js        # MAL username importer (preview + commit)
+│   ├── index.js             # Home — hero + continue watching + trending
+│   ├── my-list.js           # Personal list (tabs, list/grid view)
+│   ├── profile.js           # User profile
+│   ├── search.js            # Discover (results + curated modes)
+│   ├── calendar.js          # Weekly schedule grid
+│   ├── movies.js            # Top rated movies
+│   └── sign-in|sign-up|forgot-password|reset-password|privacy|license
+├── lang/                    # en.json (source of truth) + pt.json, es.json, fr.json
+├── styles/                  # Global tokens + per-page CSS modules
+├── tests/                   # Vitest suite (Firestore emulator + pure unit tests)
+├── instrumentation.js       # Sentry server init + onRequestError
+├── instrumentation-client.js# Sentry browser init (silent transactions, ignored patterns)
+├── firestore.rules
 ├── firestore.indexes.json
-├── firebase.json        # Emulator port config
+├── firebase.json            # Emulator port config
 └── next.config.js
 ```
 
@@ -149,12 +176,21 @@ AnimeLegacy/
 | `/studios/[id]` | Studio detail — hero, KPIs, filmography timeline, score distribution |
 | `/my-list` | Personal list with tabs, list/grid view |
 | `/profile` | Profile stats, favorites, reviews, activity |
-| `/movies` | Top rated movies |
+| `/movies` | Top rated movies, paginated |
+| `/characters` | Top characters by favourites count, paginated |
+| `/voices` / `/voices/[id]` | Top voice actors index + per-actor filmography & signature roles |
+| `/calendar` | Weekly schedule grid — currently airing anime bucketed by day × hour in viewer TZ |
+| `/import/mal` | MAL username importer — list + favourites preview, skip-silent merge |
+| `/collections`, `/compare` | Coming-soon placeholders with roadmap copy (not 404s) |
 | `/sign-in`, `/sign-up` | Auth |
 | `/forgot-password`, `/reset-password` | Recovery flow |
 | `/privacy` | GDPR rights + account-deletion contact |
 | `/license` | MIT License full text + repo link |
 | `/api/delete-account` | Self-service erasure endpoint (auto when Admin SDK configured, 503 fallback otherwise) |
+| `/api/mal-import` | MyAnimeList list/favourites scraper proxy (server-side, IP-rate-limited) |
+| `/api/anime-recs?id=` | Per-anime recommendations for `BecauseYouLiked` shuffle (Jikan recs + genre-top fill, cached 1h) |
+| `/api/studio-posters?id=` | Poster mini-strip for a studio card on `/studios` index (cached 15m, `stale-while-revalidate=3600`) |
+| `/api/translate-synopsis` | MyMemory proxy used by `useTranslatedText` (IP rate-limited, 24h browser cache) |
 
 ---
 
@@ -217,7 +253,9 @@ Tokens live in [`styles/tokens.css`](styles/tokens.css). All components consume 
 
 - **Jikan** (`api.jikan.moe/v4`) is the main source for anime metadata, characters, and search.
 - **AniList GraphQL** supplements poster/banner URLs with higher-resolution imagery. IDs are resolved by MAL ID in batches of 25.
-- **Firestore** stores per-user state with real-time `onSnapshot` listeners. Catalog docs are denormalized for offline-friendly views of each user's list.
+- **Firestore** stores per-user state. Listeners are consolidated into shared subscriber stores in [`lib/firebase/`](lib/firebase/) (one `onSnapshot` per `(uid, key)` fan-out to N React subscribers) so re-renders and cross-component overlap don't multiply listeners.
+- **Request dedup is mandatory** — every external getter (Jikan/AniList/MyMemory) routes through an inflight `Map` keyed by request id, so N concurrent callers for the same data share one network round-trip. Search-style endpoints layer a session-scoped LRU+TTL cache on top (see `HeaderSearch.jsx`). See the `Request dedup` section of [`CLAUDE.md`](CLAUDE.md) for the contract any new fetcher has to follow.
+- **Sentry** is wired via [`instrumentation.js`](instrumentation.js) (server, `captureRequestError`) and [`instrumentation-client.js`](instrumentation-client.js) (browser, init + named `captureRouterTransitionStart`). `tracesSampleRate: 0`, `replays*: 0`, `autoSessionTracking: false`, and `beforeSendTransaction: () => null` keep the envelope POSTs to **just** real unhandled exceptions. `ErrorBoundary.jsx` and each `/api/*` route call `Sentry.captureException` explicitly inside their `catch` blocks rather than using `console.error`, so caught failures still surface in Sentry. Set `NEXT_PUBLIC_SENTRY_DSN` in `.env.local` to enable; absent DSN = silently disabled.
 
 ### In-memory TTL cache
 
@@ -288,6 +326,33 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/profileStats.test.js` | Pure profile aggregators (`computeStats`, `computeGenres`). |
 | `tests/authErrors.test.js` | Firebase Auth error-code → i18n key mapping. |
 | `tests/deleteAccount.test.js` | `/api/delete-account` gatekeeping — 405 / 503 fallback / 401 auth paths. |
+| `tests/sessionCache.test.js` | Generic LRU + TTL + inflight cache factory used by `HeaderSearch`. |
+| `tests/subscriberStore.test.js` | Factory behind Firestore listener consolidation — single underlying listener per key, fan-out to N subscribers, teardown on last leave. |
+| `tests/authStateStore.test.js` | Singleton `onAuthStateChanged` consolidation: one listener globally, fan-out to every `useAuth` consumer. |
+| `tests/anilistDedup.test.js` | Per-ID inflight dedup of the AniList batch fetcher — overlapping cold IDs across concurrent SSR calls only hit AniList once per ID. |
+| `tests/mymemoryDedup.test.js` | MyMemory translation dedup keyed by `(text, lang)` — concurrent identical translations share one request. |
+| `tests/seasonPeriod.test.js` / `tests/seasonHero.test.js` | Seasons-page pure logic — period KPI (ended / upcoming / active days), editor pick + top three with score-or-popularity fallback, sparse-hero threshold. |
+| `tests/router.test.js` | `currentPath(router)` defensive split — handles undefined `asPath` from `/_error` and partial router states. |
+| `tests/userDisplay.test.js` | `userInitials(name)` — fallback to `"U"`, trim, unicode initials, numeric coercion. |
+| `tests/chunk.test.js` | Generic `chunk(items, size)` array splitter. |
+| `tests/media.test.js` | Image-URL pickers — AniList → Jikan webp → jpg fallback order for posters, banners, thumbs, character avatars. |
+| `tests/time.test.js` | `formatRelativeTime` (Firestore Timestamp support, minutes/hours/days bands), `isSameCalendarDay`, `weekdayDates` Monday-anchoring. |
+| `tests/season.test.js` | `getSeasonFromDate` (Jan-Mar=winter, …), `formatSeasonLabel` fallback paths, `SEASON_KEYS` order. |
+| `tests/animeUtils.test.js` | `dedupeByMalId`, `primaryStudioName`, `slimAnimeForDiscover`, `isHentaiAnime`, `isAiringAnime`, `isAiringWithSeasonHeuristic` — the Jikan list-side primitives. |
+| `tests/cardShape.test.js` | `toCardShape` — Jikan + AniList → card adapter, no inline reshaping anywhere else. |
+| `tests/calendarSchedule.test.js` | JST → local day/hour conversion for the weekly schedule grid (mocked TZ, DST-safe, wrap-around). |
+| `tests/discoverFilter.test.js` | Discover URL params — sort/view/type/status/decade/score normalisation, genre query builder, extra-filter chaining. |
+| `tests/discoverPayload.test.js` | Slicing the top-anime list into editorial / hidden-gems / vibe-pool / mood-poster pools for the Discover page SSR. |
+| `tests/discoverRecs.test.js` | "Because you liked" recommendation pool — random anchor pick, dedup by mal_id, banner uniqueness. |
+| `tests/airingThisWeek.test.js` | Schedule → flat list ordered by days-from-today + local time. |
+| `tests/moods.test.js` | Mood definitions — primary-genre integrity, accent colour shape, label/sub i18n keys present. |
+| `tests/vibeFinder.test.js` | Pace / tone / world coord mapping from genre + type + episodes + synopsis keywords, euclidean ranking. |
+| `tests/charLocalize.test.js` | `localizeRole` / `localizeLanguage` — fallback to raw value when no i18n key matches. |
+| `tests/studio.test.js` | Studio helpers — name picking, initials, `classifyProducerRole` (the FMA-on-both-cards regression guard). |
+| `tests/studioAccent.test.js` | Deterministic palette rotation — same `mal_id` always gets the same accent colour. |
+| `tests/studioStats.test.js` | Studio detail aggregates — avg score, airing count, upcoming filter, score histogram + highlights, top genres, group-by-year. |
+| `tests/profileActivity.test.js` | Profile activity feed — group adjacent same-type events, prune duplicates, sort newest-first. |
+| `tests/malImport.test.js` | MAL list → AnimeLegacy shape mapping (status, score/2, year pivot, payload, summary + favourite plan). |
 
 ### Adding tests
 
@@ -311,6 +376,48 @@ Runs a production build with `@next/bundle-analyzer` enabled, then opens a treem
 ```bash
 pnpm analyze
 ```
+
+### CI — bundle-size diff
+
+[`.github/workflows/bundle-size.yml`](.github/workflows/bundle-size.yml) builds the PR branch and `main`, parses `next build` output via [`scripts/bundle-report.cjs`](scripts/bundle-report.cjs), and posts a sticky PR comment with per-route First Load JS diff. ±2% gets flagged. There's no hard gate — the signal is there so regressions aren't silent.
+
+---
+
+## Internationalization
+
+Wrap components with `translate()` from [`react-switch-lang`](https://github.com/MaximeMaillet/react-switch-lang) — they receive `t` as a prop and call `t('your.dot.notated.key')`. Translations live as nested JSON under [`lang/`](lang/), one file per language (`en.json` is the source of truth, `pt.json` / `es.json` / `fr.json` mirror its shape).
+
+**Adding a new translatable string:**
+
+1. Add the key to `lang/en.json`.
+2. Run `pnpm gen-trans` — auto-translates new keys into pt/es/fr via MyMemory, removes orphans, throttled to stay under the daily quota. Set `MYMEMORY_EMAIL` in `.env.local` to raise the bucket cap from 5 000 → 50 000 words/day.
+3. In a component: `import { translate } from 'react-switch-lang'; export default translate(MyComponent);` then `t('your.key')` inside.
+
+Auto-translations of long-form synopses can read pt-BR instead of pt-PT — MyMemory falls back to BR when no European-Portuguese match exists. Acceptable for now; not worth re-opening the translation provider question unless quality becomes a blocker.
+
+**Adding a new language:** copy `lang/en.json` to `lang/{code}.json`, add an entry to [`lib/constants/flags.js`](lib/constants/flags.js), update [`lib/i18n.js`](lib/i18n.js), and add the locale to `scripts/generate-translations.cjs::LOCALES`.
+
+---
+
+## Releases
+
+Semver discipline. Source of truth: `package.json::version` + a matching git tag `vX.Y.Z` + GitHub release. Auto-deploy fires on every push to `main` regardless of tag, so tags are for human-readable history, not deploys.
+
+| Bump | When |
+|------|------|
+| `patch` (`0.x.y` → `0.x.y+1`) | Bug fixes, copy tweaks, lint/comment cleanup, dep bumps with no behaviour change, internal refactors with no user-visible delta |
+| `minor` (`0.x` → `0.x+1.0`) | New user-visible features, new pages, redesigns, new translations, new public APIs, non-breaking schema additions |
+| `major` (`0.x.x` → `1.0.0`) | Breaking Firestore schema migrations, removed features, auth-flow rewrites, anything that needs a migration step on existing user data |
+
+After landing changes on `main` with a clean working tree:
+
+```bash
+pnpm version patch          # or: minor / major — bumps package.json + creates the git tag
+git push --follow-tags
+gh release create vX.Y.Z -F /tmp/vX.Y.Z-notes.md
+```
+
+Release notes are written by hand (group commits by area: Seasons / Discover / etc.) — `--generate-notes` produces a flat squashed-PR list that's useless when commits land directly on `main`.
 
 ---
 
@@ -336,6 +443,12 @@ AnimeLegacy runs on a single Hetzner Cloud VPS (CX23, Nuremberg) with Caddy as t
 | Backups | Hetzner snapshots — 7 days, daily, automatic |
 
 **DNS:** managed at Cloudflare Registrar with two A records (`@` and `www`) pointing to the VPS IP. Cloudflare proxy is **off** (DNS only) so Caddy can issue/renew certs directly via Let's Encrypt HTTP-01 challenge.
+
+**Monitoring:**
+
+- **Uptime** — [UptimeRobot](https://uptimerobot.com) free tier pings `https://www.animelegacy.org` every 5 minutes. Three consecutive failures → email alert. No external dashboard URL; logs visible in the UptimeRobot console.
+- **Errors** — Sentry captures unhandled exceptions (server `captureRequestError` + browser `ErrorBoundary` + per-`/api/*` `catch`). Source maps uploaded on every `pnpm build` via `@sentry/cli`.
+- **Logs** — `journalctl -u animelegacy -f` on the VPS for the Node process; Caddy access logs at `/var/log/caddy/access.log`.
 
 Password-reset emails are handled by Firebase Authentication — customize the template in the Firebase console and point the action URL to:
 
