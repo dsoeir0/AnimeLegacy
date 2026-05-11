@@ -11,10 +11,8 @@ function VibeFinder({ pool, t }) {
   const [tone, setTone] = useState(50);
   const [world, setWorld] = useState(50);
 
-  const target = { pace, tone, world };
   const matches = useMemo(
-    () => (pool?.length ? rankByVibe(pool, target, 4) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    () => (pool?.length ? rankByVibe(pool, { pace, tone, world }, 4) : []),
     [pool, pace, tone, world],
   );
 

@@ -54,9 +54,7 @@ export default function useTranslatedText({
           if (cached && typeof cached === 'string' && cached.trim()) {
             return cached;
           }
-        } catch {
-          // fall through to live translation
-        }
+        } catch {}
       }
 
       const response = await fetch('/api/translate-synopsis', {
@@ -78,9 +76,7 @@ export default function useTranslatedText({
             { [cacheField]: { [lang]: translated } },
             { merge: true },
           );
-        } catch {
-          // sessionCache still covers anon users
-        }
+        } catch {}
       }
 
       return translated;
@@ -101,9 +97,7 @@ export default function useTranslatedText({
         if (cancelled) return;
         sessionCache.set(key, translated);
         setText(translated);
-      } catch {
-        // keep English fallback
-      } finally {
+      } catch {} finally {
         if (!cancelled) setLoading(false);
       }
     };
