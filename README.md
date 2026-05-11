@@ -123,16 +123,16 @@ AnimeLegacy/
 │   ├── discover/            # EditorialFeature, MoodGrid, VibeFinder, HiddenGems, GenreRail, BecauseYouLiked, SurpriseMe, AiringThisWeek, FilterBanner
 │   ├── layout/              # Sidebar, Header, HeaderSearch, LanguageSwitcher, Layout
 │   ├── modals/              # Modal, AddToListModal, RatingReviewModal
-│   ├── profile/             # ProfileStrip, KpiRow, ActivityGroups, FavoriteCharactersStrip, FavoriteVoicesStrip, FavoriteStudiosStrip, ReviewCard, SeasonRing, StreakCard, EditProfileModal, DangerZone, GenreBars
+│   ├── profile/             # ProfileHeader, ProfileEmptyState, KpiRow, ActivityTimeline, FavoritePosterGrid, FavoritesStrip, FavoriteCharactersStrip, FavoriteVoicesStrip, FavoriteStudiosStrip, TopFavoritesCards, ReorderControls, ReviewsPanel, ReviewRow, RatingDistribution, RecentEntriesTable, SeasonRing, StreakCard, WatchHeatmap, EditProfileModal, DangerZone, GenreBars
 │   ├── seasons/             # EditorPickCard, KpiRow, SeasonTabs, TopThreeSection
 │   ├── studios/             # StudioCard, FeaturedStudio, StudioFilterBar, StudiosHeader
 │   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon, Dropdown, MultiDropdown
 │   └── ErrorBoundary.jsx    # Sentry-wired top-level boundary (wraps `<App>`)
-├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useBodyScrollLock
+├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useFavoriteIds, useBodyScrollLock, useDragReorder
 ├── lib/
 │   ├── firebase/            # client.js + admin.js + authStateStore, userProfileStore, userListStore (subscriber stores for listener consolidation) + createSubscriberStore factory
-│   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios
-│   ├── utils/               # anime, season, media, time, cardShape, synopsis, listTransitions, profileActivity, profileStats, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay, chunk
+│   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios, favoriteOrder (shared batch personalRank writer)
+│   ├── utils/               # anime, season, media, time, cardShape, synopsis, listTransitions, profileActivity, profileStats, heatmap, rating, reorder, debounce, reviewsView, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay, chunk
 │   ├── constants/           # flags.js (SUPPORTED_LANGUAGES, flagcdn URLs)
 │   └── constants.js         # FAVORITE_LIMIT, MAX_AVATAR_SIZE_*, PASSWORD_RULES, isValidEmail
 ├── pages/
@@ -323,7 +323,12 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/upsertUserProfile.test.js` | Profile writes — `createdAt` preserved, `usernameLower` derivation, avatar merge semantics, impersonation blocked. |
 | `tests/userDataRules.test.js` | Firestore rules for all user-scoped subcollections (`anime`, `list`, `activity`, `favoriteCharacters`) + catalog (`anime/{id}`) + `characterStats/{id}` whitelist. |
 | `tests/cache.test.js` | Shared service cache helper — hit/miss behaviour, TTL expiry, stale-on-error fallback. |
-| `tests/profileStats.test.js` | Pure profile aggregators (`computeStats`, `computeGenres`). |
+| `tests/profileStats.test.js` | Pure profile aggregators — `computeStats`, `computeGenres`, `computeMeanScoreWithSigma`, `computeRatingHistogram`, `computeRecentEntries`, `countCompletedInDays`. |
+| `tests/reorder.test.js` | `mergeReorderedSlice` — merges a reordered subset into the full list while preserving the rest of the original order. |
+| `tests/heatmap.test.js` | `buildHeatmap` 26-week × 7-day grid — level thresholds, Firestore Timestamp handling, future-cell marking. |
+| `tests/rating.test.js` | `toFivePoint` / `formatFivePoint` — MAL 1-10 → app-wide 1-5 conversion with null-safety for missing scores. |
+| `tests/debounce.test.js` | `debounce` — trailing-edge collapse of rapid calls into one, then re-arms after the window. |
+| `tests/reviewsView.test.js` | `reviewsView` helpers — sentiment grouping (loved/liked/mixed/disliked on the 1-5 scale), sort modes, year/text filters, year collection, stats aggregator. |
 | `tests/authErrors.test.js` | Firebase Auth error-code → i18n key mapping. |
 | `tests/deleteAccount.test.js` | `/api/delete-account` gatekeeping — 405 / 503 fallback / 401 auth paths. |
 | `tests/sessionCache.test.js` | Generic LRU + TTL + inflight cache factory used by `HeaderSearch`. |
