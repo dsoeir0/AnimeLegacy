@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { getAdminAuth, getAdminDb } from '../../lib/firebase/admin';
 
 const USER_SUBCOLLECTIONS = ['anime', 'activity', 'list', 'collections', 'favoriteCharacters'];
@@ -57,7 +58,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true });
   } catch (err) {
-    console.error('delete-account failed:', err);
+    Sentry.captureException(err, { tags: { route: 'delete-account' } });
     return res.status(500).json({ error: 'Deletion failed' });
   }
 }

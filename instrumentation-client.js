@@ -1,12 +1,27 @@
-import * as Sentry from '@sentry/nextjs';
+import { captureRouterTransitionStart, init } from '@sentry/nextjs';
 
-Sentry.init({
+const IGNORED_PATTERNS = [
+  /Loading initial props cancelled/i,
+  /Failed to load static props/i,
+  /next-route-loader/i,
+];
+
+init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  enabled: Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN),
   tracesSampleRate: 0,
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0,
-  enabled: Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN),
+  autoSessionTracking: false,
+  beforeSend(event) {
+    const message =
+      event?.exception?.values?.[0]?.value || event?.message || '';
+    if (IGNORED_PATTERNS.some((re) => re.test(message))) return null;
+    return event;
+  },
+  beforeSendTransaction() {
+    return null;
+  },
 });
 
-// eslint-disable-next-line import/namespace
-export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+export const onRouterTransitionStart = captureRouterTransitionStart;

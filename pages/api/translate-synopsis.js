@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { SUPPORTED_TARGETS, translateText } from '../../lib/services/mymemory';
 
 const MAX_INPUT_LENGTH = 4000;
@@ -55,7 +56,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
     return res.status(200).json({ translated });
   } catch (err) {
-    console.error('translate-synopsis failed:', err);
+    Sentry.captureException(err, { tags: { route: 'translate-synopsis' } });
     return res.status(502).json({ error: 'Translation failed' });
   }
 }

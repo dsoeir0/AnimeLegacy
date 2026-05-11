@@ -2,6 +2,7 @@ import { Component } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RotateCw } from 'lucide-react';
 import { translate } from 'react-switch-lang';
+import * as Sentry from '@sentry/nextjs';
 import Button from './ui/Button';
 import styles from './ErrorBoundary.module.css';
 
@@ -16,10 +17,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    if (typeof window !== 'undefined' && window?.console) {
-      // eslint-disable-next-line no-console
-      console.error('[ErrorBoundary]', error, info?.componentStack);
-    }
+    Sentry.captureException(error, { extra: { componentStack: info?.componentStack } });
   }
 
   handleRetry = () => {
