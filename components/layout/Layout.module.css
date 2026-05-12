@@ -15,3 +15,19 @@
   flex: 1;
   min-width: 0;
 }
+
+.mobileTopBar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+  .headerHideOnMobile {
+    display: none;
+  }
+  .mobileTopBar {
+    display: block;
+  }
+}

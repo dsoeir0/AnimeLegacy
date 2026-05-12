@@ -1,0 +1,61 @@
+.bottomNav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .bottomNav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 10px 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--al-ink-1) 0%, transparent) 0%,
+      color-mix(in srgb, var(--al-ink-1) 92%, transparent) 28%,
+      color-mix(in srgb, var(--al-ink-1) 98%, transparent) 100%
+    );
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-top: 0.5px solid var(--al-border);
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--al-fg-3);
+  text-decoration: none;
+  transition: color var(--dur-2) var(--ease-standard);
+}
+
+.item:hover {
+  color: var(--al-fg-2);
+}
+
+.itemActive,
+.itemActive:hover {
+  color: var(--al-primary-2);
+}
+
+.icon {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--al-fg-2);
+}
+
+.itemActive .icon {
+  color: var(--al-primary-2);
+}
