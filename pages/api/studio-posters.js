@@ -1,6 +1,9 @@
 import { getAnimeByProducer } from '../../lib/services/jikan';
 import { filterOutHentai } from '../../lib/utils/anime';
+import { createRateLimiter, guardApiRoute } from '../../lib/utils/rateLimit';
 import { classifyProducerRole } from '../../lib/utils/studio';
+
+const limiter = createRateLimiter({ max: 60, windowMs: 60_000 });
 
 const slimAnime = (a) => ({
   mal_id: a?.mal_id,
@@ -17,6 +20,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ items: [] });
   }
+  if (!guardApiRoute(req, res, limiter)) return;
 
   const id = Number.parseInt(req.query.id, 10);
   if (!Number.isFinite(id) || id <= 0) {

@@ -5,6 +5,9 @@ import {
   getAnimeRecommendations,
 } from '../../lib/services/jikan';
 import { filterOutHentai } from '../../lib/utils/anime';
+import { createRateLimiter, guardApiRoute } from '../../lib/utils/rateLimit';
+
+const limiter = createRateLimiter({ max: 30, windowMs: 60_000 });
 
 const slim = (item) => ({
   mal_id: item.mal_id,
@@ -20,6 +23,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  if (!guardApiRoute(req, res, limiter)) return;
   const id = Number(req.query.id);
   if (!Number.isFinite(id) || id <= 0) {
     return res.status(400).json({ error: 'Invalid id' });

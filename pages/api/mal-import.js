@@ -1,6 +1,10 @@
+import { createRateLimiter, guardApiRoute } from '../../lib/utils/rateLimit';
+
 const MAX_ITEMS = 5000;
 const PAGE_SIZE = 300;
 const MAL_UA = 'Mozilla/5.0 (compatible; AnimeLegacy/1.0)';
+
+const limiter = createRateLimiter({ max: 3, windowMs: 60_000 });
 
 const cleanUsername = (raw) => {
   if (typeof raw !== 'string') return null;
@@ -60,6 +64,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'method_not_allowed' });
   }
+  if (!guardApiRoute(req, res, limiter)) return;
 
   const username = cleanUsername(req.query.username);
   if (!username) {

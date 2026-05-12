@@ -1,7 +1,10 @@
 import * as Sentry from '@sentry/nextjs';
 import { getAdminAuth, getAdminDb } from '../../lib/firebase/admin';
+import { createRateLimiter, guardApiRoute } from '../../lib/utils/rateLimit';
 
 const USER_SUBCOLLECTIONS = ['anime', 'activity', 'list', 'collections', 'favoriteCharacters'];
+
+const limiter = createRateLimiter({ max: 5, windowMs: 60_000 });
 
 const deleteCollection = async (db, collRef) => {
   const snap = await collRef.get();
@@ -16,6 +19,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  if (!guardApiRoute(req, res, limiter)) return;
 
   const auth = getAdminAuth();
   const db = getAdminDb();
