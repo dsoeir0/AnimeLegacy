@@ -4,37 +4,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { Search } from 'lucide-react';
 import { translate } from 'react-switch-lang';
-import { filterOutHentai } from '../../lib/utils/anime';
 import {
-  searchAnime,
-  searchCharacters,
-  searchPeople,
-  searchProducers,
-} from '../../lib/services/jikan';
-import { createSessionCache } from '../../lib/utils/sessionCache';
+  EMPTY_CATEGORY_RESULTS,
+  fetchCategorizedResults,
+} from '../../lib/services/categorySearch';
 import styles from './Header.module.css';
 
-const EMPTY_RESULTS = { anime: [], characters: [], people: [], studios: [] };
-
-const cache = createSessionCache({ ttlMs: 5 * 60 * 1000, max: 50 });
-
-const fetchHeaderResults = (q) =>
-  cache.withInflight(q, async () => {
-    const [animeRes, charRes, peopleRes, prodRes] = await Promise.all([
-      searchAnime(q, 1, 4),
-      searchCharacters(q, 1, 4),
-      searchPeople(q, 1, 4),
-      searchProducers(q, 1, 4),
-    ]);
-    const safeArray = (res) =>
-      !res?.error && Array.isArray(res?.data) ? res.data : [];
-    return {
-      anime: filterOutHentai(safeArray(animeRes)),
-      characters: safeArray(charRes),
-      people: safeArray(peopleRes),
-      studios: safeArray(prodRes),
-    };
-  });
+const EMPTY_RESULTS = EMPTY_CATEGORY_RESULTS;
 
 function HeaderSearch({ t }) {
   const router = useRouter();
@@ -58,7 +34,7 @@ function HeaderSearch({ t }) {
     }
     setIsLoading(true);
     const timer = setTimeout(async () => {
-      const value = await fetchHeaderResults(trimmedQuery);
+      const value = await fetchCategorizedResults(trimmedQuery, 4);
       if (!isActive) return;
       setResults(value);
       setIsOpen(true);

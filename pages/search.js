@@ -18,6 +18,8 @@ import SurpriseMe from '../components/discover/SurpriseMe';
 import AiringThisWeek from '../components/discover/AiringThisWeek';
 import FilterBanner from '../components/discover/FilterBanner';
 import { DISCOVER_MOODS } from '../components/discover/moods';
+import MobileSearch from '../components/search/MobileSearch';
+import MobileCatalogue from '../components/search/MobileCatalogue';
 import styles from './search.module.css';
 import useMyList from '../hooks/useMyList';
 import {
@@ -69,6 +71,7 @@ function DiscoverPage({
   status,
   decade,
   minScore,
+  kind,
   t,
 }) {
   const router = useRouter();
@@ -179,7 +182,24 @@ function DiscoverPage({
       description={
         query ? t('search.metaDesc') : t('discoverPage.metaDesc')
       }
+      mobileTitle={t('nav.discover')}
     >
+      {isSearchMode && (kind === 'anime' || activeMood || safeGenres.length > 0) ? (
+        <MobileCatalogue
+          items={items}
+          total={total}
+          query={query}
+          activeGenres={safeGenres}
+          genres={genres}
+          type={type}
+        />
+      ) : (
+        <MobileSearch
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          query={query}
+        />
+      )}
       <div className={styles.page}>
         <header className={styles.head}>
           <div>
@@ -461,6 +481,7 @@ export async function getServerSideProps(context) {
   const status = normalizeStatus(context.query?.status);
   const decade = normalizeDecade(context.query?.decade);
   const minScore = normalizeScore(context.query?.min);
+  const kind = context.query?.kind === 'anime' ? 'anime' : '';
 
   const genresRes = await getAnimeGenres();
   const genres = (Array.isArray(genresRes?.data) ? genresRes.data : []).map((g) => ({
@@ -526,6 +547,7 @@ export async function getServerSideProps(context) {
         status,
         decade,
         minScore,
+        kind,
       },
     };
   }
@@ -620,6 +642,7 @@ export async function getServerSideProps(context) {
       status: '',
       decade: '',
       minScore: '',
+      kind: '',
     },
   };
 }
