@@ -1,0 +1,56 @@
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.facade {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: var(--al-ink-0);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.thumb {
+  object-fit: cover;
+}
+
+.gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 50%,
+    color-mix(in srgb, var(--al-ink-0) 65%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+.playButton {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--al-ink-0) 75%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--al-white) 30%, transparent);
+  color: var(--al-white);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: transform var(--dur-2) var(--ease-standard), background var(--dur-2);
+}
+
+.facade:hover .playButton {
+  transform: translate(-50%, -50%) scale(1.05);
+  background: color-mix(in srgb, var(--al-ink-0) 60%, transparent);
+}
