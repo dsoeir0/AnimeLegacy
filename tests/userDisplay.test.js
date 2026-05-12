@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { userInitials } from '../lib/utils/userDisplay.js';
+import { nameInitials, userInitials } from '../lib/utils/userDisplay.js';
 
 describe('userInitials', () => {
   it('returns the first uppercase letter of the name', () => {
@@ -23,5 +23,26 @@ describe('userInitials', () => {
 
   it('coerces numbers to strings', () => {
     expect(userInitials(42)).toBe('4');
+  });
+});
+
+describe('nameInitials', () => {
+  it('returns 2-letter initials for first + last words', () => {
+    expect(nameInitials('Aive Reno')).toBe('AR');
+    expect(nameInitials('M. Yamazaki')).toBe('MY');
+  });
+
+  it('returns first two chars when single-word name', () => {
+    expect(nameInitials('Daru')).toBe('DA');
+  });
+
+  it('returns ?? for empty input', () => {
+    expect(nameInitials('')).toBe('??');
+    expect(nameInitials(null)).toBe('??');
+    expect(nameInitials('   ')).toBe('??');
+  });
+
+  it('respects count=1 to return single letter', () => {
+    expect(nameInitials('Aive Reno', 1)).toBe('A');
   });
 });
