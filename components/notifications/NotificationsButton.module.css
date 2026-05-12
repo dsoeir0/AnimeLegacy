@@ -1,0 +1,76 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.btnDesktop {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--al-fg-2);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--dur-2) var(--ease-standard);
+}
+
+.btnDesktop:hover {
+  background: color-mix(in srgb, var(--al-white) 5%, transparent);
+  color: var(--al-fg-1);
+}
+
+.btnMobile {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--al-ink-3) 70%, transparent);
+  border: 1px solid var(--al-border);
+  color: var(--al-fg-1);
+  cursor: pointer;
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.btnMobile:hover {
+  border-color: var(--al-border-strong);
+}
+
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--al-warm);
+  color: var(--al-ink-0);
+  border: 2px solid var(--al-ink-1);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9px;
+  line-height: 12px;
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 50;
+}
+
+@media (max-width: 768px) {
+  .dropdown {
+    right: -8px;
+  }
+}

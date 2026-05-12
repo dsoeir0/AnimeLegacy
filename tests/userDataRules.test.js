@@ -143,7 +143,12 @@ describe('users/{uid}/activity rules', () => {
 // Three favourite subcollections share the same isolation rules: only the
 // owner can read or write, no cross-user access. Parameterised so that new
 // favourite types (voices, studios, etc.) only require adding the slug here.
-for (const col of ['favoriteCharacters', 'favoriteVoices', 'favoriteStudios']) {
+for (const col of [
+  'favoriteCharacters',
+  'favoriteVoices',
+  'favoriteStudios',
+  'notificationState',
+]) {
   describe(`users/{uid}/${col} rules`, () => {
     it(`owner can write ${col}`, async () => {
       await assertSucceeds(

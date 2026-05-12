@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Bell, Sparkles, ArrowLeft } from 'lucide-react';
+import { Sparkles, ArrowLeft } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
@@ -11,6 +11,7 @@ import { userInitials } from '../../lib/utils/userDisplay';
 import IconButton from '../ui/IconButton';
 import LanguageSwitcher from './LanguageSwitcher';
 import HeaderSearch from './HeaderSearch';
+import NotificationsButton from '../notifications/NotificationsButton';
 import styles from './Header.module.css';
 
 const BREADCRUMBS = [
@@ -80,7 +81,7 @@ function Header({ variant = 'default', t }) {
         <LanguageSwitcher />
         <div className={styles.divider} />
         <IconButton icon={Sparkles} tooltip={t('header.whatsNew')} />
-        <IconButton icon={Bell} tooltip={t('header.notifications')} />
+        <NotificationsButton variant="desktop" />
         <div className={styles.divider} />
         <div className={styles.profile} ref={profileRef}>
           <button

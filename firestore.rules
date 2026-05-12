@@ -111,6 +111,10 @@ service cloud.firestore {
       match /favoriteStudios/{studioId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      match /notificationState/{stateId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
   }
 }

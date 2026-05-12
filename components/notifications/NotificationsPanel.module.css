@@ -1,0 +1,237 @@
+.panel {
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border-strong);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.head {
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--al-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.headTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headTitle {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--al-fg-1);
+}
+
+.headBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--al-warm);
+  color: var(--al-ink-0);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.headActions {
+  display: flex;
+  gap: 8px;
+}
+
+.headAction {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--al-fg-2);
+  cursor: pointer;
+}
+
+.headAction:hover:not(:disabled) {
+  border-color: var(--al-border-strong);
+  color: var(--al-fg-1);
+}
+
+.headAction:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.status {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--al-fg-3);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 30px 24px 32px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--al-ink-3);
+  border: 1px solid var(--al-border);
+  color: var(--al-fg-3);
+  margin-bottom: 4px;
+}
+
+.emptyTitle {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--al-fg-1);
+}
+
+.emptyBody {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--al-fg-3);
+}
+
+.list {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  overflow-y: auto;
+}
+
+.item {
+  position: relative;
+}
+
+.itemLink {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.itemLink:hover {
+  background: var(--al-ink-3);
+}
+
+.itemIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+}
+
+.iconAccent {
+  background: var(--al-primary-gradient-soft);
+  color: var(--al-primary-ink);
+  border: 1px solid color-mix(in srgb, var(--al-primary-2) 22%, transparent);
+}
+
+.iconAccentLive {
+  background: color-mix(in srgb, var(--al-danger) 16%, transparent);
+  color: color-mix(in srgb, var(--al-danger) 92%, white);
+  border: 1px solid color-mix(in srgb, var(--al-danger) 30%, transparent);
+}
+
+.iconAccentSuccess {
+  background: var(--al-success-soft);
+  color: var(--al-success);
+  border: 1px solid color-mix(in srgb, var(--al-success) 28%, transparent);
+}
+
+.iconAccentWarm {
+  background: var(--al-warm-soft);
+  color: var(--al-warm-ink);
+  border: 1px solid color-mix(in srgb, var(--al-warm) 28%, transparent);
+}
+
+.iconAccentMuted {
+  background: var(--al-ink-3);
+  color: var(--al-fg-3);
+  border: 1px solid var(--al-border);
+}
+
+.itemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.itemKind {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--al-fg-3);
+  text-transform: uppercase;
+}
+
+.itemTitle {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  color: var(--al-fg-1);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemSubtitle {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--al-fg-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--al-warm);
+  flex-shrink: 0;
+}
+
+.itemUnread .itemTitle {
+  color: var(--al-fg-1);
+}
