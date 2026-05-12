@@ -2,6 +2,12 @@
   padding: 40px 48px 80px;
 }
 
+@media (max-width: 768px) {
+  .page {
+    display: none;
+  }
+}
+
 .head {
   margin-bottom: 32px;
   padding-bottom: 28px;

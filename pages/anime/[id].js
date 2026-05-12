@@ -12,6 +12,8 @@ import RatingDisplay from '../../components/ui/RatingDisplay';
 import AddToListModal from '../../components/modals/AddToListModal';
 import RatingModal from '../../components/modals/RatingModal';
 import ReviewModal from '../../components/modals/ReviewModal';
+import MobileAnimeDetail from '../../components/anime/MobileAnimeDetail';
+import TrailerEmbed from '../../components/anime/TrailerEmbed';
 import { canReviewStatus, resolveStatus } from '../../lib/utils/listTransitions';
 import styles from './[id].module.css';
 import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
@@ -64,8 +66,11 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
   const synopsisText = translatedSynopsis || t('anime.synopsisMissing');
   const backgroundText = translatedBackground;
   const ratingLabel = data?.rating || t('anime.notRated');
+  const ratingShort = data?.rating ? data.rating.split(' - ')[0] : t('anime.notRated');
   const durationLabel = data?.duration || '—';
   const [showAllCharacters, setShowAllCharacters] = useState(false);
+  const [synopsisExpanded, setSynopsisExpanded] = useState(false);
+  const [backgroundExpanded, setBackgroundExpanded] = useState(false);
   const normalized = useMemo(() => normalizeAnime(data), [data]);
   const { addItem, getEntry, canEdit, favoritesCount } = useMyList();
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -146,7 +151,24 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
     <Layout
       title={`${data.title || t('anime.unknownTitle')} · ${t('anime.metaTitleSuffix')}`}
       description={data.synopsis || t('anime.metaDescFallback')}
+      mobileTitle={data?.type || t('header.breadcrumb.anime')}
     >
+      <MobileAnimeDetail
+        data={data}
+        normalized={normalized}
+        banner={backdropUrl}
+        poster={posterUrl}
+        seasonLabel={seasonLabel}
+        studioName={studioName}
+        score={score}
+        episodesCount={episodesCount}
+        statusLabel={statusLabel}
+        ratingLabel={ratingShort}
+        currentEntry={currentEntry}
+        onOpenAdd={openAddModal}
+        onOpenRating={openRatingModal}
+        onAdvanceProgress={() => openAddModal(normalized, currentEntry)}
+      />
       <div className={styles.page}>
         <div className={styles.hero}>
           <Image
@@ -273,7 +295,20 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
             <div className={styles.mainColumn}>
               <section className={styles.section}>
                 <div className={styles.sectionEyebrow}>{t('anime.synopsisEyebrow')}</div>
-                <p className={styles.synopsisText}>{synopsisText}</p>
+                <p
+                  className={`${styles.synopsisText} ${synopsisExpanded ? '' : styles.synopsisTextCollapsed}`}
+                >
+                  {synopsisText}
+                </p>
+                {synopsisText && synopsisText.length > 240 ? (
+                  <button
+                    type="button"
+                    className={styles.synopsisToggle}
+                    onClick={() => setSynopsisExpanded((v) => !v)}
+                  >
+                    {synopsisExpanded ? t('actions.showLess') : t('actions.readMore')}
+                  </button>
+                ) : null}
                 <div className={styles.genreTags}>
                   {genres.map((g) => (
                     <span key={g} className={styles.genreTag}>
@@ -288,12 +323,7 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
                   <div className={styles.sectionEyebrow}>{t('anime.trailerEyebrow')}</div>
                   <h3 className={styles.sectionTitle}>{t('anime.trailerTitle')}</h3>
                   <div className={styles.videoFrame}>
-                    <iframe
-                      className={styles.trailerEmbed}
-                      title="Official trailer"
-                      allow="accelerometer; fullscreen; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      src={trailerUrl}
-                    />
+                    <TrailerEmbed embedUrl={trailerUrl} title={data?.title || 'Trailer'} />
                   </div>
                 </section>
               ) : null}
@@ -301,7 +331,20 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
               {backgroundText ? (
                 <section className={styles.section}>
                   <div className={styles.sectionEyebrow}>{t('anime.backgroundEyebrow')}</div>
-                  <p className={styles.synopsisText}>{backgroundText}</p>
+                  <p
+                    className={`${styles.synopsisText} ${backgroundExpanded ? '' : styles.synopsisTextCollapsed}`}
+                  >
+                    {backgroundText}
+                  </p>
+                  {backgroundText.length > 240 ? (
+                    <button
+                      type="button"
+                      className={styles.synopsisToggle}
+                      onClick={() => setBackgroundExpanded((v) => !v)}
+                    >
+                      {backgroundExpanded ? t('actions.showLess') : t('actions.readMore')}
+                    </button>
+                  ) : null}
                 </section>
               ) : null}
 
@@ -312,14 +355,19 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
                     <h3 className={styles.sectionTitle}>{t('anime.castTitle')}</h3>
                   </div>
                   {orderedChars.length > 6 ? (
-                    <Button
-                      variant="plain"
-                      size="sm"
-                      iconRight={ArrowRight}
-                      onClick={() => setShowAllCharacters((p) => !p)}
+                    <button
+                      type="button"
+                      className={styles.castToggle}
+                      onClick={() => setShowAllCharacters((prev) => !prev)}
+                      aria-expanded={showAllCharacters}
                     >
-                      {showAllCharacters ? t('actions.showLess') : t('actions.viewAll')}
-                    </Button>
+                      <span>
+                        {showAllCharacters
+                          ? t('actions.showLess')
+                          : t('anime.castViewAllCount', { n: orderedChars.length })}
+                      </span>
+                      <ArrowRight size={14} strokeWidth={2} />
+                    </button>
                   ) : null}
                 </div>
                 {visibleChars.length === 0 ? (
@@ -377,7 +425,7 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
             </div>
 
             <aside className={styles.sideColumn}>
-              <div className={styles.asideCard}>
+              <div className={`${styles.asideCard} ${styles.asideProgressCard}`}>
                 <div className={styles.sectionEyebrow}>{t('anime.yourProgress')}</div>
                 {currentEntry ? (
                   <>

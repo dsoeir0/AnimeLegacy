@@ -27,6 +27,7 @@ import StatusBadge from '../components/ui/StatusBadge';
 import Skeleton from '../components/ui/Skeleton';
 import AddToListModal from '../components/modals/AddToListModal';
 import RatingModal from '../components/modals/RatingModal';
+import MobileMyList from '../components/myList/MobileMyList';
 import styles from './my-list.module.css';
 import useMyList from '../hooks/useMyList';
 import { healMissingAddedAt } from '../lib/services/userList';
@@ -131,6 +132,23 @@ function MyList({ t }) {
     });
     return counts;
   }, [detailsById, isAiringNow, list]);
+
+  const mobileKpis = useMemo(() => {
+    const year = new Date().getFullYear();
+    let airingNow = 0;
+    let thisYear = 0;
+    list.forEach((item) => {
+      const detail = detailsById.get(String(item.id)) || {};
+      const status = resolveStatus(detail.status, isAiringNow(detail, item));
+      if (status === 'watching' && isAiringNow(detail, item)) airingNow += 1;
+      const ts = detail?.addedAt ?? detail?.updatedAt;
+      const date = ts?.toDate ? ts.toDate() : ts ? new Date(ts) : null;
+      if (date && !Number.isNaN(date.getTime()) && date.getFullYear() === year) {
+        thisYear += 1;
+      }
+    });
+    return { airingNow, thisYear, onPause: statusCounts.on_hold };
+  }, [list, detailsById, isAiringNow, statusCounts.on_hold]);
 
   const filteredList = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -448,7 +466,25 @@ function MyList({ t }) {
   };
 
   return (
-    <Layout title={t('myList.metaTitle')} description={t('myList.metaDesc')}>
+    <Layout title={t('myList.metaTitle')} description={t('myList.metaDesc')} mobileTitle={t('nav.myList')}>
+      {user ? (
+        <MobileMyList
+          list={list}
+          orderedList={orderedList}
+          detailsById={detailsById}
+          isAiringNow={isAiringNow}
+          statusCounts={statusCounts}
+          stats={stats}
+          filters={FILTERS}
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          airingNowCount={mobileKpis.airingNow}
+          onPauseCount={mobileKpis.onPause}
+          thisYearCount={mobileKpis.thisYear}
+        />
+      ) : null}
       <div className={styles.page}>
         {!user ? (
           <div className={styles.emptyCard}>

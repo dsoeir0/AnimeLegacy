@@ -9,6 +9,7 @@ import Button from '../components/ui/Button';
 import IconButton from '../components/ui/IconButton';
 import RatingDisplay from '../components/ui/RatingDisplay';
 import PosterCard from '../components/cards/PosterCard';
+import MobileHome from '../components/home/MobileHome';
 import AddToListModal from '../components/modals/AddToListModal';
 import useMyList from '../hooks/useMyList';
 import { dedupeByMalId, filterOutHentai, normalizeAnime } from '../lib/utils/anime';
@@ -335,8 +336,21 @@ function Home({ currentResposta, moviesResposta, aniListMap, topMovies, t }) {
     setMoviePicks(pickRandom(moviePool, 6, currentIds));
   };
 
+  const mobileAiring = trendingData.slice(0, 12);
+  const mobileHighlights = currentData
+    .filter((item) => !mobileAiring.find((h) => h.mal_id === item.mal_id))
+    .slice(0, 6);
+
   return (
-    <Layout title={t('home.metaTitle')} description={t('home.metaDesc')}>
+    <Layout title={t('home.metaTitle')} description={t('home.metaDesc')} mobileTitle={t('nav.home')}>
+      <MobileHome
+        heroSlides={heroSlides}
+        airing={mobileAiring}
+        highlights={mobileHighlights}
+        aniListMap={aniListMap}
+        onOpenModal={openAddModal}
+        getEntry={getEntry}
+      />
       <div className={styles.main}>
         {heroSlides.length > 0 ? (
           <HeroCarousel

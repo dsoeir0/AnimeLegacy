@@ -1,0 +1,222 @@
+.mobileProfile {
+  display: none;
+  position: relative;
+  padding: 0 18px 4px;
+  background: var(--al-ink-1);
+}
+
+@media (max-width: 768px) {
+  .mobileProfile {
+    display: block;
+  }
+}
+
+.banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bannerGradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 30%,
+    color-mix(in srgb, var(--al-collection) 35%, transparent) 0%,
+    transparent 60%
+  ),
+  linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--al-collection) 22%, var(--al-ink-0)) 0%,
+    color-mix(in srgb, var(--al-primary-2) 12%, var(--al-ink-1)) 60%,
+    var(--al-ink-1) 100%
+  );
+}
+
+.bannerFade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--al-ink-0) 45%, transparent) 0%,
+    transparent 30%,
+    color-mix(in srgb, var(--al-ink-1) 88%, transparent) 80%,
+    var(--al-ink-1) 100%
+  );
+}
+
+.topActions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 4px 0;
+}
+
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--al-ink-0) 40%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, var(--al-white) 16%, transparent);
+  color: var(--al-white);
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  border-color: color-mix(in srgb, var(--al-white) 32%, transparent);
+}
+
+.identity {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  margin-top: 80px;
+  padding: 0 4px;
+}
+
+.avatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 22px;
+  background: var(--al-primary-gradient);
+  display: grid;
+  place-items: center;
+  color: var(--al-white);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: -0.025em;
+  border: 3px solid var(--al-ink-1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.identityBody {
+  min-width: 0;
+  flex: 1;
+  padding-bottom: 6px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--al-fg-1);
+  line-height: 1.05;
+}
+
+.handle {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--al-fg-3);
+}
+
+.bio {
+  position: relative;
+  z-index: 2;
+  margin: 14px 4px 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--al-fg-2);
+  text-wrap: pretty;
+}
+
+.actionsRow {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  padding: 0 4px 18px;
+}
+
+.editBtn {
+  flex: 1;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--al-primary-gradient);
+  border: none;
+  color: var(--al-ink-0);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.statsCard {
+  position: relative;
+  z-index: 2;
+  padding: 18px 16px;
+  background: var(--al-ink-2);
+  border: 1px solid var(--al-border);
+  border-radius: 16px;
+  margin-bottom: 18px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.statCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--al-fg-3);
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  color: var(--al-fg-1);
+  line-height: 1;
+}
+
+.statValueAccent {
+  color: var(--al-warm-ink);
+}
+
+.statSub {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: var(--al-fg-3);
+}

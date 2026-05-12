@@ -1,0 +1,333 @@
+.mobileCalendar {
+  display: none;
+  background: var(--al-ink-1);
+  padding-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .mobileCalendar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+}
+
+.header {
+  padding: 28px 22px 4px;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.headerEyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--al-fg-3);
+}
+
+.headerNav {
+  display: flex;
+  gap: 8px;
+}
+
+.navBtn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--al-border);
+  background: var(--al-ink-3);
+  color: var(--al-fg-2);
+  cursor: pointer;
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.navBtn:hover {
+  border-color: var(--al-border-strong);
+  color: var(--al-fg-1);
+}
+
+.headerTitle {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--al-fg-1);
+  line-height: 1;
+}
+
+.headerStats {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.headerStatsNum {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--al-primary-ink);
+}
+
+.headerStatsRest {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--al-fg-3);
+}
+
+.dayStrip {
+  display: flex;
+  gap: 8px;
+  padding: 8px 18px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.dayStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.dayPill {
+  flex-shrink: 0;
+  width: 56px;
+  padding: 10px 0;
+  border-radius: 14px;
+  border: 1px solid var(--al-border);
+  background: var(--al-ink-3);
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: background var(--dur-2) var(--ease-standard), border-color var(--dur-2);
+}
+
+.dayPillActive {
+  border-color: transparent;
+  background: var(--al-primary-gradient);
+}
+
+.dayPillLabel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--al-fg-3);
+}
+
+.dayPillActive .dayPillLabel {
+  color: color-mix(in srgb, var(--al-ink-0) 70%, transparent);
+}
+
+.dayPillNum {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--al-fg-1);
+  margin-top: 2px;
+}
+
+.dayPillActive .dayPillNum {
+  color: var(--al-ink-0);
+}
+
+.dayPillCount {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--al-fg-4);
+  margin-top: 4px;
+}
+
+.dayPillActive .dayPillCount {
+  color: color-mix(in srgb, var(--al-ink-0) 70%, transparent);
+}
+
+.dayHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 22px 6px;
+}
+
+.dayHeadEyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 10.5px;
+  color: var(--al-warm-ink);
+  margin-bottom: 4px;
+}
+
+.dayHeadTitle {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  color: var(--al-fg-1);
+}
+
+.inListPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  background: var(--al-collection-soft);
+  border: 1px solid color-mix(in srgb, var(--al-collection) 30%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--al-collection);
+}
+
+.inListDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--al-collection);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 18px 12px 22px;
+  border-bottom: 1px solid var(--al-border);
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowInList::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  background: var(--al-collection);
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.rowCover {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px solid var(--al-border);
+  background: var(--al-ink-3);
+}
+
+.rowCover img {
+  object-fit: cover;
+}
+
+.rowBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--al-fg-1);
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowTags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tagSimul {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 1.5px 5px;
+  background: var(--al-warm-soft);
+  color: var(--al-warm-ink);
+  border-radius: 4px;
+  border: 0.5px solid color-mix(in srgb, var(--al-warm) 30%, transparent);
+}
+
+.tagInList {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--al-collection);
+  font-weight: 600;
+}
+
+.rowTime {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowTimeBig {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--al-fg-2);
+}
+
+.rowInList .rowTimeBig {
+  color: var(--al-fg-1);
+}
+
+.rowTimeTz {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--al-fg-4);
+}
+
+.empty {
+  padding: 32px 22px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--al-fg-3);
+}

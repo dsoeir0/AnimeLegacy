@@ -2,6 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react';
 import { translate } from 'react-switch-lang';
 import Layout from '../components/layout/Layout';
 import CalendarCell from '../components/calendar/CalendarCell';
+import MobileCalendar from '../components/calendar/MobileCalendar';
 import useMyList from '../hooks/useMyList';
 import { getSchedules } from '../lib/services/jikan';
 import { dedupeByMalId, filterOutHentai } from '../lib/utils/anime';
@@ -48,7 +49,14 @@ function CalendarPage({ schedulesByDay, t }) {
   );
 
   return (
-    <Layout title={t('calendar.metaTitle')} description={t('calendar.metaDesc')}>
+    <Layout title={t('calendar.metaTitle')} description={t('calendar.metaDesc')} mobileTitle={t('nav.calendar')}>
+      <MobileCalendar
+        week={week}
+        now={now}
+        bucket={bucket}
+        myListIds={myListIds}
+        totalCount={totalCount}
+      />
       <div className={styles.page}>
         <header className={styles.head}>
           <div className={styles.eyebrow}>{t('calendar.eyebrow')}</div>

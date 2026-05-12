@@ -5,6 +5,12 @@
   gap: 32px;
 }
 
+@media (max-width: 768px) {
+  .page {
+    display: none;
+  }
+}
+
 .hero {
   display: grid;
   grid-template-columns: 1fr 320px;

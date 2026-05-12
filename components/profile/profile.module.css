@@ -753,7 +753,7 @@
 
 .reviewsSegmentBtnActive {
   background: var(--al-primary-2);
-  color: var(--al-primary-ink);
+  color: var(--al-ink-0);
   font-weight: 600;
 }
 
@@ -981,11 +981,8 @@
 }
 
 .modalHead {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--al-border);
+  padding: 0 44px 18px 0;
+  margin-bottom: 4px;
 }
 
 .modalEyebrow {
@@ -1007,7 +1004,7 @@
 }
 
 .modalForm {
-  padding: 22px 24px 24px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -1142,13 +1139,6 @@
   font-size: 12.5px;
 }
 
-.modalActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
-
 @media (max-width: 1100px) {
   .kpiRow {
     grid-template-columns: repeat(3, 1fr);
@@ -1168,23 +1158,22 @@
 
 @media (max-width: 768px) {
   .page {
-    padding: 28px 20px 80px;
+    padding: 0 0 24px;
+    gap: 0;
   }
-  .strip {
-    grid-template-columns: auto 1fr;
-    grid-template-areas:
-      'avatar ident'
-      'actions actions';
-    gap: 14px;
-  }
-  .stripAvatar { grid-area: avatar; }
-  .stripIdent { grid-area: ident; }
-  .stripActions { grid-area: actions; justify-content: flex-start; }
-  .kpiRow {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .header,
+  .kpiRow,
   .aside {
-    flex-direction: column;
+    display: none;
+  }
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .content {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
   .contentBody {
     padding: 18px;
@@ -1790,6 +1779,10 @@
   background: linear-gradient(135deg, var(--al-ink-3), var(--al-ink-4));
 }
 
+.timelineFormatTagMobile {
+  display: none;
+}
+
 .timelineFormatTag_longform {
   background: linear-gradient(
     135deg,
@@ -1883,11 +1876,240 @@
 
 @media (max-width: 720px) {
   .topFavGrid { grid-template-columns: repeat(2, 1fr); }
-  .header { padding: 20px; }
-  .headerName { font-size: 20px; }
   .reviewRow {
     grid-template-columns: 40px 56px 1fr auto;
     gap: 10px;
   }
   .reviewRowWords, .reviewRowDate { display: none; }
+}
+
+@media (max-width: 768px) {
+  .header,
+  .kpiRow,
+  .aside {
+    display: none;
+  }
+
+  .topFavGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .reviewsStatsBanner {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .reviewsKpis {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .kpi {
+    padding: 10px 12px;
+  }
+
+  .kpiLabel {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+  }
+
+  .kpiValue {
+    font-size: 20px;
+  }
+
+  .kpiUnit {
+    font-size: 11px;
+  }
+
+  .kpiDelta {
+    font-size: 9.5px;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  .reviewsToolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .reviewsSearch {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .reviewsSegment {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .reviewsSegment::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reviewsSegmentBtn {
+    flex-shrink: 0;
+    padding: 6px 9px;
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+
+  .reviewsSegmentLabel {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .entriesHead {
+    display: none;
+  }
+
+  .entriesRow {
+    grid-template-columns: 1fr auto auto auto;
+    gap: 8px;
+    padding: 8px 4px;
+    align-items: center;
+  }
+
+  .entriesIndex {
+    display: none;
+  }
+
+  .entriesTitle {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .entriesThumb {
+    width: 36px;
+    height: 52px;
+  }
+
+  .entriesTitleText {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .entriesTitleName {
+    font-size: 12.5px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .entriesTitleMeta {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .entriesProgress {
+    font-size: 10.5px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .entriesScore {
+    font-size: 12px;
+    text-align: right;
+    min-width: 24px;
+  }
+
+  .topFavRank {
+    top: 6px;
+    left: 6px;
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+
+  .topFavMeta {
+    bottom: 32px;
+    left: 8px;
+    right: 8px;
+    font-size: 7.5px;
+    letter-spacing: 0.1em;
+  }
+
+  .reorderControls {
+    top: 6px;
+    right: 6px;
+    gap: 3px;
+  }
+
+  .reorderBtn {
+    width: 22px;
+    height: 22px;
+  }
+
+  .timelineGroup {
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+  }
+
+  .timelineDay {
+    font-size: 18px;
+  }
+
+  .timelineMonth {
+    font-size: 9px;
+  }
+
+  .timelineItem {
+    grid-template-columns: 32px 1fr auto;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .timelineIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .timelineFormatTagDesktop {
+    display: none;
+  }
+
+  .timelineFormatTagMobile {
+    width: auto;
+    height: auto;
+    padding: 3px 7px;
+    border-radius: 6px;
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+
+  .timelineBody {
+    gap: 4px;
+  }
+
+  .timelineTitle {
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .timelineLabel {
+    font-size: 11.5px;
+    line-height: 1.3;
+  }
+
+  .timelineAgo {
+    font-size: 9.5px;
+    align-self: flex-start;
+    padding-top: 2px;
+    white-space: nowrap;
+  }
 }

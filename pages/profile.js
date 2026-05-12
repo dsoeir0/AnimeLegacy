@@ -10,6 +10,7 @@ import FavoriteVoicesStrip from '../components/profile/FavoriteVoicesStrip';
 import FavoritesStrip from '../components/profile/FavoritesStrip';
 import GenreBars from '../components/profile/GenreBars';
 import KpiRow from '../components/profile/KpiRow';
+import MobileProfileHeader from '../components/profile/MobileProfileHeader';
 import ProfileEmptyState from '../components/profile/ProfileEmptyState';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import RatingDistribution from '../components/profile/RatingDistribution';
@@ -50,8 +51,9 @@ import styles from '../components/profile/profile.module.css';
 
 const TABS = [
   { id: 'Overview', labelKey: 'profile.tabs.overview' },
-  { id: 'Favorites', labelKey: 'profile.tabs.favorites' },
+  { id: 'Stats', labelKey: 'profile.tabs.stats' },
   { id: 'Reviews', labelKey: 'profile.tabs.reviews' },
+  { id: 'Favorites', labelKey: 'profile.tabs.favorites' },
   { id: 'Activity', labelKey: 'profile.tabs.activity' },
 ];
 
@@ -233,7 +235,21 @@ function ProfilePage({ t }) {
   }, [favoriteIdsKey]);
 
   return (
-    <Layout title={t('profile.metaTitle')} description={t('profile.metaDesc')}>
+    <Layout title={t('profile.metaTitle')} description={t('profile.metaDesc')} mobileTitle={t('nav.profile')}>
+      {user ? (
+        <MobileProfileHeader
+          avatar={avatar}
+          initials={initials}
+          displayName={displayName}
+          handle={handle}
+          joinYear={joinYear}
+          bio={profile?.bio}
+          stats={stats}
+          reviewsCount={writtenReviews.length}
+          mean={meanWithSigma.mean}
+          onEdit={() => setIsEditing(true)}
+        />
+      ) : null}
       <div className={styles.page}>
         {!user ? (
           <div className={styles.empty}>
@@ -332,11 +348,6 @@ function ProfilePage({ t }) {
                 >
                   {activeTab === 'Overview' ? (
                     <>
-                      <RatingDistribution
-                        histogram={ratingHistogram}
-                        rated={ratedCount}
-                        peak={peakRating}
-                      />
                       <RecentEntriesTable
                         entries={recentEntries}
                         total={listEntries}
@@ -346,6 +357,25 @@ function ProfilePage({ t }) {
                         favorites={favorites}
                         aniListMap={aniListMap}
                         onReorder={handleReorderFavorites}
+                      />
+                    </>
+                  ) : null}
+
+                  {activeTab === 'Stats' ? (
+                    <>
+                      <RatingDistribution
+                        histogram={ratingHistogram}
+                        rated={ratedCount}
+                        peak={peakRating}
+                      />
+                      <div className={styles.section}>
+                        <h3 className={styles.sectionTitle}>{t('profile.genreBreakdown')}</h3>
+                        <GenreBars bars={genreBars} />
+                      </div>
+                      <WatchHeatmap
+                        heatmap={activityHeatmap}
+                        title={t('profile.activityHeatmap')}
+                        meta={t('profile.heatmapMeta')}
                       />
                     </>
                   ) : null}
@@ -409,18 +439,11 @@ function ProfilePage({ t }) {
                   ) : null}
 
                   {activeTab === 'Activity' ? (
-                    <>
-                      <WatchHeatmap
-                        heatmap={activityHeatmap}
-                        title={t('profile.activityHeatmap')}
-                        meta={t('profile.heatmapMeta')}
-                      />
-                      <ActivityTimeline
-                        groups={activityGroups}
-                        total={activityAll.length}
-                        animeItems={animeItems}
-                      />
-                    </>
+                    <ActivityTimeline
+                      groups={activityGroups}
+                      total={activityAll.length}
+                      animeItems={animeItems}
+                    />
                   ) : null}
                 </div>
               </section>

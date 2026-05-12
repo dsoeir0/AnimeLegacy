@@ -9,6 +9,7 @@ import Dropdown from '../../components/ui/Dropdown';
 import PosterCard from '../../components/cards/PosterCard';
 import EditorPickCard from '../../components/seasons/EditorPickCard';
 import KpiRow from '../../components/seasons/KpiRow';
+import MobileSeasons from '../../components/seasons/MobileSeasons';
 import SeasonTabs from '../../components/seasons/SeasonTabs';
 import TopThreeSection from '../../components/seasons/TopThreeSection';
 import styles from './[year].module.css';
@@ -232,7 +233,14 @@ function Seasons({
     <Layout
       title={t('seasonsPage.metaTitle', { year })}
       description={t('seasonsPage.metaDesc')}
+      mobileTitle={t('nav.seasons')}
     >
+      <MobileSeasons
+        seasonMap={seasonMap}
+        year={numericYear}
+        initialSeason={activeSeason}
+        aniListMap={aniListMap}
+      />
       <div className={styles.page}>
         <header className={styles.hero}>
           <div className={styles.heroLeft}>

@@ -62,10 +62,13 @@ function ActivityTimeline({ groups, total, animeItems, t }) {
                     <span className={`${styles.timelineIcon} ${styles[`timelineIcon_${verb}`]}`}>
                       <Icon size={14} strokeWidth={2.4} />
                     </span>
-                    <span className={`${styles.timelineFormatTag} ${styles[`timelineFormatTag_${fmt.key}`]}`}>
+                    <span className={`${styles.timelineFormatTag} ${styles[`timelineFormatTag_${fmt.key}`]} ${styles.timelineFormatTagDesktop}`}>
                       {fmt.label}
                     </span>
                     <span className={styles.timelineBody}>
+                      <span className={`${styles.timelineFormatTag} ${styles[`timelineFormatTag_${fmt.key}`]} ${styles.timelineFormatTagMobile}`}>
+                        {fmt.label}
+                      </span>
                       <span className={styles.timelineTitle}>{entry.title || t('status.unknown')}</span>
                       <span className={styles.timelineLabel}>{entry.label || verb}</span>
                     </span>

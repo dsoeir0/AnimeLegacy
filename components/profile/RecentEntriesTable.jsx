@@ -64,7 +64,7 @@ function RecentEntriesTable({ entries, total, onSeeAll, t }) {
                   </span>
                 </span>
               </span>
-              <span><StatusBadge status={entry.status} /></span>
+              <span><StatusBadge status={entry.status} size="xs" /></span>
               <span className={styles.entriesProgress}>
                 {Number.isFinite(entry.progress) ? entry.progress : 0}
                 {entry.episodesTotal ? <>/{entry.episodesTotal}</> : null}

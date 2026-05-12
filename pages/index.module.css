@@ -5,6 +5,12 @@
   gap: 56px;
 }
 
+@media (max-width: 768px) {
+  .main {
+    display: none;
+  }
+}
+
 .hero {
   position: relative;
   height: 520px;
