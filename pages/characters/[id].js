@@ -9,6 +9,7 @@ import {
 } from '../../lib/services/favoriteCharacters';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
+import MobileCharacterDetail from '../../components/characters/MobileCharacterDetail';
 import styles from './[id].module.css';
 import useAuth from '../../hooks/useAuth';
 import useFavoriteToggle from '../../hooks/useFavoriteToggle';
@@ -144,7 +145,21 @@ function CharacterPage({
     <Layout
       title={`${character?.name || 'Character'} · AnimeLegacy`}
       description={character?.about || 'Character profile and appearances.'}
+      mobileTitle={character?.name || t('header.breadcrumb.character')}
     >
+      <MobileCharacterDetail
+        character={character}
+        imageUrl={imageUrl}
+        appearances={anime}
+        voices={voices}
+        bioText={translatedAbout || character?.about || ''}
+        favoriteCount={favoriteTotal || 0}
+        isFavorite={isFavorite}
+        favoriteError={favoriteError}
+        favoriteLoaded={favoriteLoaded}
+        onToggleFavorite={toggleFavorite}
+        canFavorite={Boolean(user?.uid)}
+      />
       <div className={styles.page}>
         <section className={styles.hero}>
           <div className={styles.heroImageFrame}>

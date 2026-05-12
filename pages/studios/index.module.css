@@ -2,6 +2,10 @@
   padding: 40px 48px 80px;
 }
 
+@media (max-width: 768px) {
+  .page { display: none; }
+}
+
 .empty {
   padding: 64px 32px;
   text-align: center;

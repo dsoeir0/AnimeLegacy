@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import IconButton from '../../components/ui/IconButton';
+import MobileCharacters from '../../components/characters/MobileCharacters';
 import { getTopCharacters } from '../../lib/services/jikan';
 import styles from './index.module.css';
 
@@ -13,13 +14,14 @@ const posterFrom = (character) =>
   character?.images?.jpg?.image_url ||
   '/logo_no_text.png';
 
-function CharactersIndexPage({ items, pagination, page, t }) {
+function CharactersIndexPage({ items, pagination, page, totalIndexed, t }) {
   const router = useRouter();
   const lastPage = pagination?.last_visible_page || 1;
   const go = (p) => router.push({ pathname: '/characters', query: { page: p } });
 
   return (
-    <Layout title={t('characters.metaTitle')} description={t('characters.metaDesc')}>
+    <Layout title={t('characters.metaTitle')} description={t('characters.metaDesc')} mobileTitle={t('nav.characters')}>
+      <MobileCharacters items={items} totalIndexed={totalIndexed} />
       <div className={styles.page}>
         <header className={styles.head}>
           <div className={styles.eyebrow}>{t('characters.eyebrow')}</div>
@@ -112,5 +114,6 @@ export async function getServerSideProps(context) {
   const response = await getTopCharacters(page);
   const items = Array.isArray(response?.data) ? response.data : [];
   const pagination = response?.pagination || {};
-  return { props: { items, pagination, page } };
+  const totalIndexed = pagination?.items?.total || items.length;
+  return { props: { items, pagination, page, totalIndexed } };
 }

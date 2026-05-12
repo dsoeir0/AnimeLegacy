@@ -11,6 +11,7 @@ import {
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
 import RatingDisplay from '../../components/ui/RatingDisplay';
+import MobileStudioDetail from '../../components/studios/MobileStudioDetail';
 import useAuth from '../../hooks/useAuth';
 import useFavoriteToggle from '../../hooks/useFavoriteToggle';
 import useTranslatedText from '../../hooks/useTranslatedText';
@@ -149,7 +150,21 @@ function StudioDetailPage({ producer, works, related, t }) {
     <Layout
       title={`${name} · AnimeLegacy`}
       description={t('studio.metaDescFallback', { name })}
+      mobileTitle={name || t('header.breadcrumb.studio')}
     >
+      <MobileStudioDetail
+        producer={producer}
+        works={works}
+        accent={accent}
+        topScoreBest={highlights.best}
+        avgScoreValue={mean}
+        airingCount={airing}
+        isFavorite={isFavorite}
+        favoriteError={favoriteError}
+        favoriteLoaded={favoriteLoaded}
+        onToggleFavorite={toggleFavorite}
+        canFavorite={Boolean(user?.uid)}
+      />
       <div className={styles.page}>
         <section className={styles.hero}>
           {heroPoster ? (

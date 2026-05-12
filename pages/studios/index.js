@@ -8,6 +8,7 @@ import StudiosHeader from '../../components/studios/StudiosHeader';
 import FeaturedStudio from '../../components/studios/FeaturedStudio';
 import StudioFilterBar from '../../components/studios/StudioFilterBar';
 import StudioCard from '../../components/studios/StudioCard';
+import MobileStudios from '../../components/studios/MobileStudios';
 import useAuth from '../../hooks/useAuth';
 import useFavoriteIds from '../../hooks/useFavoriteIds';
 import { getAnimeByProducer, getProducers } from '../../lib/services/jikan';
@@ -160,7 +161,8 @@ function StudiosIndexPage({ items, portfolio, featuredIndex = 0, pagination, pag
   }, [restIdsSignature]);
 
   return (
-    <Layout title={t('studios.metaTitle')} description={t('studios.metaDesc')}>
+    <Layout title={t('studios.metaTitle')} description={t('studios.metaDesc')} mobileTitle={t('nav.studios')}>
+      <MobileStudios items={items} postersByStudio={postersByStudio} totals={totals} />
       <div className={styles.page}>
         <StudiosHeader totals={totals} />
 

@@ -1,5 +1,6 @@
 import { translate } from 'react-switch-lang';
 import ComingSoon from '../components/ui/ComingSoon';
+import MobileCollections from '../components/collections/MobileCollections';
 
 function CollectionsPage({ t }) {
   return (
@@ -14,6 +15,8 @@ function CollectionsPage({ t }) {
       ]}
       primaryLabel={t('comingSoon.backHome')}
       metaDescription={t('comingSoon.collections.meta')}
+      mobileTitle={t('nav.collections')}
+      mobileSlot={<MobileCollections />}
     />
   );
 }

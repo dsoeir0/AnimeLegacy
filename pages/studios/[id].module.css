@@ -4,6 +4,10 @@
   min-height: 100%;
 }
 
+@media (max-width: 768px) {
+  .page { display: none; }
+}
+
 .empty {
   padding: 96px 24px;
   text-align: center;
@@ -775,6 +779,9 @@
     position: static;
     padding: 40px 24px 32px;
     grid-template-columns: auto 1fr;
+  }
+  .heroTitle {
+    font-size: clamp(36px, 8vw, 56px);
   }
   .heroLogo {
     width: 100px;

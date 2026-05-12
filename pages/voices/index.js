@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import IconButton from '../../components/ui/IconButton';
+import MobileVoices from '../../components/voices/MobileVoices';
 import { getTopPeople } from '../../lib/services/jikan';
 import styles from './index.module.css';
 
@@ -13,13 +14,14 @@ const posterFrom = (person) =>
   person?.images?.jpg?.image_url ||
   '/logo_no_text.png';
 
-function VoicesIndexPage({ items, pagination, page, t }) {
+function VoicesIndexPage({ items, pagination, page, totalIndexed, t }) {
   const router = useRouter();
   const lastPage = pagination?.last_visible_page || 1;
   const go = (p) => router.push({ pathname: '/voices', query: { page: p } });
 
   return (
-    <Layout title={t('voices.metaTitle')} description={t('voices.metaDesc')}>
+    <Layout title={t('voices.metaTitle')} description={t('voices.metaDesc')} mobileTitle={t('nav.voiceActors')}>
+      <MobileVoices items={items} totalIndexed={totalIndexed} />
       <div className={styles.page}>
         <header className={styles.head}>
           <div className={styles.eyebrow}>{t('voices.eyebrow')}</div>
@@ -116,5 +118,6 @@ export async function getServerSideProps(context) {
   const response = await getTopPeople(page);
   const items = Array.isArray(response?.data) ? response.data : [];
   const pagination = response?.pagination || {};
-  return { props: { items, pagination, page } };
+  const totalIndexed = pagination?.items?.total || items.length;
+  return { props: { items, pagination, page, totalIndexed } };
 }

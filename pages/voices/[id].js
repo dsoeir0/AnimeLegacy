@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Star } from 'lucide-react';
 import { translate, getLanguage } from 'react-switch-lang';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/ui/Button';
+import MobileVoiceDetail from '../../components/voices/MobileVoiceDetail';
 import useAuth from '../../hooks/useAuth';
 import useFavoriteToggle from '../../hooks/useFavoriteToggle';
 import useTranslatedText from '../../hooks/useTranslatedText';
 import { getPersonById, getPersonAnime, getPersonVoices } from '../../lib/services/jikan';
+import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
+import { sortVoiceRolesByPopularity } from '../../lib/utils/voiceRoles';
 import { localizeRole } from '../../lib/utils/charLocalize';
 import {
   setVoiceFavorite,
@@ -48,6 +51,7 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
 
   const {
     isFavorite,
+    favoriteTotal,
     favoriteError,
     favoriteLoaded,
     toggleFavorite,
@@ -102,14 +106,34 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
+
+  const sortedVoiceEntries = useMemo(
+    () => sortVoiceRolesByPopularity(voiceEntries),
+    [voiceEntries],
+  );
+
   const visibleAnime = showAllAnime ? animeEntries : animeEntries.slice(0, 8);
-  const visibleRoles = showAllRoles ? voiceEntries : voiceEntries.slice(0, 12);
+  const visibleRoles = showAllRoles ? sortedVoiceEntries : sortedVoiceEntries.slice(0, 12);
 
   return (
     <Layout
       title={`${person.name || 'Voice actor'} · AnimeLegacy`}
       description={t('voice.metaDesc', { name: person.name || 'Voice actor' })}
+      mobileTitle={person.name || t('header.breadcrumb.voiceActor')}
     >
+      <MobileVoiceDetail
+        person={person}
+        imageUrl={imageUrl}
+        voiceEntries={sortedVoiceEntries}
+        animeCount={animeEntries.length}
+        favoriteCount={favoriteTotal || 0}
+        bioText={translatedAbout || person?.about || ''}
+        isFavorite={isFavorite}
+        favoriteError={favoriteError}
+        favoriteLoaded={favoriteLoaded}
+        onToggleFavorite={toggleFavorite}
+        canFavorite={Boolean(user?.uid)}
+      />
       <div className={styles.page}>
         <section className={styles.hero}>
           <div className={styles.heroImage}>
@@ -132,12 +156,6 @@ function VoiceActorDetailPage({ person, animeEntries, voiceEntries, t }) {
             ) : null}
 
             <div className={styles.stats}>
-              <div className={styles.stat}>
-                <div className={styles.statLabel}>{t('voice.stats.favorites')}</div>
-                <div className={styles.statValue}>
-                  {typeof person.favorites === 'number' ? person.favorites.toLocaleString() : '—'}
-                </div>
-              </div>
               <div className={styles.stat}>
                 <div className={styles.statLabel}>{t('voice.stats.born')}</div>
                 <div className={styles.statValueSmall}>
@@ -311,11 +329,42 @@ export async function getServerSideProps(context) {
     getPersonAnime(id),
     getPersonVoices(id),
   ]);
+  const voiceEntries = Array.isArray(voicesRes?.data) ? voicesRes.data : [];
+  const malIds = Array.from(
+    new Set(
+      voiceEntries
+        .map((entry) => entry?.anime?.mal_id)
+        .filter((mid) => Number.isFinite(mid) && mid > 0),
+    ),
+  );
+  let aniListMap = {};
+  if (malIds.length > 0) {
+    try {
+      aniListMap = await fetchAniListMediaByMalIds(malIds);
+    } catch {
+      aniListMap = {};
+    }
+  }
+  const enrichedVoiceEntries = voiceEntries.map((entry) => {
+    const malId = entry?.anime?.mal_id;
+    const meta = (malId && aniListMap[malId]) || null;
+    if (!meta) return entry;
+    return {
+      ...entry,
+      anime: {
+        ...entry.anime,
+        score: meta.averageScore != null ? meta.averageScore / 10 : entry.anime?.score ?? null,
+        year: meta.year || entry.anime?.year || null,
+        favourites: meta.favourites ?? null,
+        popularity: meta.popularity ?? null,
+      },
+    };
+  });
   return {
     props: {
       person: personRes?.data || null,
       animeEntries: Array.isArray(animeRes?.data) ? animeRes.data : [],
-      voiceEntries: Array.isArray(voicesRes?.data) ? voicesRes.data : [],
+      voiceEntries: enrichedVoiceEntries,
     },
   };
 }
