@@ -21,7 +21,8 @@
     "compare": "Compare",
     "discover": "Discover",
     "expandSidebar": "Expand sidebar",
-    "collapseSidebar": "Collapse sidebar"
+    "collapseSidebar": "Collapse sidebar",
+    "primaryAriaLabel": "Primary navigation"
   },
   "header": {
     "searchPlaceholder": "Search anime, characters, studios…",
@@ -100,6 +101,8 @@
     "viewDetails": "View details",
     "viewAll": "View all",
     "showLess": "Show less",
+    "readMore": "Read more",
+    "seeAll": "See all",
     "reset": "Reset",
     "shufflePicks": "Shuffle picks",
     "browseSeasons": "Browse seasons",
@@ -223,7 +226,14 @@
     "curatedEyebrow": "CURATED",
     "filmsTitle": "Films, reshuffled",
     "currentSeasonEyebrow": "CURRENT SEASON",
-    "seasonHighlights": "Season highlights"
+    "seasonHighlights": "Season highlights",
+    "heroScoreLabel": "MAL Score",
+    "heroScoreSub": "{scored} scored · #{rank}",
+    "heroDotAria": "Show hero slide {n}",
+    "mobileAiringTitle": "What's airing now",
+    "mobileAiringMeta": "{n} simulcasts tracked",
+    "mobileHighlightsTitle": "{season} {year} highlights",
+    "mobileHighlightsMeta": "{n} titles to explore"
   },
   "myList": {
     "metaTitle": "AnimeLegacy · My list",
@@ -251,7 +261,27 @@
     "yourScore": "Your score",
     "advance": "Advance",
     "rate": "Rate",
-    "importFromMal": "Import from MyAnimeList"
+    "importFromMal": "Import from MyAnimeList",
+    "mobileEyebrow": "YOUR LIBRARY",
+    "mobileTitlesLabel": "titles",
+    "mobileFilterAria": "Filter library",
+    "mobileEpisodes": "{n} EP",
+    "mobileEmpty": "No entries in this filter yet.",
+    "mobileEmptySearch": "Nothing in your library matches “{q}”.",
+    "mobileSort": {
+      "heading": "SORT BY",
+      "default": "Default",
+      "title": "Title (A-Z)",
+      "rating": "Rating (high)",
+      "activeLabel": "SORT · {name}"
+    },
+    "mobileStatsDays": "{n} DAYS",
+    "mobileStatsHours": "{n} HRS",
+    "mobileStatsMean": "{n} MEAN ★",
+    "mobileStatsNoDays": "—",
+    "mobileKpiAiring": "AIRING NOW",
+    "mobileKpiOnPause": "ON PAUSE",
+    "mobileKpiThisYear": "THIS YEAR"
   },
   "import": {
     "mal": {
@@ -313,10 +343,12 @@
     "bioDefault": "No bio yet — tell the chronicle what you are watching.",
     "tabs": {
       "overview": "Overview",
+      "stats": "Stats",
       "favorites": "Favorites",
       "reviews": "Reviews",
       "activity": "Activity"
     },
+    "genreBreakdown": "Genre breakdown",
     "stats": {
       "watched": "WATCHED",
       "episodes": "EPISODES",
@@ -418,6 +450,15 @@
     "yearInReview": "Year in review",
     "yearInReviewSoon": "Coming soon — a yearly recap of what you watched, rated, and discovered.",
     "comingSoonTag": "Soon",
+    "mobileMoreMenu": "More",
+    "mobileStatAnime": "ANIME",
+    "mobileStatAnimeSub": "watched",
+    "mobileStatReviews": "REVIEWS",
+    "mobileStatReviewsSub": "published",
+    "mobileStatDays": "DAYS",
+    "mobileStatDaysSub": "screen time",
+    "mobileStatMean": "MEAN",
+    "mobileStatMeanSub": "★ score",
     "ratingDistributionEmpty": "Rate a few entries to see your score curve.",
     "moveUp": "Move up",
     "moveDown": "Move down",
@@ -543,7 +584,13 @@
     "titlesOnPage": "{n} TITLES ON THIS PAGE",
     "pageOf": "Page {current} of {total}",
     "emptyTitle": "No results yet",
-    "emptyBody": "Try a different title, or check your spelling."
+    "emptyBody": "Try a different title, or check your spelling.",
+    "mobileResultsEyebrow": "{n} RESULTS",
+    "mobileNoResults": "Nothing matches “{q}”.",
+    "mobileIdleHint": "Try a title, character, voice actor or studio.",
+    "mobileSectionMeta": "{shown} of {total}",
+    "mobileSeeAll": "See all {n} →",
+    "mobileWorksCount": "{n} works"
   },
   "discoverPage": {
     "metaTitle": "AnimeLegacy · Discover",
@@ -555,6 +602,32 @@
     "subtitle": "Curated picks, mood-led collections, and a vibe dial for when \"what should I watch?\" doesn't have a good keyword.",
     "searchPlaceholder": "Title, studio, genre…",
     "searchLabel": "Search anime by title, studio, or genre",
+    "mobileEyebrow": "EXPLORE",
+    "mobileTitle": "Find anything.",
+    "mobilePlaceholder": "Anime, studios, characters…",
+    "mobileBrowseEyebrow": "BROWSE",
+    "browseCharacters": "Characters",
+    "browseVoices": "Voice actors",
+    "browseStudios": "Studios",
+    "browseCollections": "Collections",
+    "browseAnime": "Anime",
+    "browseMovies": "Movies",
+    "mobileCatalogueEyebrow": "EXPLORE ANIME",
+    "mobileCatalogueEyebrowQuery": "RESULTS FOR \"{q}\"",
+    "mobileCatalogueTitle": "The catalogue.",
+    "mobileStatsTitles": "{n} titles",
+    "mobileStatsGenres": "{n} genres",
+    "mobileStatsYears": "{n} years",
+    "mobileTypeAll": "All",
+    "mobileTypeTv": "TV",
+    "mobileTypeMovie": "Films",
+    "mobileTypeOva": "OVA",
+    "mobileTypeSpecial": "Special",
+    "mobileTypeOna": "ONA",
+    "mobileBestMatch": "BEST MATCH",
+    "mobileScoredBy": "{n} scored",
+    "mobileAllResults": "All results",
+    "mobileShowingOf": "Showing {shown} of {total}",
     "activeLabel": "ACTIVE",
     "clearAll": "Clear all",
     "editorial": {
@@ -707,6 +780,7 @@
     "castEyebrow": "CAST",
     "castTitle": "Main characters",
     "castUnavailable": "Characters unavailable.",
+    "castViewAllCount": "View all {n}",
     "yourProgress": "YOUR PROGRESS",
     "notInList": "Not in your list yet.",
     "yourScore": "YOUR SCORE",
@@ -737,7 +811,15 @@
     "unknownTitle": "Unknown title",
     "cv": "CV",
     "roleLabel": "Role",
-    "notRated": "Not rated"
+    "notRated": "Not rated",
+    "mobileMore": "More",
+    "mobileRated": "RATED",
+    "mobileProgressEyebrow": "YOUR PROGRESS · {status}",
+    "mobileStarted": "STARTED {date}",
+    "mobileEp": "EP {n}",
+    "mobileEpNum": "EP {n}",
+    "mobileThrough": "{pct}% through",
+    "mobileUpdateScore": "Update score"
   },
   "movies": {
     "metaTitle": "AnimeLegacy · Movies",
@@ -760,8 +842,16 @@
       "favorites": "FAVORITES",
       "age": "AGE",
       "height": "HEIGHT",
-      "gender": "GENDER"
+      "gender": "GENDER",
+      "ageShort": "Age {v}"
     },
+    "kpiAppearances": "Appearances",
+    "kpiFavorites": "Favorites",
+    "kpiVoices": "Voices",
+    "kpiAppearancesValue": "{n} shows",
+    "appearancesMore": "+{n} more",
+    "voiceMetaShort": "Lead voice · {lang}",
+    "voicesMore": "+{n} more dubs",
     "favoriteTitle": "Favorite character",
     "favoriteHintOn": "Showcased on your profile.",
     "favoriteHintOff": "Mark to feature on your profile.",
@@ -807,7 +897,16 @@
     "subtitle": "The most favorited characters across every anime ever catalogued. Click for bios, appearances, and voice actors.",
     "emptyTitle": "No data available",
     "emptyBody": "The Jikan API is not responding. Try again in a moment.",
-    "fans": "fans"
+    "fans": "fans",
+    "mobileEyebrow": "EXPLORE CHARACTERS",
+    "mobileTitle": "The faces.",
+    "mobileStatsIndexed": "{n} indexed",
+    "mobileStatsShown": "{n} on this page",
+    "mobileFanFavorite": "FAN FAVORITE",
+    "mobileLikesCount": "{n} likes",
+    "mobileFansCount": "{n} fans",
+    "mobileTopTitle": "Most loved",
+    "mobileResultsCount": "{n} results"
   },
   "voices": {
     "metaTitle": "AnimeLegacy · Voice actors",
@@ -818,7 +917,14 @@
     "subtitle": "The most beloved seiyuu and international voice actors. Click through for their filmography and roles.",
     "emptyTitle": "No data available",
     "emptyBody": "The Jikan API is not responding. Try again in a moment.",
-    "fans": "fans"
+    "fans": "fans",
+    "mobileEyebrow": "EXPLORE VOICE ACTORS",
+    "mobileTitle": "The voices.",
+    "mobileStatsIndexed": "{n} indexed",
+    "mobileStatsShown": "{n} shown below",
+    "mobileFansCount": "{n} fans",
+    "mobileBornIn": "Born {y}",
+    "mobileEmpty": "No voice actors match this letter."
   },
   "voice": {
     "metaDesc": "{name} profile, voice roles, and filmography.",
@@ -840,7 +946,13 @@
     "filmographyEyebrow": "FILMOGRAPHY",
     "filmographyTitle": "Anime appearances",
     "noFilmography": "No filmography available.",
-    "notFoundBody": "This voice actor could not be loaded."
+    "notFoundBody": "This voice actor could not be loaded.",
+    "kpiRoles": "Total roles",
+    "kpiYears": "Years active",
+    "kpiAppearances": "Appearances",
+    "kpiFavorites": "Favorites",
+    "recentRolesTitle": "Recent roles",
+    "recentRolesMore": "+{n} more roles"
   },
   "studios": {
     "metaTitle": "AnimeLegacy · Studios",
@@ -859,6 +971,30 @@
       "studios": "STUDIOS",
       "productions": "PRODUCTIONS"
     },
+    "mobileEyebrow": "EXPLORE STUDIOS",
+    "mobileTitle": "The houses.",
+    "mobileStatsIndexed": "{n} indexed",
+    "mobileStatsShown": "{n} on this page",
+    "mobileFilters": {
+      "all": "All eras",
+      "veteran": "Veteran",
+      "modern": "Modern",
+      "rising": "Rising"
+    },
+    "mobileEras": {
+      "veteran": "Veteran",
+      "modern": "Modern",
+      "rising": "Rising",
+      "unknown": "Era unknown"
+    },
+    "mobileStat": {
+      "works": "Works",
+      "top": "Top",
+      "active": "Active"
+    },
+    "mobileYes": "Yes",
+    "mobileNo": "No",
+    "mobileEmpty": "No studios match this filter.",
     "featured": {
       "eyebrow": "STUDIO IN FOCUS",
       "openCatalog": "Open full catalogue",
@@ -894,7 +1030,19 @@
     "catalogueEyebrow": "CATALOGUE",
     "worksBy": "Works by {name}",
     "noWorks": "No works catalogued.",
-    "notFoundBody": "This studio could not be loaded."
+    "notFoundBody": "This studio could not be loaded.",
+    "mobileWebsite": "Website",
+    "mobileKpiWorks": "Works",
+    "mobileKpiTop": "Top score",
+    "mobileKpiYears": "Years",
+    "mobileKpiAiring": "Airing",
+    "mobileSelectedWorks": "Selected works",
+    "mobileWorksTotal": "{n} total",
+    "mobileWorksMore": "+{n} more works",
+    "mobileSignalsEyebrow": "STUDIO SIGNALS",
+    "mobileStatAvg": "Average score",
+    "mobileStatBest": "Best score",
+    "mobileAboutTitle": "About"
   },
   "studioPage": {
     "breadcrumbStudios": "Studios",
@@ -976,12 +1124,21 @@
       "friday": "Friday",
       "saturday": "Saturday",
       "sunday": "Sunday"
-    }
+    },
+    "weekLabel": "WEEK {n}",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "mobileSimulcastsCount": "{n} simulcasts",
+    "mobileSimulcastsRest": "airing this week · {inList} in your list",
+    "mobileEpsToday": "{n} episodes today",
+    "mobileInList": "{n} in list",
+    "tagInList": "IN LIST"
   },
   "seasonsPage": {
     "metaTitle": "AnimeLegacy · Seasons {year}",
     "metaDesc": "Every season's anime lineup by year, curated for easy discovery.",
     "eyebrow": "CHRONICLE · SEASONS",
+    "yearLabel": "Year",
     "seasons": {
       "winter": "Winter",
       "spring": "Spring",
@@ -1004,6 +1161,20 @@
     "emptyBody": "Try removing a filter or switching seasons.",
     "volume": "Vol. {n}",
     "filtersToggle": "Filters",
+    "archiveEyebrow": "ARCHIVE BY SEASON",
+    "threeToWatchEyebrow": "EDITORIAL · THREE TO WATCH",
+    "threeToWatchTitle": "If you only have time for three, our writers picked these.",
+    "mobileStatsTitles": "{n} titles tracked",
+    "mobileStatsAiring": "{n} airing",
+    "mobileTabCount": "{n} titles",
+    "mobileAllTitle": "All {n} titles",
+    "epShort": "EP",
+    "blurb": {
+      "winter": "A season for cosy commitment — quieter shows hold the centre while the late premieres find their feet.",
+      "spring": "A patient season. Quieter shows are doing the heavy lifting — and a long-awaited mecha return is testing how much the genre has changed.",
+      "summer": "Loud, bright, and full of risks — the season tradition lets writers swing for spectacle before autumn pulls everyone back.",
+      "fall": "The year sharpens. Headline sequels meet first-time directors, and the calendar gets unusually crowded for a few short weeks."
+    },
     "kpis": {
       "titles": "TITLES",
       "airing": "AIRING",
@@ -1128,6 +1299,17 @@
       "avatarLabel": "Avatar"
     }
   },
+  "collectionsPage": {
+    "mobileEyebrow": "EXPLORE COLLECTIONS",
+    "mobileTitle": "Curated lists.",
+    "mobileStatsRoadmap": "Coming soon · in roadmap",
+    "mobileTabs": {
+      "all": "All",
+      "editorial": "Editorial",
+      "community": "Community",
+      "saved": "Saved"
+    }
+  },
   "comingSoon": {
     "collections": {
       "eyebrow": "CURATED · ROADMAP",
@@ -1157,5 +1339,28 @@
     "body": "We hit an error rendering this screen. Refreshing usually fixes it. If it keeps happening, let us know.",
     "tryAgain": "Try again",
     "goHome": "Go home"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "clearAll": "Clear all",
+    "loading": "Catching up…",
+    "emptyTitle": "All caught up",
+    "emptyBody": "Updates about your watching list and favorites land here.",
+    "kind": {
+      "airingToday": "AIRING TODAY",
+      "airingTomorrow": "AIRING TOMORROW",
+      "newEpisode": "NEW EPISODE",
+      "sequel": "SEQUEL ANNOUNCED",
+      "finished": "FINISHED AIRING"
+    },
+    "body": {
+      "airingToday": "New episode airing today.",
+      "airingTomorrow": "New episode airing tomorrow.",
+      "newEpisode": "Now on EP {n}.",
+      "sequelOf": "Sequel to {title}.",
+      "sequelGeneric": "A sequel has been announced.",
+      "finished": "{n} episodes ready to watch."
+    }
   }
 }

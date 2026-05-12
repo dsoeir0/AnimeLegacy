@@ -21,7 +21,8 @@
     "compare": "Comparar",
     "discover": "Descubrir",
     "expandSidebar": "Ampliar la barra lateral",
-    "collapseSidebar": "Contraer la barra lateral"
+    "collapseSidebar": "Contraer la barra lateral",
+    "primaryAriaLabel": "Navegación principal"
   },
   "header": {
     "searchPlaceholder": "Buscar anime, personajes, estudios…",
@@ -100,6 +101,8 @@
     "viewDetails": "Ver detalles",
     "viewAll": "Ver todo",
     "showLess": "Mostrar menos",
+    "readMore": "Leer más",
+    "seeAll": "Ver todo",
     "reset": "Restablecer",
     "shufflePicks": "Barajar selección",
     "browseSeasons": "Explorar temporadas",
@@ -223,7 +226,14 @@
     "curatedEyebrow": "CURADURÍA",
     "filmsTitle": "Películas, reorganizadas",
     "currentSeasonEyebrow": "TEMPORADA ACTUAL",
-    "seasonHighlights": "Destacados de la temporada"
+    "seasonHighlights": "Destacados de la temporada",
+    "heroScoreLabel": "Puntuación MAL",
+    "heroScoreSub": "{scored} valoraciones · #{rank}",
+    "heroDotAria": "Mostrar diapositiva {n}",
+    "mobileAiringTitle": "Emitiéndose ahora",
+    "mobileAiringMeta": "{n} simulcasts seguidos",
+    "mobileHighlightsTitle": "Destacados {season} {year}",
+    "mobileHighlightsMeta": "{n} títulos para explorar"
   },
   "myList": {
     "metaTitle": "AnimeLegacy · Mi lista",
@@ -251,7 +261,27 @@
     "yourScore": "Tu puntuación",
     "advance": "Avanzar",
     "rate": "Puntuar",
-    "importFromMal": "Importar desde MyAnimeList"
+    "importFromMal": "Importar desde MyAnimeList",
+    "mobileEyebrow": "TU BIBLIOTECA",
+    "mobileTitlesLabel": "títulos",
+    "mobileFilterAria": "Filtrar biblioteca",
+    "mobileEpisodes": "{n} EP",
+    "mobileEmpty": "Aún no hay entradas en este filtro.",
+    "mobileEmptySearch": "Nada en tu biblioteca coincide con «{q}».",
+    "mobileSort": {
+      "heading": "ORDENAR POR",
+      "default": "Predeterminado",
+      "title": "Titulo  (A-Z)",
+      "rating": "Valoración (alta)",
+      "activeLabel": "Ordenar nombre"
+    },
+    "mobileStatsDays": "{n} DÍAS",
+    "mobileStatsHours": "{n} HRS",
+    "mobileStatsMean": "MEDIA {n} ★",
+    "mobileStatsNoDays": "—",
+    "mobileKpiAiring": "EN EMISIÓN",
+    "mobileKpiOnPause": "EN PAUSA",
+    "mobileKpiThisYear": "ESTE AÑO"
   },
   "import": {
     "mal": {
@@ -313,10 +343,12 @@
     "bioDefault": "Aún no hay biografía — cuéntale a la crónica lo que estás viendo.",
     "tabs": {
       "overview": "Resumen",
+      "stats": "Estadísticas",
       "favorites": "Favoritos",
       "reviews": "Reseñas",
       "activity": "Actividad"
     },
+    "genreBreakdown": "Desglose por género",
     "stats": {
       "watched": "VISTOS",
       "episodes": "EPISODIOS",
@@ -418,6 +450,15 @@
     "yearInReview": "Año en revista",
     "yearInReviewSoon": "Próximamente — un resumen anual de lo que viste, valoraste y descubriste.",
     "comingSoonTag": "Pronto",
+    "mobileMoreMenu": "Más",
+    "mobileStatAnime": "ANIME",
+    "mobileStatAnimeSub": "vistos",
+    "mobileStatReviews": "RESEÑAS",
+    "mobileStatReviewsSub": "publicadas",
+    "mobileStatDays": "DÍAS",
+    "mobileStatDaysSub": "tiempo de visualización",
+    "mobileStatMean": "MEDIA",
+    "mobileStatMeanSub": "★ puntuación",
     "ratingDistributionEmpty": "Valora algunas entradas para ver tu curva de puntuaciones.",
     "moveUp": "Mover arriba",
     "moveDown": "Mover abajo",
@@ -543,7 +584,13 @@
     "titlesOnPage": "{n} TÍTULOS EN ESTA PÁGINA",
     "pageOf": "Página {current} de {total}",
     "emptyTitle": "Todavía sin resultados",
-    "emptyBody": "Prueba con un título diferente o comprueba la ortografía."
+    "emptyBody": "Prueba con un título diferente o comprueba la ortografía.",
+    "mobileResultsEyebrow": "{n} RESULTADOS",
+    "mobileNoResults": "Nada coincide con «{q}».",
+    "mobileIdleHint": "Prueba con un título, personaje, actor de voz o estudio.",
+    "mobileSectionMeta": "{shown} de {total}",
+    "mobileSeeAll": "Ver todo {n} →",
+    "mobileWorksCount": "{n} obras"
   },
   "discoverPage": {
     "metaTitle": "AnimeLegacy · Descubre",
@@ -555,6 +602,32 @@
     "subtitle": "Selección curada, colecciones por estado de ánimo y un dial de vibe para cuando «¿qué veo hoy?» no tiene una buena palabra clave.",
     "searchPlaceholder": "Título, estudio, género...",
     "searchLabel": "Busca anime por título, estudio o género",
+    "mobileEyebrow": "EXPLORAR",
+    "mobileTitle": "Encuentra lo que sea.",
+    "mobilePlaceholder": "Anime, estudios, personajes…",
+    "mobileBrowseEyebrow": "EXPLORAR",
+    "browseCharacters": "Personajes",
+    "browseVoices": "Actores de voz",
+    "browseStudios": "Estudios",
+    "browseCollections": "Colecciones",
+    "browseAnime": "Anime",
+    "browseMovies": "Películas",
+    "mobileCatalogueEyebrow": "EXPLORA EL ANIME",
+    "mobileCatalogueEyebrowQuery": "RESULTADOS PARA \"{q}\"",
+    "mobileCatalogueTitle": "Catálogo",
+    "mobileStatsTitles": "{n} títulos",
+    "mobileStatsGenres": "{n} géneros",
+    "mobileStatsYears": "{n} años",
+    "mobileTypeAll": "Todos",
+    "mobileTypeTv": "TV",
+    "mobileTypeMovie": "Películas",
+    "mobileTypeOva": "OVA. ",
+    "mobileTypeSpecial": "Anotaciones",
+    "mobileTypeOna": "ONa",
+    "mobileBestMatch": "La mejor coincidencia",
+    "mobileScoredBy": "{n} puntuación",
+    "mobileAllResults": "Todos los resultados",
+    "mobileShowingOf": "Mostrando {shown} de {total}",
     "activeLabel": "ACTIVO",
     "clearAll": "Vaciar todo",
     "editorial": {
@@ -707,6 +780,7 @@
     "castEyebrow": "REPARTO",
     "castTitle": "Personajes principales",
     "castUnavailable": "Personajes no disponibles.",
+    "castViewAllCount": "Ver todo {n}",
     "yourProgress": "TU PROGRESO",
     "notInList": "Aún no está en tu lista.",
     "yourScore": "TU PUNTUACIÓN",
@@ -737,7 +811,15 @@
     "unknownTitle": "Título desconocido",
     "cv": "VOZ",
     "roleLabel": "Papel",
-    "notRated": "Sin puntuar"
+    "notRated": "Sin puntuar",
+    "mobileMore": "Más",
+    "mobileRated": "EDAD",
+    "mobileProgressEyebrow": "TU PROGRESO · {status}",
+    "mobileStarted": "INICIADO {date}",
+    "mobileEp": "EP {n}",
+    "mobileEpNum": "EP {n}",
+    "mobileThrough": "{pct}% completado",
+    "mobileUpdateScore": "Actualizar nota"
   },
   "movies": {
     "metaTitle": "AnimeLegacy · Películas",
@@ -760,8 +842,16 @@
       "favorites": "FAVORITOS",
       "age": "EDAD",
       "height": "ALTURA",
-      "gender": "GÉNERO"
+      "gender": "GÉNERO",
+      "ageShort": "Edad {v}"
     },
+    "kpiAppearances": "Comparecientes",
+    "kpiFavorites": "Favoritos",
+    "kpiVoices": "Voces",
+    "kpiAppearancesValue": "{n} espectáculos",
+    "appearancesMore": "+{n} más",
+    "voiceMetaShort": "Voz principal · {lang}",
+    "voicesMore": "+{n} doblajes más",
     "favoriteTitle": "Personaje favorito",
     "favoriteHintOn": "Destacado en tu perfil.",
     "favoriteHintOff": "Marca para destacarlo en tu perfil.",
@@ -807,7 +897,16 @@
     "subtitle": "Los personajes más queridos de cada anime catalogado. Haz clic para ver biografías, apariciones y actores de voz.",
     "emptyTitle": "Sin datos disponibles",
     "emptyBody": "La API de Jikan no está respondiendo. Inténtalo de nuevo en un momento.",
-    "fans": "fans"
+    "fans": "fans",
+    "mobileEyebrow": "EXPLORA PERSONAJES",
+    "mobileTitle": "Los rostros",
+    "mobileStatsIndexed": "{n} indexado",
+    "mobileStatsShown": "{n} en esta página",
+    "mobileFanFavorite": "\"Favorito de los aficionados\"",
+    "mobileLikesCount": "{n} me gusta",
+    "mobileFansCount": "{n} fans",
+    "mobileTopTitle": "Los más deseados",
+    "mobileResultsCount": "{n} resultados"
   },
   "voices": {
     "metaTitle": "AnimeLegacy · Actores de voz",
@@ -818,7 +917,14 @@
     "subtitle": "Los seiyuu y actores de voz internacionales más queridos. Haz clic para ver su filmografía y papeles.",
     "emptyTitle": "Sin datos disponibles",
     "emptyBody": "La API de Jikan no está respondiendo. Inténtalo de nuevo en un momento.",
-    "fans": "fans"
+    "fans": "fans",
+    "mobileEyebrow": "EXPLORA LOS ACTORES DE VOZ",
+    "mobileTitle": "Las voces",
+    "mobileStatsIndexed": "{n} indexado",
+    "mobileStatsShown": "{n} que se muestra a continuación",
+    "mobileFansCount": "{n} fans",
+    "mobileBornIn": "Nacido {y}",
+    "mobileEmpty": "Ningún actor de voz coincide con esta carta."
   },
   "voice": {
     "metaDesc": "Perfil de {name}, papeles de voz y filmografía.",
@@ -840,7 +946,13 @@
     "filmographyEyebrow": "FILMOGRAFÍA",
     "filmographyTitle": "Apariciones en anime",
     "noFilmography": "No hay filmografía disponible.",
-    "notFoundBody": "No se ha podido cargar este actor de voz."
+    "notFoundBody": "No se ha podido cargar este actor de voz.",
+    "kpiRoles": "Nº de roles de usuario",
+    "kpiYears": "Período de actividad",
+    "kpiAppearances": "Comparecientes",
+    "kpiFavorites": "Favoritos",
+    "recentRolesTitle": "Funciones recientes",
+    "recentRolesMore": "+{n} roles más"
   },
   "studios": {
     "metaTitle": "AnimeLegacy · Estudios",
@@ -859,6 +971,30 @@
       "studios": "ESTUDIOS",
       "productions": "PRODUCCIONES"
     },
+    "mobileEyebrow": "EXPLORA ESTUDIOS",
+    "mobileTitle": "Las Casas ",
+    "mobileStatsIndexed": "{n} indexado",
+    "mobileStatsShown": "{n} en esta página",
+    "mobileFilters": {
+      "all": "Todas las eras",
+      "veteran": "Veterano",
+      "modern": "Moderna",
+      "rising": "Ascendente"
+    },
+    "mobileEras": {
+      "veteran": "Veterano",
+      "modern": "Moderna",
+      "rising": "Ascendente",
+      "unknown": "Era desconocida"
+    },
+    "mobileStat": {
+      "works": "Obras",
+      "top": "Vista del ",
+      "active": "Activo"
+    },
+    "mobileYes": "Sí",
+    "mobileNo": "No",
+    "mobileEmpty": "Ningún estudio coincide con este filtro.",
     "featured": {
       "eyebrow": "ESTUDIO EN FOCO",
       "openCatalog": "Ver catálogo completo",
@@ -894,7 +1030,19 @@
     "catalogueEyebrow": "CATÁLOGO",
     "worksBy": "Obras de {name}",
     "noWorks": "Sin obras catalogadas.",
-    "notFoundBody": "No se ha podido cargar este estudio."
+    "notFoundBody": "No se ha podido cargar este estudio.",
+    "mobileWebsite": "Sitio Web",
+    "mobileKpiWorks": "Obras",
+    "mobileKpiTop": "Puntuación más alta",
+    "mobileKpiYears": "Años",
+    "mobileKpiAiring": "Oreado",
+    "mobileSelectedWorks": "Obras seleccionadas",
+    "mobileWorksTotal": "{n} en total",
+    "mobileWorksMore": "+{n} obras más",
+    "mobileSignalsEyebrow": "SEÑALES DE ESTUDIO",
+    "mobileStatAvg": "Puntuación media",
+    "mobileStatBest": "Mejor puntuación",
+    "mobileAboutTitle": "Sobre el estudio"
   },
   "studioPage": {
     "breadcrumbStudios": "Studios",
@@ -976,12 +1124,21 @@
       "friday": "Viernes",
       "saturday": "Sábado",
       "sunday": "Domingo"
-    }
+    },
+    "weekLabel": "SEMANA {n}",
+    "prevWeek": "Semana anterior",
+    "nextWeek": "Próxima semana",
+    "mobileSimulcastsCount": "{n} simulcasts",
+    "mobileSimulcastsRest": "emitiéndose esta semana · {inList} en tu lista",
+    "mobileEpsToday": "{n} episodios hoy",
+    "mobileInList": "{n} en lista",
+    "tagInList": "EN LISTA"
   },
   "seasonsPage": {
     "metaTitle": "AnimeLegacy · Temporadas {year}",
     "metaDesc": "El alineamiento de anime de cada temporada por año, seleccionado para un descubrimiento fácil.",
     "eyebrow": "CRÓNICA · TEMPORADAS",
+    "yearLabel": "Año",
     "seasons": {
       "winter": "Invierno",
       "spring": "Primavera",
@@ -1004,6 +1161,20 @@
     "emptyBody": "Prueba a quitar un filtro o cambiar de temporada.",
     "volume": "Vol. {n}",
     "filtersToggle": "Filtros",
+    "archiveEyebrow": "ARCHIVO POR TEMPORADA",
+    "threeToWatchEyebrow": "EDITORIAL · TRES PARA VER",
+    "threeToWatchTitle": "Si solo tienes tiempo para tres, nuestros editores eligieron estas.",
+    "mobileStatsTitles": "{n} títulos seguidos",
+    "mobileStatsAiring": "{n} en emisión",
+    "mobileTabCount": "{n} títulos",
+    "mobileAllTitle": "Todos los {n} títulos",
+    "epShort": "EP",
+    "blurb": {
+      "winter": "Una temporada para apostar por lo acogedor — las series discretas sostienen el centro mientras los estrenos tardíos encuentran su sitio.",
+      "spring": "Una temporada paciente. Las series más discretas están haciendo el trabajo pesado — y un esperado regreso de un mecha está poniendo a prueba cuánto ha cambiado el género.",
+      "summer": "Ruidoso, brillante y lleno de riesgos — la tradición veraniega da a los autores espacio para apostar por el espectáculo antes de que el otoño tire de todos.",
+      "fall": "El año se afila. Las secuelas pesadas se cruzan con directores debutantes y el calendario se llena durante unas pocas semanas."
+    },
     "kpis": {
       "titles": "TÍTULOS",
       "airing": "EN EMISIÓN",
@@ -1128,6 +1299,17 @@
       "avatarLabel": "Avatar"
     }
   },
+  "collectionsPage": {
+    "mobileEyebrow": "Explora nuestras colecciones",
+    "mobileTitle": "Listas seleccionadas",
+    "mobileStatsRoadmap": "Próximamente · en hoja de ruta",
+    "mobileTabs": {
+      "all": "Todos",
+      "editorial": "Editorial",
+      "community": "Comunidad",
+      "saved": "Guardado"
+    }
+  },
   "comingSoon": {
     "collections": {
       "eyebrow": "CURADURÍA · EN PREPARACIÓN",
@@ -1157,5 +1339,28 @@
     "body": "Ha ocurrido un error al mostrar esta pantalla. Recargar normalmente lo arregla. Si sigue pasando, háznoslo saber.",
     "tryAgain": "Reintentar",
     "goHome": "Ir al inicio"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar como leída",
+    "clearAll": "Vaciar todo",
+    "loading": "Recuperación",
+    "emptyTitle": "¡Todo hecho!",
+    "emptyBody": "Las actualizaciones sobre tu lista de seguimiento y favoritos llegan aquí.",
+    "kind": {
+      "airingToday": "TRANSMITIDO HOY",
+      "airingTomorrow": "SE EMITIRÁ MAÑANA",
+      "newEpisode": "Nuevo episodio",
+      "sequel": "SECUELA ANUNCIADA",
+      "finished": "TRANSMISIÓN TERMINADA"
+    },
+    "body": {
+      "airingToday": "Nuevo episodio que se emite hoy.",
+      "airingTomorrow": "Mañana se emitirá un nuevo episodio.",
+      "newEpisode": "Ahora en EP {n}.",
+      "sequelOf": "Secuela de {title}.",
+      "sequelGeneric": "Se ha anunciado una secuela.",
+      "finished": "{n} episodios listos para ver."
+    }
   }
 }

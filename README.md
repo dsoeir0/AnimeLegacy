@@ -117,26 +117,34 @@ pnpm gen-trans             # Auto-translate new en.json keys into pt/es/fr via M
 ```
 AnimeLegacy/
 ├── components/
+│   ├── anime/               # MobileAnimeDetail (hero + meta + progress card), TrailerEmbed (lite-youtube facade)
 │   ├── auth/                # AuthShell, AuthPage, EmailAuthForm, GoogleAuthButton, ProfileCompletionModal
-│   ├── calendar/            # CalendarCell — single (day × hour) slot entry
+│   ├── calendar/            # CalendarCell — single (day × hour) slot entry; MobileCalendar
 │   ├── cards/               # PosterCard, DetailedCard, HorizontalRow
+│   ├── characters/          # MobileCharacters (index 3-col grid), MobileCharacterDetail (hero + KPIs + appearances + voices + bio)
+│   ├── collections/         # MobileCollections (shell with Coming Soon)
 │   ├── discover/            # EditorialFeature, MoodGrid, VibeFinder, HiddenGems, GenreRail, BecauseYouLiked, SurpriseMe, AiringThisWeek, FilterBanner
-│   ├── layout/              # Sidebar, Header, HeaderSearch, LanguageSwitcher, Layout
-│   ├── modals/              # Modal, AddToListModal, RatingReviewModal
-│   ├── profile/             # ProfileHeader, ProfileEmptyState, KpiRow, ActivityTimeline, FavoritePosterGrid, FavoritesStrip, FavoriteCharactersStrip, FavoriteVoicesStrip, FavoriteStudiosStrip, TopFavoritesCards, ReorderControls, ReviewsPanel, ReviewRow, RatingDistribution, RecentEntriesTable, SeasonRing, StreakCard, WatchHeatmap, EditProfileModal, DangerZone, GenreBars
-│   ├── seasons/             # EditorPickCard, KpiRow, SeasonTabs, TopThreeSection
-│   ├── studios/             # StudioCard, FeaturedStudio, StudioFilterBar, StudiosHeader
-│   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon, Dropdown, MultiDropdown
+│   ├── home/                # MobileHome (hero carousel + airing strip + highlights)
+│   ├── layout/              # Sidebar, Header, HeaderSearch, LanguageSwitcher, Layout, MobileTopBar (logo + search/lang/bell/avatar)
+│   ├── modals/              # Modal (shared bottom-sheet on mobile), AddToListModal, RatingReviewModal
+│   ├── myList/              # MobileMyList (KPI strip + tabs + status rows + sort menu)
+│   ├── notifications/       # NotificationsButton (bell + badge), NotificationsPanel (categorized list, mark-all-read, clear-all)
+│   ├── profile/             # ProfileHeader, MobileProfileHeader, ProfileEmptyState, KpiRow, ActivityTimeline, FavoritePosterGrid, FavoritesStrip, FavoriteCharactersStrip, FavoriteVoicesStrip, FavoriteStudiosStrip, TopFavoritesCards, ReorderControls, ReviewsPanel, ReviewRow, RatingDistribution, RecentEntriesTable, SeasonRing, StreakCard, WatchHeatmap, EditProfileModal (uses shared Modal), DangerZone, GenreBars
+│   ├── search/              # MobileSearch (empty state + categorized results), MobileCatalogue (anime catalogue with type tabs/genre chips/best match/grid)
+│   ├── seasons/             # EditorPickCard, KpiRow, SeasonTabs, TopThreeSection, MobileSeasons (year dropdown + season tabs + editorial + 3-col grid)
+│   ├── studios/             # StudioCard, FeaturedStudio, StudioFilterBar, StudiosHeader, MobileStudios (index era tabs + cards), MobileStudioDetail (logo hero + KPI strip + works grid + about)
+│   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon (with mobileSlot), Dropdown, MultiDropdown
+│   ├── voices/              # MobileVoices (A-Z letter index + initials avatars), MobileVoiceDetail (avatar hero + 4-cell KPI grid + recent roles + bio)
 │   └── ErrorBoundary.jsx    # Sentry-wired top-level boundary (wraps `<App>`)
-├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useFavoriteIds, useBodyScrollLock, useDragReorder
+├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useFavoriteIds, useBodyScrollLock, useDragReorder, useNotifications (composes user list + favorites + notificationState + lazy schedule/relations fetch)
 ├── lib/
-│   ├── firebase/            # client.js + admin.js + authStateStore, userProfileStore, userListStore (subscriber stores for listener consolidation) + createSubscriberStore factory
-│   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios, favoriteOrder (shared batch personalRank writer)
-│   ├── utils/               # anime, season, media, time, cardShape, synopsis, listTransitions, profileActivity, profileStats, heatmap, rating, reorder, debounce, reviewsView, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay, chunk
+│   ├── firebase/            # client.js + admin.js + authStateStore, userProfileStore, userListStore, notificationStateStore (lastReadAt + dismissedIds + seenEpisodes) — subscriber stores for listener consolidation + createSubscriberStore factory
+│   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight, includes score/popularity/favourites/year), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios, favoriteOrder (shared batch personalRank writer), categorySearch (4-section parallel fetch shared by HeaderSearch desktop + MobileSearch)
+│   ├── utils/               # anime, season, media, time, cardShape, synopsis, text (truncateText/firstSentence), listTransitions, profileActivity, profileStats, heatmap, rating, reorder, debounce, reviewsView, rateLimit, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay (userInitials + nameInitials), chunk, notifications (compute logic for airing/finished/newEpisode/sequel), voiceRoles (year + sortVoiceRolesByPopularity)
 │   ├── constants/           # flags.js (SUPPORTED_LANGUAGES, flagcdn URLs)
 │   └── constants.js         # FAVORITE_LIMIT, MAX_AVATAR_SIZE_*, PASSWORD_RULES, isValidEmail
 ├── pages/
-│   ├── api/                 # delete-account, anime-recs, studio-posters, translate-synopsis, mal-import
+│   ├── api/                 # delete-account, anime-recs, studio-posters, translate-synopsis, mal-import, notifications-data (schedules + relations for notification computation)
 │   ├── anime/[id]           # Anime detail (hero, characters, recs)
 │   ├── characters/          # index + [id] detail
 │   ├── voices/              # index + [id] detail (voice actors)
@@ -191,6 +199,8 @@ AnimeLegacy/
 | `/api/anime-recs?id=` | Per-anime recommendations for `BecauseYouLiked` shuffle (Jikan recs + genre-top fill, cached 1h) |
 | `/api/studio-posters?id=` | Poster mini-strip for a studio card on `/studios` index (cached 15m, `stale-while-revalidate=3600`) |
 | `/api/translate-synopsis` | MyMemory proxy used by `useTranslatedText` (IP rate-limited, 24h browser cache) |
+| `/api/notifications-data?favorites=&schedules=` | Schedules (weekly Jikan) + relations (`/anime/{id}/relations` per favourite) used by `useNotifications` to compute airing/sequel categories. Server-side `cachedJikan`, browser `private, max-age=300, stale-while-revalidate=900` |
+| `/search?q=&kind=anime` | When `kind=anime`, mobile renders `MobileCatalogue` (anime-only catalogue with type tabs + genre chips + best match + grid). Default mobile (`q=` only) shows the categorized 4-section results. |
 
 ---
 
@@ -328,6 +338,7 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/heatmap.test.js` | `buildHeatmap` 26-week × 7-day grid — level thresholds, Firestore Timestamp handling, future-cell marking. |
 | `tests/rating.test.js` | `toFivePoint` / `formatFivePoint` — MAL 1-10 → app-wide 1-5 conversion with null-safety for missing scores. |
 | `tests/debounce.test.js` | `debounce` — trailing-edge collapse of rapid calls into one, then re-arms after the window. |
+| `tests/rateLimit.test.js` | `createRateLimiter` (in-memory sliding-window per key) + `guardApiRoute` HTTP adapter — used on all `/api/*` routes to cap abuse without an external Redis. |
 | `tests/reviewsView.test.js` | `reviewsView` helpers — sentiment grouping (loved/liked/mixed/disliked on the 1-5 scale), sort modes, year/text filters, year collection, stats aggregator. |
 | `tests/authErrors.test.js` | Firebase Auth error-code → i18n key mapping. |
 | `tests/deleteAccount.test.js` | `/api/delete-account` gatekeeping — 405 / 503 fallback / 401 auth paths. |
@@ -338,7 +349,7 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/mymemoryDedup.test.js` | MyMemory translation dedup keyed by `(text, lang)` — concurrent identical translations share one request. |
 | `tests/seasonPeriod.test.js` / `tests/seasonHero.test.js` | Seasons-page pure logic — period KPI (ended / upcoming / active days), editor pick + top three with score-or-popularity fallback, sparse-hero threshold. |
 | `tests/router.test.js` | `currentPath(router)` defensive split — handles undefined `asPath` from `/_error` and partial router states. |
-| `tests/userDisplay.test.js` | `userInitials(name)` — fallback to `"U"`, trim, unicode initials, numeric coercion. |
+| `tests/userDisplay.test.js` | `userInitials(name)` + `nameInitials(name, count)` — 2-letter initials from first+last word, fallback `"??"` / `"U"`, unicode + numeric coercion. |
 | `tests/chunk.test.js` | Generic `chunk(items, size)` array splitter. |
 | `tests/media.test.js` | Image-URL pickers — AniList → Jikan webp → jpg fallback order for posters, banners, thumbs, character avatars. |
 | `tests/time.test.js` | `formatRelativeTime` (Firestore Timestamp support, minutes/hours/days bands), `isSameCalendarDay`, `weekdayDates` Monday-anchoring. |
@@ -358,6 +369,9 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/studioStats.test.js` | Studio detail aggregates — avg score, airing count, upcoming filter, score histogram + highlights, top genres, group-by-year. |
 | `tests/profileActivity.test.js` | Profile activity feed — group adjacent same-type events, prune duplicates, sort newest-first. |
 | `tests/malImport.test.js` | MAL list → AnimeLegacy shape mapping (status, score/2, year pivot, payload, summary + favourite plan). |
+| `tests/notifications.test.js` | `computeNotifications` + `baselineSeenEpisodes` — airing today/tomorrow, new-episode delta, finished bingeable, sequel announced, dismissedIds filtering, read marking, kind-priority sort. |
+| `tests/text.test.js` | `truncateText` (word-boundary ellipsis, source-line stripping, whitespace collapse) + `firstSentence` (`.`/`!`/`?` cut + 90-char fallback). |
+| `tests/voiceRoles.test.js` | `yearOfVoiceRole` (anime.year → aired.from fallback) + `sortVoiceRolesByPopularity` (favourites desc → popularity asc → year desc) — voice actor role ranking. |
 
 ### Adding tests
 
