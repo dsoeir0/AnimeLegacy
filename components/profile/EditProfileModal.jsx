@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { updateProfile } from 'firebase/auth';
-import { X } from 'lucide-react';
 import { translate } from 'react-switch-lang';
-import Button from '../ui/Button';
+import Modal from '../modals/Modal';
+import modalStyles from '../modals/Modal.module.css';
 import DangerZone from './DangerZone';
-import IconButton from '../ui/IconButton';
 import { getFirebaseClient } from '../../lib/firebase/client';
 import {
   claimUsername,
@@ -114,103 +113,111 @@ function EditProfileModal({
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div
-        className={styles.modal}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className={styles.modalHead}>
-          <div>
-            <div className={styles.modalEyebrow}>{t('profile.modalSettings')}</div>
-            <h2 className={styles.modalTitle}>{t('profile.modalTitle')}</h2>
-          </div>
-          <IconButton icon={X} tooltip={t('actions.close')} onClick={onClose} />
-        </div>
-        <form className={styles.modalForm} onSubmit={handleSaveProfile}>
-          <div className={styles.modalAvatarRow}>
-            <div className={styles.modalAvatarCircle}>
-              {editPreview ? (
-                <Image
-                  src={editPreview}
-                  alt=""
-                  width={88}
-                  height={88}
-                />
-              ) : avatar ? (
-                <Image
-                  src={avatar}
-                  alt={displayName}
-                  width={88}
-                  height={88}
-                />
-              ) : (
-                <span>{initials}</span>
-              )}
-            </div>
-            <div className={styles.modalAvatarStack}>
-              <input
-                type="file"
-                accept="image/*"
-                className={styles.modalFile}
-                onChange={(e) => {
-                  setEditAvatarFile(e.target.files?.[0] || null);
-                  setRemoveAvatar(false);
-                }}
-              />
-              <button
-                type="button"
-                className={styles.modalLinkBtn}
-                onClick={() => {
-                  setEditAvatarFile(null);
-                  setRemoveAvatar(true);
-                }}
-                disabled={!avatar && !editPreview}
-              >
-                {t('actions.removePhoto')}
-              </button>
-            </div>
-          </div>
-
-          <label className={styles.modalLabel}>
-            {t('forms.username')}
-            <input
-              className={styles.modalInput}
-              type="text"
-              value={editUsername}
-              onChange={(e) => setEditUsername(e.target.value)}
-              required
-            />
-          </label>
-          <label className={styles.modalLabel}>
-            {t('forms.bio')}
-            <textarea
-              className={styles.modalTextarea}
-              value={editBio}
-              onChange={(e) => setEditBio(e.target.value)}
-              rows={3}
-            />
-          </label>
-
-          {editError ? <div className={styles.modalError}>{editError}</div> : null}
-
-          <div className={styles.modalActions}>
-            <Button variant="ghost" size="md" onClick={onClose}>
-              {t('actions.cancel')}
-            </Button>
-            <Button variant="primary" size="md" type="submit" disabled={saving}>
-              {saving ? t('actions.saving') : t('actions.saveChanges')}
-            </Button>
-          </div>
-
-          <DangerZone
-            username={profile?.username || displayName}
-            onClosed={onClose}
-          />
-        </form>
+    <Modal
+      open
+      onClose={onClose}
+      labelledBy="edit-profile-modal-title"
+      closeLabel={t('actions.close')}
+      footer={
+        <>
+          <button
+            type="button"
+            className={modalStyles.btnSecondary}
+            onClick={onClose}
+            disabled={saving}
+          >
+            {t('actions.cancel')}
+          </button>
+          <button
+            type="submit"
+            form="edit-profile-form"
+            className={modalStyles.btnPrimary}
+            disabled={saving}
+          >
+            {saving ? t('actions.saving') : t('actions.saveChanges')}
+          </button>
+        </>
+      }
+    >
+      <div className={styles.modalHead}>
+        <div className={styles.modalEyebrow}>{t('profile.modalSettings')}</div>
+        <h2 id="edit-profile-modal-title" className={styles.modalTitle}>
+          {t('profile.modalTitle')}
+        </h2>
       </div>
-    </div>
+      <form id="edit-profile-form" className={styles.modalForm} onSubmit={handleSaveProfile}>
+        <div className={styles.modalAvatarRow}>
+          <div className={styles.modalAvatarCircle}>
+            {editPreview ? (
+              <Image
+                src={editPreview}
+                alt=""
+                width={88}
+                height={88}
+              />
+            ) : avatar ? (
+              <Image
+                src={avatar}
+                alt={displayName}
+                width={88}
+                height={88}
+              />
+            ) : (
+              <span>{initials}</span>
+            )}
+          </div>
+          <div className={styles.modalAvatarStack}>
+            <input
+              type="file"
+              accept="image/*"
+              className={styles.modalFile}
+              onChange={(e) => {
+                setEditAvatarFile(e.target.files?.[0] || null);
+                setRemoveAvatar(false);
+              }}
+            />
+            <button
+              type="button"
+              className={styles.modalLinkBtn}
+              onClick={() => {
+                setEditAvatarFile(null);
+                setRemoveAvatar(true);
+              }}
+              disabled={!avatar && !editPreview}
+            >
+              {t('actions.removePhoto')}
+            </button>
+          </div>
+        </div>
+
+        <label className={styles.modalLabel}>
+          {t('forms.username')}
+          <input
+            className={styles.modalInput}
+            type="text"
+            value={editUsername}
+            onChange={(e) => setEditUsername(e.target.value)}
+            required
+          />
+        </label>
+        <label className={styles.modalLabel}>
+          {t('forms.bio')}
+          <textarea
+            className={styles.modalTextarea}
+            value={editBio}
+            onChange={(e) => setEditBio(e.target.value)}
+            rows={3}
+          />
+        </label>
+
+        {editError ? <div className={styles.modalError}>{editError}</div> : null}
+
+        <DangerZone
+          username={profile?.username || displayName}
+          onClosed={onClose}
+        />
+      </form>
+    </Modal>
   );
 }
 

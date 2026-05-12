@@ -6,6 +6,20 @@
   padding: 40px 24px;
 }
 
+.pageHideOnMobile {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+@media (max-width: 768px) {
+  .pageHideOnMobile {
+    display: none;
+  }
+}
+
 .card {
   max-width: 520px;
   width: 100%;

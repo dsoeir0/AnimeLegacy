@@ -12,10 +12,17 @@ export default function ComingSoon({
   primaryHref = '/',
   primaryLabel = 'Back to home',
   metaDescription,
+  mobileSlot,
+  mobileTitle,
 }) {
   return (
-    <Layout title={`${title} · AnimeLegacy`} description={metaDescription || description}>
-      <div className={styles.page}>
+    <Layout
+      title={`${title} · AnimeLegacy`}
+      description={metaDescription || description}
+      mobileTitle={mobileTitle}
+    >
+      {mobileSlot}
+      <div className={mobileSlot ? styles.pageHideOnMobile : styles.page}>
         <div className={styles.card}>
           <div className={styles.iconWrap}>
             <Sparkles size={28} strokeWidth={1.75} />

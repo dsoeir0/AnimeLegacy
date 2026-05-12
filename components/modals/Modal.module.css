@@ -159,20 +159,51 @@
   outline: none;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 768px) {
   .backdrop {
     padding: 0;
     align-items: flex-end;
+    background: rgba(6, 7, 9, 0.88);
+    animation: sheetFadeIn var(--dur-3) var(--ease-out);
   }
   .modal {
-    max-height: 92vh;
-    border-radius: 18px 18px 0 0;
+    max-height: min(88vh, 820px);
+    border-radius: 26px 26px 0 0;
     border-bottom: none;
+    box-shadow: 0 -30px 60px rgba(0, 0, 0, 0.5);
+    animation: sheetSlideUp var(--dur-4) var(--ease-out);
+  }
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--al-fg-4);
+    opacity: 0.4;
+    z-index: 5;
+    pointer-events: none;
   }
   .content {
-    padding: 22px 20px 18px;
+    padding: 26px 20px 18px;
   }
   .footer {
-    padding: 12px 16px 18px;
+    padding: 12px 16px calc(18px + env(safe-area-inset-bottom, 0px));
   }
+  .closeButton {
+    top: 18px;
+  }
+}
+
+@keyframes sheetSlideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sheetFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

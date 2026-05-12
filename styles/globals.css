@@ -21,6 +21,10 @@ button {
   font: inherit;
 }
 
+textarea {
+  resize: vertical;
+}
+
 .bi {
   display: inline-block;
   line-height: 1;

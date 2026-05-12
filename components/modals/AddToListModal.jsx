@@ -107,7 +107,6 @@ function AddToListModal({
   const maxProgress =
     isAiring && totalEpisodes ? Math.max(totalEpisodes - 1, 0) : totalEpisodes ?? undefined;
   const progressValue = clamp(progress, 0, maxProgress);
-  const isCompleted = status === 'completed';
   const favoriteLimitReached = favoriteCount >= FAVORITE_LIMIT && !initialFavorite;
   const progressPercent = totalEpisodes
     ? Math.min(100, Math.round((progressValue / totalEpisodes) * 100))
@@ -178,16 +177,13 @@ function AddToListModal({
                 src={anime.image}
                 alt={anime?.title || 'Anime poster'}
                 fill
-                sizes="120px"
+                sizes="(max-width: 560px) 140px, 120px"
                 className={styles.posterImg}
               />
             </div>
           ) : (
-            <div className={styles.posterFallback} />
+            <div className={styles.posterFallback} aria-hidden="true" />
           )}
-          <div className={`${styles.badge} ${isCompleted ? styles.badgeCompleted : ''}`}>
-            {activeOption ? t(activeOption.labelKey) : ''}
-          </div>
         </div>
 
         <div className={styles.fields}>
