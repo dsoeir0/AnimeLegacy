@@ -5,6 +5,19 @@
     "es": "Espanhol",
     "fr": "Francês"
   },
+  "install": {
+    "button": "Instalar app",
+    "closeLabel": "Fechar",
+    "title": "Instalar AnimeLegacy",
+    "androidBody": "Adiciona o AnimeLegacy como app no teu telemóvel — ecrã inteiro, sem barra do browser.",
+    "androidCta": "Instalar",
+    "perkLauncher": "Ícone no ecrã principal, abre como app nativa.",
+    "perkOffline": "Recargas mais rápidas — o shell fica em cache.",
+    "iosBody": "O Safari não tem botão de instalação automática. Adiciona ao ecrã principal em três toques:",
+    "iosStep1": "Toca no botão Partilhar no fundo do Safari.",
+    "iosStep2": "Percorre a lista e escolhe \"Adicionar ao Ecrã Principal\".",
+    "iosStep3": "Toca em \"Adicionar\" no canto superior direito."
+  },
   "nav": {
     "explore": "Explorar",
     "yourLibrary": "A sua biblioteca",

@@ -5,6 +5,19 @@
     "es": "Espagnol",
     "fr": "Français"
   },
+  "install": {
+    "button": "Installer l'app",
+    "closeLabel": "Fermer",
+    "title": "Installer AnimeLegacy",
+    "androidBody": "Ajoute AnimeLegacy comme app sur ton téléphone — plein écran, sans barre de navigateur.",
+    "androidCta": "Installer",
+    "perkLauncher": "Icône sur l'écran d'accueil, s'ouvre comme une app native.",
+    "perkOffline": "Rechargements plus rapides — le shell est mis en cache.",
+    "iosBody": "Safari n'a pas d'invite d'installation automatique. Ajoute à l'écran d'accueil en trois étapes :",
+    "iosStep1": "Touche le bouton Partager en bas de Safari.",
+    "iosStep2": "Fais défiler la liste et choisis « Sur l'écran d'accueil ».",
+    "iosStep3": "Touche « Ajouter » en haut à droite."
+  },
   "nav": {
     "explore": "Explorer",
     "yourLibrary": "Votre bibliothèque",

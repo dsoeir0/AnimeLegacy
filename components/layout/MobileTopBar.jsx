@@ -8,6 +8,7 @@ import useUserProfile from '../../hooks/useUserProfile';
 import { DEFAULT_LANGUAGE, flags, SUPPORTED_LANGUAGES } from '../../lib/constants/flags';
 import { userInitials } from '../../lib/utils/userDisplay';
 import NotificationsButton from '../notifications/NotificationsButton';
+import InstallAppButton from '../ui/InstallAppButton';
 import styles from './MobileTopBar.module.css';
 
 function MobileTopBar({ title, t }) {
@@ -75,7 +76,13 @@ function MobileTopBar({ title, t }) {
   return (
     <header className={styles.bar}>
       <Link href="/" className={styles.brand} aria-label={t('nav.home')}>
-        <span className={styles.brandLogo}>AL</span>
+        <img
+          src="/brand/iris-mark.svg"
+          alt=""
+          width={28}
+          height={28}
+          className={styles.brandLogo}
+        />
         {title ? <span className={styles.brandTitle}>{title}</span> : null}
       </Link>
       <div className={styles.actions}>
@@ -165,6 +172,9 @@ function MobileTopBar({ title, t }) {
                 >
                   {t('header.menu.myList')}
                 </Link>
+                <div className={styles.menuInstall}>
+                  <InstallAppButton />
+                </div>
                 <button
                   type="button"
                   className={styles.menuItem}

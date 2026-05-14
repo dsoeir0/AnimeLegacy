@@ -25,15 +25,6 @@
 .brandLogo {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  background: var(--al-primary-gradient);
-  color: var(--al-ink-0);
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 12px;
-  letter-spacing: -0.025em;
   flex-shrink: 0;
 }
 
@@ -243,6 +234,18 @@
 .menuItem:hover {
   background: var(--al-ink-3);
   color: var(--al-fg-1);
+}
+
+.menuInstall {
+  display: flex;
+  padding: 2px 0;
+  border-top: 1px solid var(--al-border-subtle);
+  border-bottom: 1px solid var(--al-border-subtle);
+  margin: 4px 0;
+}
+
+.menuInstall :global(button) {
+  width: 100%;
 }
 
 .signIn {
