@@ -42,7 +42,7 @@
 }
 
 .collapseBtn:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--al-white) 4%, transparent);
   color: var(--al-fg-1);
 }
 
@@ -91,19 +91,19 @@
 }
 
 .navItem:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--al-white) 4%, transparent);
   color: var(--al-fg-1);
 }
 
 .navItemActive {
-  background: rgba(132, 217, 255, 0.08);
+  background: color-mix(in srgb, var(--al-primary-2) 8%, transparent);
   color: var(--al-primary-ink);
-  border-color: rgba(132, 217, 255, 0.18);
+  border-color: color-mix(in srgb, var(--al-primary-2) 18%, transparent);
   font-weight: 600;
 }
 
 .navItemActive:hover {
-  background: rgba(132, 217, 255, 0.12);
+  background: color-mix(in srgb, var(--al-primary-2) 12%, transparent);
   color: var(--al-primary-ink);
 }
 
@@ -125,21 +125,6 @@
 .userCard {
   padding: 12px;
   border-top: 1px solid var(--al-border-subtle);
-}
-
-.userRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 10px;
-  text-decoration: none;
-  color: inherit;
-  transition: background-color var(--dur-2) var(--ease-standard);
-}
-
-.userRow:hover {
-  background: rgba(255, 255, 255, 0.04);
 }
 
 .footerLinks {
@@ -171,54 +156,6 @@
   font-size: 10px;
 }
 
-.userRowCollapsed {
-  padding: 0;
-  justify-content: center;
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid var(--al-border);
-  object-fit: cover;
-}
-
-.avatarFallback {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: var(--al-primary-gradient);
-  color: var(--al-ink-0);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 13px;
-}
-
-.userMeta {
-  min-width: 0;
-  flex: 1;
-}
-
-.userName {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--al-fg-1);
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.userHandle {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 10.5px;
-  color: var(--al-fg-3);
-}
-
 @media (max-width: 900px) {
   .sidebar {
     width: 72px;
@@ -233,13 +170,8 @@
   }
   .sidebar .groupLabel,
   .sidebar .activeBar,
-  .sidebar .userMeta,
   .sidebar .collapseBtn {
     display: none;
-  }
-  .sidebar .userRow {
-    padding: 0;
-    justify-content: center;
   }
   .sidebar .navItem span {
     display: none;

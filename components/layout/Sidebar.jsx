@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
@@ -19,10 +18,7 @@ import {
 } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import Logo from '../ui/Logo';
-import useAuth from '../../hooks/useAuth';
-import useUserProfile from '../../hooks/useUserProfile';
 import { currentPath } from '../../lib/utils/router';
-import { userInitials } from '../../lib/utils/userDisplay';
 import styles from './Sidebar.module.css';
 
 const STORAGE_KEY = 'animeLegacy.sidebar.collapsed';
@@ -65,11 +61,6 @@ function NavItem({ item, collapsed, active, t }) {
 function Sidebar({ t }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
-  const { user } = useAuth();
-  const profile = useUserProfile(user?.uid);
-  const displayName = profile?.username || user?.displayName || 'Guest';
-  const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL || '';
-  const username = profile?.username || (user ? (user.email?.split('@')[0] || 'user') : 'guest');
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -120,30 +111,8 @@ function Sidebar({ t }) {
         ))}
       </nav>
 
-      <div className={styles.userCard}>
-        <Link
-          href={user ? '/profile' : '/sign-in'}
-          className={`${styles.userRow} ${collapsed ? styles.userRowCollapsed : ''}`}
-        >
-          {avatar ? (
-            <Image
-              src={avatar}
-              alt=""
-              width={36}
-              height={36}
-              className={styles.avatar}
-            />
-          ) : (
-            <div className={styles.avatarFallback}>{userInitials(displayName)}</div>
-          )}
-          {!collapsed ? (
-            <div className={styles.userMeta}>
-              <div className={styles.userName}>{displayName}</div>
-              <div className={styles.userHandle}>@{username}</div>
-            </div>
-          ) : null}
-        </Link>
-        {!collapsed ? (
+      {!collapsed ? (
+        <div className={styles.userCard}>
           <div className={styles.footerLinks}>
             <Link href="/privacy" className={styles.footerLink}>
               {t('privacy.eyebrow')}
@@ -153,8 +122,8 @@ function Sidebar({ t }) {
               {t('license.eyebrow')}
             </Link>
           </div>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </aside>
   );
 }
