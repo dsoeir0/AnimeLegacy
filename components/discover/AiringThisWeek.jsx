@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -10,9 +10,26 @@ import styles from './discover.module.css';
 
 const MAX = 14;
 
-function AiringThisWeek({ schedulesByDay, t }) {
+function AiringThisWeek({ schedulesByDay: ssrSchedules, t }) {
+  const [schedulesByDay, setSchedulesByDay] = useState(ssrSchedules || null);
   const [items, setItems] = useState([]);
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (schedulesByDay || ssrSchedules) return undefined;
+    let cancelled = false;
+    fetch('/api/schedules')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.schedulesByDay) return null;
+        setSchedulesByDay(data.schedulesByDay);
+        return null;
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [schedulesByDay, ssrSchedules]);
 
   useEffect(() => {
     setItems(flattenAiringList(schedulesByDay, new Date()).slice(0, MAX));
@@ -99,4 +116,4 @@ function AiringThisWeek({ schedulesByDay, t }) {
   );
 }
 
-export default translate(AiringThisWeek);
+export default translate(memo(AiringThisWeek));

@@ -16,7 +16,7 @@ import styles from './[year].module.css';
 import useMyList from '../../hooks/useMyList';
 import { dedupeByMalId, filterOutHentai } from '../../lib/utils/anime';
 import { fetchAniListMediaByMalIds } from '../../lib/services/anilist';
-import { getSeasonByYearAll } from '../../lib/services/jikan';
+import { getSeasonByYearAll, getSeasonByYearPage } from '../../lib/services/jikan';
 import { computePeriodKpi, getSeasonFromDate, SEASON_KEYS } from '../../lib/utils/season';
 import {
   hasScoreSignal,
@@ -433,11 +433,17 @@ export default translate(Seasons);
 
 export async function getServerSideProps(context) {
   const { year, s, sort, genre, format, view } = context.query;
+  const activeSeason =
+    typeof s === 'string' && SEASON_KEYS.includes(s) ? s : getSeasonFromDate();
+  const fetchSeason = (season) =>
+    season === activeSeason
+      ? getSeasonByYearAll(year, season)
+      : getSeasonByYearPage(year, season, 1);
   const [winterResposta, springResposta, summerResposta, fallResposta] = await Promise.all([
-    getSeasonByYearAll(year, 'winter'),
-    getSeasonByYearAll(year, 'spring'),
-    getSeasonByYearAll(year, 'summer'),
-    getSeasonByYearAll(year, 'fall'),
+    fetchSeason('winter'),
+    fetchSeason('spring'),
+    fetchSeason('summer'),
+    fetchSeason('fall'),
   ]);
   if (Array.isArray(winterResposta?.data)) winterResposta.data = dedupeByMalId(filterOutHentai(winterResposta.data));
   if (Array.isArray(springResposta?.data)) springResposta.data = dedupeByMalId(filterOutHentai(springResposta.data));

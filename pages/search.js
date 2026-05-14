@@ -9,6 +9,8 @@ import PosterCard from '../components/cards/PosterCard';
 import IconButton from '../components/ui/IconButton';
 import AddToListModal from '../components/modals/AddToListModal';
 import EditorialFeature from '../components/discover/EditorialFeature';
+import FilterBanner from '../components/discover/FilterBanner';
+import LazyOnVisible from '../components/ui/LazyOnVisible';
 import MoodGrid from '../components/discover/MoodGrid';
 import VibeFinder from '../components/discover/VibeFinder';
 import HiddenGems from '../components/discover/HiddenGems';
@@ -16,7 +18,6 @@ import GenreRail from '../components/discover/GenreRail';
 import BecauseYouLiked from '../components/discover/BecauseYouLiked';
 import SurpriseMe from '../components/discover/SurpriseMe';
 import AiringThisWeek from '../components/discover/AiringThisWeek';
-import FilterBanner from '../components/discover/FilterBanner';
 import { DISCOVER_MOODS } from '../components/discover/moods';
 import MobileSearch from '../components/search/MobileSearch';
 import MobileCatalogue from '../components/search/MobileCatalogue';
@@ -44,13 +45,11 @@ import {
 import {
   getAnimeByFilter,
   getAnimeGenres,
-  getSchedules,
   getTopAnime,
   searchAnime,
   slimAnimeResponse,
 } from '../lib/services/jikan';
 import { fetchAniListMediaByMalIds } from '../lib/services/anilist';
-import { WEEKDAY_KEYS } from '../lib/utils/time';
 
 const findMood = (id) => DISCOVER_MOODS.find((m) => m.id === id) || null;
 
@@ -402,46 +401,58 @@ function DiscoverPage({
               </section>
             ) : null}
 
-            {schedulesByDay ? (
+            <LazyOnVisible>
               <section className={styles.section}>
                 <AiringThisWeek schedulesByDay={schedulesByDay} />
               </section>
-            ) : null}
+            </LazyOnVisible>
 
             {editorial?.moodPosters ? (
-              <section className={styles.section}>
-                <MoodGrid postersByMood={editorial.moodPosters} />
-              </section>
+              <LazyOnVisible>
+                <section className={styles.section}>
+                  <MoodGrid postersByMood={editorial.moodPosters} />
+                </section>
+              </LazyOnVisible>
             ) : null}
 
             {genres?.length ? (
-              <section className={styles.section}>
-                <GenreRail genres={genres} />
-              </section>
+              <LazyOnVisible minHeight={200}>
+                <section className={styles.section}>
+                  <GenreRail genres={genres} />
+                </section>
+              </LazyOnVisible>
             ) : null}
 
             {editorial?.vibePool?.length ? (
-              <section className={styles.section}>
-                <VibeFinder pool={editorial.vibePool} />
-              </section>
+              <LazyOnVisible>
+                <section className={styles.section}>
+                  <VibeFinder pool={editorial.vibePool} />
+                </section>
+              </LazyOnVisible>
             ) : null}
 
             {editorial?.vibePool?.length ? (
-              <section className={styles.section}>
-                <BecauseYouLiked pool={editorial.vibePool} />
-              </section>
+              <LazyOnVisible>
+                <section className={styles.section}>
+                  <BecauseYouLiked pool={editorial.vibePool} />
+                </section>
+              </LazyOnVisible>
             ) : null}
 
             {editorial?.gems?.length ? (
-              <section className={styles.section}>
-                <HiddenGems gems={editorial.gems} />
-              </section>
+              <LazyOnVisible>
+                <section className={styles.section}>
+                  <HiddenGems gems={editorial.gems} />
+                </section>
+              </LazyOnVisible>
             ) : null}
 
             {editorial?.vibePool?.length ? (
-              <section className={styles.section}>
-                <SurpriseMe pool={editorial.vibePool} />
-              </section>
+              <LazyOnVisible>
+                <section className={styles.section}>
+                  <SurpriseMe pool={editorial.vibePool} />
+                </section>
+              </LazyOnVisible>
             ) : null}
           </>
         )}
@@ -607,23 +618,6 @@ export async function getServerSideProps(context) {
     }
   }
 
-  let schedulesByDay = null;
-  try {
-    const scheduleEntries = await Promise.all(
-      WEEKDAY_KEYS.map((key) => getSchedules(key).then((res) => [key, res])),
-    );
-    schedulesByDay = Object.fromEntries(
-      scheduleEntries.map(([key, res]) => [
-        key,
-        Array.isArray(res?.data)
-          ? dedupeByMalId(filterOutHentai(res.data)).map(slimScheduleAnime)
-          : [],
-      ]),
-    );
-  } catch {
-    schedulesByDay = null;
-  }
-
   return {
     props: {
       mode: 'discover',
@@ -635,7 +629,7 @@ export async function getServerSideProps(context) {
       activeMood: null,
       editorial,
       genres,
-      schedulesByDay,
+      schedulesByDay: null,
       sort,
       view,
       type: '',
@@ -647,18 +641,3 @@ export async function getServerSideProps(context) {
   };
 }
 
-const slimScheduleAnime = (item) => ({
-  mal_id: item?.mal_id ?? null,
-  title: item?.title ?? null,
-  images: {
-    webp: {
-      image_url: item?.images?.webp?.image_url ?? null,
-      large_image_url: item?.images?.webp?.large_image_url ?? null,
-    },
-    jpg: {
-      image_url: item?.images?.jpg?.image_url ?? null,
-      large_image_url: item?.images?.jpg?.large_image_url ?? null,
-    },
-  },
-  broadcast: item?.broadcast?.time ? { time: item.broadcast.time } : null,
-});
