@@ -1,5 +1,14 @@
 import Link from 'next/link';
-import { Bell, BellRing, CheckCheck, ChevronRight, PlayCircle, Sparkles, Trash2 } from 'lucide-react';
+import {
+  Bell,
+  BellRing,
+  CheckCheck,
+  ChevronRight,
+  PlayCircle,
+  Sparkles,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import styles from './NotificationsPanel.module.css';
 
@@ -38,6 +47,7 @@ function NotificationsPanel({
   onClose,
   onMarkAllRead,
   onClearAll,
+  onDismiss,
   t,
 }) {
   const isEmpty = !loading && notifications.length === 0;
@@ -123,6 +133,21 @@ function NotificationsPanel({
                   </span>
                   {!n.read ? <span className={styles.itemDot} aria-hidden="true" /> : null}
                 </Link>
+                {onDismiss ? (
+                  <button
+                    type="button"
+                    className={styles.itemDismiss}
+                    aria-label={t('notifications.dismiss')}
+                    title={t('notifications.dismiss')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      onDismiss(n.id);
+                    }}
+                  >
+                    <X size={12} strokeWidth={2.25} />
+                  </button>
+                ) : null}
               </li>
             );
           })}

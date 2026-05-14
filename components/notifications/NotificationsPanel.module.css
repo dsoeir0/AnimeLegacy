@@ -56,11 +56,12 @@
 
 .headAction {
   flex: 1;
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 7px 8px;
+  padding: 7px 6px;
   border-radius: 8px;
   background: var(--al-ink-3);
   border: 1px solid var(--al-border);
@@ -70,6 +71,9 @@
   letter-spacing: -0.005em;
   color: var(--al-fg-2);
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .headAction:hover:not(:disabled) {
@@ -141,9 +145,43 @@
   grid-template-columns: 28px 1fr auto;
   gap: 10px;
   align-items: center;
-  padding: 10px 14px;
+  padding: 10px 40px 10px 14px;
   text-decoration: none;
   color: inherit;
+}
+
+.itemDismiss {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--al-fg-3);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-standard), background var(--dur-2);
+}
+
+.item:hover .itemDismiss,
+.itemDismiss:focus-visible {
+  opacity: 1;
+}
+
+.itemDismiss:hover {
+  background: var(--al-ink-3);
+  color: var(--al-fg-1);
+}
+
+@media (hover: none) {
+  .itemDismiss {
+    opacity: 1;
+  }
 }
 
 .itemLink:hover {

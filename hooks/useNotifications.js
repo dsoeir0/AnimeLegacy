@@ -42,6 +42,8 @@ export default function useNotifications(uid) {
   const [state, setState] = useState(EMPTY_STATE);
   const [remote, setRemote] = useState({ schedulesByDay: null, relationsByFavorite: {} });
   const [loadingRemote, setLoadingRemote] = useState(false);
+  const [optimisticDismissed, setOptimisticDismissed] = useState([]);
+  const [optimisticReadAt, setOptimisticReadAt] = useState(null);
   const baselineRef = useRef(false);
 
   useEffect(() => {
@@ -64,6 +66,22 @@ export default function useNotifications(uid) {
       setState(data || EMPTY_STATE);
     });
   }, [uid]);
+
+  useEffect(() => {
+    if (optimisticReadAt === null) return;
+    if (Number.isFinite(state.lastReadAt) && state.lastReadAt >= optimisticReadAt - 2000) {
+      setOptimisticReadAt(null);
+    }
+  }, [state.lastReadAt, optimisticReadAt]);
+
+  useEffect(() => {
+    if (optimisticDismissed.length === 0) return;
+    const serverIds = new Set(state.dismissedIds || []);
+    const remaining = optimisticDismissed.filter((id) => !serverIds.has(id));
+    if (remaining.length !== optimisticDismissed.length) {
+      setOptimisticDismissed(remaining);
+    }
+  }, [state.dismissedIds, optimisticDismissed]);
 
   const favoriteIds = useMemo(
     () =>
@@ -92,15 +110,26 @@ export default function useNotifications(uid) {
     }
   }, [uid, listEntries, state.seenEpisodes]);
 
+  const effectiveState = useMemo(() => {
+    if (optimisticDismissed.length === 0 && optimisticReadAt === null) return state;
+    return {
+      ...state,
+      lastReadAt: optimisticReadAt !== null ? optimisticReadAt : state.lastReadAt,
+      dismissedIds: optimisticDismissed.length
+        ? [...(state.dismissedIds || []), ...optimisticDismissed]
+        : state.dismissedIds,
+    };
+  }, [state, optimisticDismissed, optimisticReadAt]);
+
   const notifications = useMemo(
     () =>
       computeNotifications({
         listEntries,
         schedulesByDay: remote.schedulesByDay,
         relationsByFavorite: remote.relationsByFavorite,
-        state,
+        state: effectiveState,
       }),
-    [listEntries, remote, state],
+    [listEntries, remote, effectiveState],
   );
 
   const unreadCount = useMemo(
@@ -110,7 +139,11 @@ export default function useNotifications(uid) {
 
   const handleMarkAllRead = useCallback(() => {
     if (!uid) return Promise.resolve();
-    return markAllRead(uid).catch(() => {});
+    setOptimisticReadAt(Date.now());
+    return markAllRead(uid).catch((err) => {
+      console.error('[notifications] markAllRead failed:', err);
+      setOptimisticReadAt(null);
+    });
   }, [uid]);
 
   const handleClearAll = useCallback(() => {
@@ -123,12 +156,37 @@ export default function useNotifications(uid) {
         seenPatch[String(n.malId)] = Number(n.extra.episodes);
       }
     }
-    const promises = [dismissNotifications(uid, ids).catch(() => {})];
+    setOptimisticDismissed((prev) => [...prev, ...ids]);
+    const rollback = () => {
+      setOptimisticDismissed((prev) => prev.filter((id) => !ids.includes(id)));
+    };
+    const promises = [
+      dismissNotifications(uid, ids).catch((err) => {
+        console.error('[notifications] dismissAll failed:', err);
+        rollback();
+      }),
+    ];
     if (Object.keys(seenPatch).length > 0) {
-      promises.push(setSeenEpisodes(uid, seenPatch, current).catch(() => {}));
+      promises.push(
+        setSeenEpisodes(uid, seenPatch, current).catch((err) => {
+          console.error('[notifications] setSeenEpisodes failed:', err);
+        }),
+      );
     }
     return Promise.all(promises);
   }, [uid, notifications, state.seenEpisodes]);
+
+  const handleDismiss = useCallback(
+    (id) => {
+      if (!uid || !id) return Promise.resolve();
+      setOptimisticDismissed((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      return dismissNotifications(uid, [id]).catch((err) => {
+        console.error('[notifications] dismiss failed:', err);
+        setOptimisticDismissed((prev) => prev.filter((x) => x !== id));
+      });
+    },
+    [uid],
+  );
 
   return {
     notifications,
@@ -137,5 +195,6 @@ export default function useNotifications(uid) {
     ensureData,
     markAllRead: handleMarkAllRead,
     clearAll: handleClearAll,
+    dismiss: handleDismiss,
   };
 }

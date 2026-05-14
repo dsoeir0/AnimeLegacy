@@ -17,6 +17,7 @@ function NotificationsButton({ variant = 'desktop', t }) {
     ensureData,
     markAllRead,
     clearAll,
+    dismiss,
   } = useNotifications(user?.uid);
 
   useEffect(() => {
@@ -66,6 +67,7 @@ function NotificationsButton({ variant = 'desktop', t }) {
             onClose={() => setOpen(false)}
             onMarkAllRead={markAllRead}
             onClearAll={clearAll}
+            onDismiss={dismiss}
           />
         </div>
       ) : null}

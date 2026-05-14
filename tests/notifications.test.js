@@ -125,6 +125,18 @@ describe('computeNotifications', () => {
     expect(out[0].read).toBe(true);
   });
 
+  it('stamps createdAt to start-of-day so markAllRead survives later renders', () => {
+    const noon = new Date('2026-05-04T12:00:00');
+    const evening = new Date('2026-05-04T23:30:00');
+    const out = computeNotifications({
+      listEntries: [listEntry(101)],
+      schedulesByDay: { monday: [monAired(101)] },
+      state: { lastReadAt: noon.getTime() },
+      now: evening,
+    });
+    expect(out[0].read).toBe(true);
+  });
+
   it('sorts by kind priority then title', () => {
     const out = computeNotifications({
       listEntries: [
