@@ -14,11 +14,11 @@ const formatShortDate = (entry, lang) => {
     .toUpperCase();
 };
 
-const scoreClass = (rating, styles) => {
-  if (rating === null || rating === undefined) return styles.reviewRowScoreMid;
+const scoreClass = (rating, s) => {
+  if (rating === null || rating === undefined) return s.reviewRowScoreMid;
   if (rating >= 4) return '';
-  if (rating >= 3) return styles.reviewRowScoreMid;
-  return styles.reviewRowScoreLow;
+  if (rating >= 3) return s.reviewRowScoreMid;
+  return s.reviewRowScoreLow;
 };
 
 function ReviewRow({ entry, rank, lang, t }) {

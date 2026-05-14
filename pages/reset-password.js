@@ -40,6 +40,7 @@ function ResetPasswordPage({ t }) {
       .then((emailAddress) => {
         setEmail(emailAddress);
         setStatus('ready');
+        return null;
       })
       .catch((err) => {
         setError(

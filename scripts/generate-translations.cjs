@@ -1,32 +1,13 @@
-/* eslint-disable no-console */
-
-//
-//  generate-translations.cjs
-//
-//  Keeps the per-language JSON files under /lang in sync with en.json.
-//  Uses MyMemory (https://mymemory.translated.net/doc/spec.php):
-//    • 5 000 words/day for anonymous IP
-//    • 50 000 words/day if you set MYMEMORY_EMAIL in .env.local
-//    • No API key, no credit card, no SDK
-//
-//  Run with:  pnpm gen-trans
-//
-
 require('dotenv').config({ path: '.env.local' });
-require('dotenv').config(); // fallback to .env
+require('dotenv').config();
 
 const fs = require('fs').promises;
 const path = require('path');
-
-/* ───────────── configuration ───────────── */
 
 const SRC_DIR = path.resolve(__dirname, '../lang');
 const EN_FILE = path.join(SRC_DIR, 'en.json');
 const API_ENDPOINT = 'https://api.mymemory.translated.net/get';
 
-// Map our app language codes to MyMemory target codes.
-// MyMemory accepts both 2-letter (en, pt, es, fr) and locale (pt-PT, es-ES, fr-FR).
-// We request pt-PT explicitly for European Portuguese (not pt-BR).
 const LOCALE_TO_MYMEM = {
   pt: 'pt-PT',
   es: 'es-ES',
@@ -35,11 +16,9 @@ const LOCALE_TO_MYMEM = {
 
 const LOCALES = Object.keys(LOCALE_TO_MYMEM);
 const SOURCE_LANG = 'en-US';
-const REQUEST_DELAY_MS = 120; // be polite — ~8 req/sec max
-const MAX_RETRIES = 3;        // per-request retries on transient errors
-const QUOTA_BAILOUT_THRESHOLD = 8; // consecutive 429s → assume daily quota is gone
-
-/* ───────────── helpers ───────────── */
+const REQUEST_DELAY_MS = 120;
+const MAX_RETRIES = 3;
+const QUOTA_BAILOUT_THRESHOLD = 8;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -69,9 +48,7 @@ async function translateText(text, target) {
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     const response = await fetch(buildUrl(text, target));
     if (response.status === 429) {
-      // Transient burst rate-limit: back off and retry. If it persists across
-      // all retries, caller escalates via the consecutive-429 counter.
-      const wait = 1500 * Math.pow(2, attempt); // 1.5s → 3s → 6s
+      const wait = 1500 * Math.pow(2, attempt);
       await sleep(wait);
       lastErr = new Error('HTTP 429');
       continue;
@@ -93,12 +70,6 @@ async function translateText(text, target) {
   throw lastErr || new Error('HTTP 429');
 }
 
-/**
- * Recursively walks the EN object in insertion order, copies valid existing
- * translations, translates missing ones, and omits any key not in EN.
- * `state` tracks consecutive-429s across the whole run so we can bail early
- * when the daily quota is clearly exhausted.
- */
 async function recurseTranslate(enObj, existing, target, state, trace = []) {
   const out = Array.isArray(enObj) ? [] : {};
 
@@ -110,11 +81,9 @@ async function recurseTranslate(enObj, existing, target, state, trace = []) {
 
     if (typeof value === 'string') {
       if (prev && String(prev).trim() !== '') {
-        out[key] = prev; // keep existing good translation
+        out[key] = prev;
       } else if (value.trim() !== '') {
         if (state.quotaGone) {
-          // skip silently — omitting the key makes the summary accurately
-          // report it as missing so the next run retries it
           continue;
         }
         try {
@@ -141,7 +110,6 @@ async function recurseTranslate(enObj, existing, target, state, trace = []) {
           if (!state.quotaGone) {
             console.warn(`⚠  ${target}:${nextPath.join('.')} skipped (${err.message})`);
           }
-          // omit the key (don't assign out[key]) so it retries next run
         }
       } else {
         out[key] = '';
@@ -169,8 +137,6 @@ function listKeys(obj, prefix = '', acc = []) {
   return acc;
 }
 
-/* ───────────── main ───────────── */
-
 (async function main() {
   if (typeof fetch !== 'function') {
     console.error('❌  global fetch() is missing — run on Node 18+.');
@@ -188,7 +154,6 @@ function listKeys(obj, prefix = '', acc = []) {
     process.exit(1);
   }
 
-  /* 1️⃣  translate / merge / clean-up */
   const state = { consecutive429: 0, quotaGone: false };
   for (const locale of LOCALES) {
     const target = LOCALE_TO_MYMEM[locale];
@@ -199,7 +164,6 @@ function listKeys(obj, prefix = '', acc = []) {
     await saveJSON(file, aligned);
   }
 
-  /* 2️⃣  summary comparison */
   console.log('\n──────── summary check ────────');
   const enKeys = listKeys(en).sort();
 

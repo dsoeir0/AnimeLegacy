@@ -28,7 +28,7 @@ const release = () => {
   document.body.style.paddingRight = savedPaddingRight;
 };
 
-export const useBodyScrollLock = (active) => {
+const useBodyScrollLock = (active) => {
   useEffect(() => {
     if (!active) return undefined;
     engage();

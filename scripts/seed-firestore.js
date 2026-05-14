@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const { FieldValue } = require('firebase-admin/firestore');
 const { getAdminDb } = require('../lib/firebase/admin');
 
