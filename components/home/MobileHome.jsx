@@ -27,7 +27,7 @@ function HeroSection({ slides, aniListMap, onOpenModal, getEntry, t }) {
   const slide = slides[idx];
   const media = aniListMap?.[slide.mal_id];
   const banner =
-    getAnimeBannerUrl(slide, media) || getAnimeImageUrl(slide, media);
+    getAnimeImageUrl(slide, media) || getAnimeBannerUrl(slide, media);
   const studio = primaryStudioName(slide) || '';
   const score = typeof slide.score === 'number' ? slide.score : null;
   const scoredBy = Number(slide.scored_by || 0);
