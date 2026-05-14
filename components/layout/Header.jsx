@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Sparkles, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { translate } from 'react-switch-lang';
 import useAuth from '../../hooks/useAuth';
 import useUserProfile from '../../hooks/useUserProfile';
@@ -80,7 +80,6 @@ function Header({ variant = 'default', t }) {
       <div className={styles.right}>
         <LanguageSwitcher />
         <div className={styles.divider} />
-        <IconButton icon={Sparkles} tooltip={t('header.whatsNew')} />
         <NotificationsButton variant="desktop" />
         <div className={styles.divider} />
         <div className={styles.profile} ref={profileRef}>

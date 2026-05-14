@@ -28,7 +28,6 @@
     "searchPlaceholder": "Pesquisar anime, personagens, estúdios…",
     "searching": "A pesquisar…",
     "noResults": "Sem resultados.",
-    "whatsNew": "Novidades",
     "notifications": "Notificações",
     "back": "Voltar",
     "changeLanguage": "Mudar idioma",
@@ -1342,8 +1341,9 @@
   },
   "notifications": {
     "title": "Notificações",
-    "markAllRead": "marcar todas como lidas",
+    "markAllRead": "Marcar lidas",
     "clearAll": "Limpar tudo",
+    "dismiss": "Dispensar",
     "loading": "Alcançando",
     "emptyTitle": "Tudo em dia",
     "emptyBody": "As atualizações sobre a sua lista de observação e favoritos chegam aqui.",

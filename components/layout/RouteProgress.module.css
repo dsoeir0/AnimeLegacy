@@ -1,0 +1,26 @@
+.track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-standard);
+}
+
+.trackVisible {
+  opacity: 1;
+}
+
+.bar {
+  height: 100%;
+  background: var(--al-primary-gradient);
+  box-shadow:
+    0 0 8px color-mix(in srgb, var(--al-primary-2) 60%, transparent),
+    0 0 4px color-mix(in srgb, var(--al-primary-2) 80%, transparent);
+  transition: width var(--dur-2) var(--ease-out);
+  will-change: width;
+}

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import BottomNav from './BottomNav';
 import Header from './Header';
 import MobileTopBar from './MobileTopBar';
+import RouteProgress from './RouteProgress';
 import Sidebar from './Sidebar';
 import styles from './Layout.module.css';
 
@@ -16,9 +17,12 @@ export default function Layout({
   description = 'Curated anime seasons, movies, and personal watchlists.',
 }) {
   const router = useRouter();
-  const desktopHeaderClass = hideHeaderOnMobile || mobileTitle ? styles.headerHideOnMobile : '';
+  const desktopHeaderClass = `${styles.headerWrap} ${
+    hideHeaderOnMobile || mobileTitle ? styles.headerHideOnMobile : ''
+  }`;
   return (
     <div className={styles.shell}>
+      <RouteProgress />
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />

@@ -5,7 +5,7 @@
   padding: 0 32px;
   gap: 16px;
   border-bottom: 1px solid var(--al-border);
-  background: rgba(11, 12, 16, 0.7);
+  background: color-mix(in srgb, var(--al-ink-1) 70%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   position: sticky;
@@ -14,7 +14,7 @@
 }
 
 .dark {
-  background: rgba(6, 7, 9, 0.6);
+  background: color-mix(in srgb, var(--al-ink-0) 60%, transparent);
 }
 
 .left {
@@ -81,7 +81,7 @@
   padding: 3px 7px;
   font-size: 10px;
   font-family: var(--font-mono);
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--al-white) 4%, transparent);
   color: var(--al-fg-3);
   border: 1px solid var(--al-border);
   border-radius: 5px;
@@ -159,7 +159,7 @@
 }
 
 .searchItem:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--al-white) 4%, transparent);
 }
 
 .searchThumb {
@@ -207,6 +207,7 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .divider {
@@ -307,7 +308,7 @@
 }
 
 .profileItem:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--al-white) 4%, transparent);
 }
 
 @media (max-width: 768px) {

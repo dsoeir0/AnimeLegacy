@@ -16,6 +16,10 @@
   min-width: 0;
 }
 
+.headerWrap {
+  display: contents;
+}
+
 .mobileTopBar {
   display: none;
 }
@@ -25,9 +29,9 @@
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
   .headerHideOnMobile {
-    display: none;
+    display: none !important;
   }
   .mobileTopBar {
-    display: block;
+    display: contents;
   }
 }
