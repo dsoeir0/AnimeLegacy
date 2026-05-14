@@ -125,7 +125,7 @@ AnimeLegacy/
 │   ├── collections/         # MobileCollections (shell with Coming Soon)
 │   ├── discover/            # EditorialFeature, MoodGrid, VibeFinder, HiddenGems, GenreRail, BecauseYouLiked, SurpriseMe, AiringThisWeek, FilterBanner
 │   ├── home/                # MobileHome (hero carousel + airing strip + highlights)
-│   ├── layout/              # Sidebar, Header, HeaderSearch, LanguageSwitcher, Layout, MobileTopBar (logo + search/lang/bell/avatar)
+│   ├── layout/              # Sidebar, Header, HeaderSearch, LanguageSwitcher, Layout, MobileTopBar (logo + search/lang/bell/avatar), RouteProgress (top progress bar on route changes)
 │   ├── modals/              # Modal (shared bottom-sheet on mobile), AddToListModal, RatingReviewModal
 │   ├── myList/              # MobileMyList (KPI strip + tabs + status rows + sort menu)
 │   ├── notifications/       # NotificationsButton (bell + badge), NotificationsPanel (categorized list, mark-all-read, clear-all)
@@ -133,7 +133,7 @@ AnimeLegacy/
 │   ├── search/              # MobileSearch (empty state + categorized results), MobileCatalogue (anime catalogue with type tabs/genre chips/best match/grid)
 │   ├── seasons/             # EditorPickCard, KpiRow, SeasonTabs, TopThreeSection, MobileSeasons (year dropdown + season tabs + editorial + 3-col grid)
 │   ├── studios/             # StudioCard, FeaturedStudio, StudioFilterBar, StudiosHeader, MobileStudios (index era tabs + cards), MobileStudioDetail (logo hero + KPI strip + works grid + about)
-│   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon (with mobileSlot), Dropdown, MultiDropdown
+│   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon (with mobileSlot), Dropdown, MultiDropdown, LazyOnVisible (IntersectionObserver gate for below-the-fold sections)
 │   ├── voices/              # MobileVoices (A-Z letter index + initials avatars), MobileVoiceDetail (avatar hero + 4-cell KPI grid + recent roles + bio)
 │   └── ErrorBoundary.jsx    # Sentry-wired top-level boundary (wraps `<App>`)
 ├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useFavoriteIds, useBodyScrollLock, useDragReorder, useNotifications (composes user list + favorites + notificationState + lazy schedule/relations fetch)
@@ -200,6 +200,7 @@ AnimeLegacy/
 | `/api/studio-posters?id=` | Poster mini-strip for a studio card on `/studios` index (cached 15m, `stale-while-revalidate=3600`) |
 | `/api/translate-synopsis` | MyMemory proxy used by `useTranslatedText` (IP rate-limited, 24h browser cache) |
 | `/api/notifications-data?favorites=&schedules=` | Schedules (weekly Jikan) + relations (`/anime/{id}/relations` per favourite) used by `useNotifications` to compute airing/sequel categories. Server-side `cachedJikan`, browser `private, max-age=300, stale-while-revalidate=900` |
+| `/api/schedules` | Weekly schedule (Mon–Sun bucketed) used by `AiringThisWeek` on `/search`, fetched client-side after first paint so it doesn't block SSR. Server-side `cachedJikan`, browser `public, max-age=900, stale-while-revalidate=3600`, IP-rate-limited to 60/min |
 | `/search?q=&kind=anime` | When `kind=anime`, mobile renders `MobileCatalogue` (anime-only catalogue with type tabs + genre chips + best match + grid). Default mobile (`q=` only) shows the categorized 4-section results. |
 
 ---
@@ -263,7 +264,7 @@ Tokens live in [`styles/tokens.css`](styles/tokens.css). All components consume 
 
 - **Jikan** (`api.jikan.moe/v4`) is the main source for anime metadata, characters, and search.
 - **AniList GraphQL** supplements poster/banner URLs with higher-resolution imagery. IDs are resolved by MAL ID in batches of 25.
-- **Firestore** stores per-user state. Listeners are consolidated into shared subscriber stores in [`lib/firebase/`](lib/firebase/) (one `onSnapshot` per `(uid, key)` fan-out to N React subscribers) so re-renders and cross-component overlap don't multiply listeners.
+- **Firestore** stores per-user state. Listeners are consolidated into shared subscriber stores in [`lib/firebase/`](lib/firebase/) (one `onSnapshot` per `(uid, key)` fan-out to N React subscribers) so re-renders and cross-component overlap don't multiply listeners. The factory also deep-equals incoming snapshots against the cached value and skips the fan-out if structurally identical, so downstream `useMemo`s stay stable across no-op snapshot churn.
 - **Request dedup is mandatory** — every external getter (Jikan/AniList/MyMemory) routes through an inflight `Map` keyed by request id, so N concurrent callers for the same data share one network round-trip. Search-style endpoints layer a session-scoped LRU+TTL cache on top (see `HeaderSearch.jsx`). See the `Request dedup` section of [`CLAUDE.md`](CLAUDE.md) for the contract any new fetcher has to follow.
 - **Sentry** is wired via [`instrumentation.js`](instrumentation.js) (server, `captureRequestError`) and [`instrumentation-client.js`](instrumentation-client.js) (browser, init + named `captureRouterTransitionStart`). `tracesSampleRate: 0`, `replays*: 0`, `autoSessionTracking: false`, and `beforeSendTransaction: () => null` keep the envelope POSTs to **just** real unhandled exceptions. `ErrorBoundary.jsx` and each `/api/*` route call `Sentry.captureException` explicitly inside their `catch` blocks rather than using `console.error`, so caught failures still surface in Sentry. Set `NEXT_PUBLIC_SENTRY_DSN` in `.env.local` to enable; absent DSN = silently disabled.
 
