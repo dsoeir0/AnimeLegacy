@@ -26,9 +26,8 @@ export default function Layout({
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
-        <link rel="icon" href="/logo_no_text.png" type="image/png" sizes="32x32" />
-        <link rel="icon" href="/logo_no_text.png" type="image/png" sizes="16x16" />
-        <link rel="apple-touch-icon" href="/logo_no_text.png" />
+        <link rel="icon" type="image/svg+xml" href="/brand/iris-favicon.svg" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </Head>
       {showSidebar ? <Sidebar /> : null}
       <main className={styles.main}>
