@@ -27,6 +27,7 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 - **Calendar** — weekly schedule grid (day × hour) of currently airing anime, rebucketed to viewer timezone post-hydration so a JST 23:00 broadcast lands in the right cell for PT viewers.
 - **Voice actor pages** — top voice actors index + per-actor detail with filmography and signature roles, links cross-wired from character pages.
 - **Multilingual** — `react-switch-lang` HOC with `en` / `pt` / `es` / `fr`. Synopses and biographies are translated on-demand via MyMemory and cached in Firestore per `(docId, lang)`.
+- **Install as an app (mobile)** — full PWA scaffolding: `manifest.webmanifest`, service worker for installability + offline fallback page, `<InstallAppButton>` in the mobile profile menu that triggers Chrome's native install prompt on Android and shows step-by-step Safari instructions on iOS. Hidden on desktop by design (no value-add over a browser tab).
 
 ---
 
@@ -108,6 +109,7 @@ pnpm test:watch            # Same, in watch mode
 pnpm analyze               # Build with @next/bundle-analyzer — opens treemap
 pnpm seed:firestore        # Seed anime catalog (requires service-account JSON)
 pnpm gen-trans             # Auto-translate new en.json keys into pt/es/fr via MyMemory
+pnpm gen-icons             # Re-render PWA icons from public/brand/iris-mark.svg (192/512/180/maskable)
 ```
 
 ---
@@ -133,10 +135,10 @@ AnimeLegacy/
 │   ├── search/              # MobileSearch (empty state + categorized results), MobileCatalogue (anime catalogue with type tabs/genre chips/best match/grid)
 │   ├── seasons/             # EditorPickCard, KpiRow, SeasonTabs, TopThreeSection, MobileSeasons (year dropdown + season tabs + editorial + 3-col grid)
 │   ├── studios/             # StudioCard, FeaturedStudio, StudioFilterBar, StudiosHeader, MobileStudios (index era tabs + cards), MobileStudioDetail (logo hero + KPI strip + works grid + about)
-│   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon (with mobileSlot), Dropdown, MultiDropdown, LazyOnVisible (IntersectionObserver gate for below-the-fold sections)
+│   ├── ui/                  # Button, IconButton, Logo, StatusBadge, RatingDisplay, ProgressBar, Skeleton, ComingSoon (with mobileSlot), Dropdown, MultiDropdown, LazyOnVisible (IntersectionObserver gate for below-the-fold sections), InstallAppButton (PWA install entry in mobile profile menu)
 │   ├── voices/              # MobileVoices (A-Z letter index + initials avatars), MobileVoiceDetail (avatar hero + 4-cell KPI grid + recent roles + bio)
 │   └── ErrorBoundary.jsx    # Sentry-wired top-level boundary (wraps `<App>`)
-├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useFavoriteIds, useBodyScrollLock, useDragReorder, useNotifications (composes user list + favorites + notificationState + lazy schedule/relations fetch)
+├── hooks/                   # useAuth, useMyList, useProfileData, useUserProfile, useTranslatedText, useFavoriteToggle, useFavoriteIds, useBodyScrollLock, useDragReorder, useNotifications (composes user list + favorites + notificationState + lazy schedule/relations fetch), usePwaInstall (capture beforeinstallprompt + iOS detection + isMobile gating)
 ├── lib/
 │   ├── firebase/            # client.js + admin.js + authStateStore, userProfileStore, userListStore, notificationStateStore (lastReadAt + dismissedIds + seenEpisodes) — subscriber stores for listener consolidation + createSubscriberStore factory
 │   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight, includes score/popularity/favourites/year), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios, favoriteOrder (shared batch personalRank writer), categorySearch (4-section parallel fetch shared by HeaderSearch desktop + MobileSearch)
