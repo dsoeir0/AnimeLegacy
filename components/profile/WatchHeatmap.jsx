@@ -1,7 +1,16 @@
+import { memo, useMemo } from 'react';
 import { translate } from 'react-switch-lang';
 import styles from './profile.module.css';
 
 function WatchHeatmap({ heatmap, title, meta, t }) {
+  const cellByKey = useMemo(() => {
+    const map = new Map();
+    for (const cell of heatmap.cells) {
+      map.set(`${cell.week}:${cell.day}`, cell);
+    }
+    return map;
+  }, [heatmap.cells]);
+
   return (
     <div className={styles.section}>
       <div className={styles.distroHead}>
@@ -19,7 +28,7 @@ function WatchHeatmap({ heatmap, title, meta, t }) {
         {Array.from({ length: heatmap.weeks * heatmap.days }, (_, idx) => {
           const week = Math.floor(idx / heatmap.days);
           const day = idx % heatmap.days;
-          const cell = heatmap.cells.find((c) => c.week === week && c.day === day);
+          const cell = cellByKey.get(`${week}:${day}`);
           if (!cell) return <span key={idx} className={styles.heatCell} data-level="0" />;
           return (
             <span
@@ -43,4 +52,4 @@ function WatchHeatmap({ heatmap, title, meta, t }) {
   );
 }
 
-export default translate(WatchHeatmap);
+export default translate(memo(WatchHeatmap));

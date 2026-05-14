@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, TrendingUp, Star } from 'lucide-react';
@@ -5,7 +6,7 @@ import { toCardShape } from '../../lib/utils/cardShape';
 import { formatFivePoint } from '../../lib/utils/rating';
 import styles from './PosterCard.module.css';
 
-export default function PosterCard({ anime, media, inList, onClick, width = 200, showMeta = true, href }) {
+function PosterCard({ anime, media, inList, onClick, width = 200, showMeta = true, href, sizes }) {
   const card = toCardShape(anime, media);
   if (!card) return null;
   const content = (
@@ -21,7 +22,12 @@ export default function PosterCard({ anime, media, inList, onClick, width = 200,
           src={card.poster}
           alt={card.title}
           fill
-          sizes={typeof width === 'number' ? `${width}px` : width}
+          sizes={
+            sizes ||
+            (typeof width === 'number'
+              ? `${width}px`
+              : '(max-width: 768px) 33vw, (max-width: 1200px) 33vw, 320px')
+          }
         />
         <div className={styles.gradient} />
         {card.rank && card.rank <= 100 ? (
@@ -62,3 +68,5 @@ export default function PosterCard({ anime, media, inList, onClick, width = 200,
   }
   return content;
 }
+
+export default memo(PosterCard);

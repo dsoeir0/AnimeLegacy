@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Shuffle } from 'lucide-react';
@@ -125,4 +125,4 @@ function MoodGrid({ postersByMood, t }) {
   );
 }
 
-export default translate(MoodGrid);
+export default translate(memo(MoodGrid));

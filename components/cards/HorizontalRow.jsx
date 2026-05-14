@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, MoreHorizontal } from 'lucide-react';
@@ -91,4 +92,4 @@ function HorizontalRow({ anime, media, entry, onClick, onEdit, href, t }) {
   return inner;
 }
 
-export default translate(HorizontalRow);
+export default translate(memo(HorizontalRow));

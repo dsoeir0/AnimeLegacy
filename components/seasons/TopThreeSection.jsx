@@ -30,7 +30,7 @@ function TopThreeSection({ items, aniListMap, t }) {
                     src={banner}
                     alt={item.title || ''}
                     fill
-                    sizes="(max-width: 1100px) 100vw, 420px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1100px) 50vw, 420px"
                     quality={90}
                     className={styles.topThreeImg}
                   />

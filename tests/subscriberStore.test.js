@@ -101,4 +101,46 @@ describe('createSubscriberStore', () => {
     unsub();
     expect(peek('k')).toBeNull();
   });
+
+  it('skips fan-out when emitted value is structurally equal to cached', () => {
+    const backend = fakeBackend();
+    const { subscribe } = createSubscriberStore(backend.subscribeFn);
+    const cb = vi.fn();
+    subscribe('k', cb);
+    backend.emit('k', { id: 1, name: 'Aive' });
+    backend.emit('k', { id: 1, name: 'Aive' });
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it('still fans out when an array contents change', () => {
+    const backend = fakeBackend();
+    const { subscribe } = createSubscriberStore(backend.subscribeFn);
+    const cb = vi.fn();
+    subscribe('k', cb);
+    backend.emit('k', [{ id: 1 }]);
+    backend.emit('k', [{ id: 1 }, { id: 2 }]);
+    expect(cb).toHaveBeenCalledTimes(2);
+  });
+
+  it('deep-compares nested objects before skipping', () => {
+    const backend = fakeBackend();
+    const { subscribe } = createSubscriberStore(backend.subscribeFn);
+    const cb = vi.fn();
+    subscribe('k', cb);
+    backend.emit('k', { meta: { count: 3, tags: ['a', 'b'] } });
+    backend.emit('k', { meta: { count: 3, tags: ['a', 'b'] } });
+    backend.emit('k', { meta: { count: 3, tags: ['a', 'c'] } });
+    expect(cb).toHaveBeenCalledTimes(2);
+  });
+
+  it('treats null/undefined transitions as a change', () => {
+    const backend = fakeBackend();
+    const { subscribe } = createSubscriberStore(backend.subscribeFn);
+    const cb = vi.fn();
+    subscribe('k', cb);
+    backend.emit('k', null);
+    backend.emit('k', { id: 1 });
+    backend.emit('k', null);
+    expect(cb).toHaveBeenCalledTimes(3);
+  });
 });

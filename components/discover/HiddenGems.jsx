@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
@@ -34,7 +35,7 @@ function HiddenGems({ gems, t }) {
                     src={url}
                     alt=""
                     fill
-                    sizes="(max-width: 768px) 50vw, 1200px"
+                    sizes="(max-width: 768px) 50vw, 1000px"
                     className={styles.gemBannerImg}
                     loading="lazy"
                   />
@@ -68,4 +69,4 @@ function HiddenGems({ gems, t }) {
   );
 }
 
-export default translate(HiddenGems);
+export default translate(memo(HiddenGems));

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Eye, Star, CheckCircle2, BookOpen } from 'lucide-react';
 import { getLanguage, translate } from 'react-switch-lang';
 import { formatRelativeTime } from '../../lib/utils/time';
@@ -96,4 +96,4 @@ function ActivityTimeline({ groups, total, animeItems, t }) {
   );
 }
 
-export default translate(ActivityTimeline);
+export default translate(memo(ActivityTimeline));

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
 import styles from './discover.module.css';
@@ -48,4 +49,4 @@ function GenreRail({ genres, t }) {
   );
 }
 
-export default translate(GenreRail);
+export default translate(memo(GenreRail));

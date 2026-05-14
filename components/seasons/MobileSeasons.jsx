@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -69,7 +69,7 @@ function YearDropdown({ year, t }) {
   );
 }
 
-function FeaturedRow({ anime, index, aniListMap, t }) {
+const FeaturedRow = memo(function FeaturedRow({ anime, index, aniListMap, t }) {
   const cover = getAnimeImageUrl(anime, aniListMap?.[anime.mal_id]);
   const studio = primaryStudioName(anime) || '';
   const score = typeof anime.score === 'number' ? anime.score : null;
@@ -102,9 +102,9 @@ function FeaturedRow({ anime, index, aniListMap, t }) {
       </span>
     </Link>
   );
-}
+});
 
-function GridCard({ anime, aniListMap }) {
+const GridCard = memo(function GridCard({ anime, aniListMap }) {
   const cover = getAnimeImageUrl(anime, aniListMap?.[anime.mal_id]);
   const studio = primaryStudioName(anime) || '';
   return (
@@ -128,7 +128,7 @@ function GridCard({ anime, aniListMap }) {
       </span>
     </Link>
   );
-}
+});
 
 function MobileSeasons({ seasonMap, year, initialSeason, aniListMap, t }) {
   const [active, setActive] = useState(initialSeason);

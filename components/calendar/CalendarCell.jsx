@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getAnimeImageUrl } from '../../lib/utils/media';
@@ -35,4 +36,4 @@ function CalendarCell({ anime, broadcastTime, inList, localTime }) {
   );
 }
 
-export default CalendarCell;
+export default memo(CalendarCell);

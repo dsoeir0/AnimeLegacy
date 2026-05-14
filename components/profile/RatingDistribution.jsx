@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { translate } from 'react-switch-lang';
 import styles from './profile.module.css';
 
@@ -41,4 +42,4 @@ function RatingDistribution({ histogram, rated, peak, t }) {
   );
 }
 
-export default translate(RatingDistribution);
+export default translate(memo(RatingDistribution));

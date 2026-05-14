@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Star, TrendingUp, LayoutGrid, List, X } from 'lucide-react';
@@ -198,4 +199,4 @@ function FilterBanner({
   );
 }
 
-export default translate(FilterBanner);
+export default translate(memo(FilterBanner));

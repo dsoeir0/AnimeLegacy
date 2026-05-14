@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { translate } from 'react-switch-lang';
@@ -130,4 +130,4 @@ function VibeFinder({ pool, t }) {
   );
 }
 
-export default translate(VibeFinder);
+export default translate(memo(VibeFinder));

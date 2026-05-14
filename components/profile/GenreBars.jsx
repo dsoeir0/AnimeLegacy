@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { translate } from 'react-switch-lang';
 import styles from './profile.module.css';
 
@@ -27,4 +28,4 @@ function GenreBars({ bars, t }) {
   );
 }
 
-export default translate(GenreBars);
+export default translate(memo(GenreBars));

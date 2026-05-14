@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -22,7 +23,7 @@ function EditorialFeature({ primary, secondary, t }) {
             src={primaryBanner}
             alt=""
             fill
-            sizes="(max-width: 768px) 100vw, 2000px"
+            sizes="(max-width: 768px) 100vw, 1280px"
             quality={85}
             priority
             className={styles.editorialBanner}
@@ -71,7 +72,7 @@ function EditorialFeature({ primary, secondary, t }) {
                   src={banner}
                   alt=""
                   fill
-                  sizes="(max-width: 768px) 50vw, 1200px"
+                  sizes="(max-width: 768px) 50vw, 1000px"
                   className={styles.editorialSecondaryImage}
                   loading="lazy"
                 />
@@ -108,4 +109,4 @@ function EditorialFeature({ primary, secondary, t }) {
   );
 }
 
-export default translate(EditorialFeature);
+export default translate(memo(EditorialFeature));

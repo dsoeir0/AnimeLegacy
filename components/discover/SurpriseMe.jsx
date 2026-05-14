@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Sparkles, Star } from 'lucide-react';
@@ -212,4 +212,4 @@ function SurpriseMe({ pool, t }) {
   );
 }
 
-export default translate(SurpriseMe);
+export default translate(memo(SurpriseMe));

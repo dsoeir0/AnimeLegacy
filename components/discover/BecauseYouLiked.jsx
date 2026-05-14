@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Shuffle } from 'lucide-react';
 import { translate } from 'react-switch-lang';
@@ -165,4 +165,4 @@ function BecauseYouLiked({ pool, t }) {
   );
 }
 
-export default translate(BecauseYouLiked);
+export default translate(memo(BecauseYouLiked));

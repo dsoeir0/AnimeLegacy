@@ -16,7 +16,7 @@ function EditorPickCard({ pick, media, studio, score, showRanking, t }) {
             src={posterUrl}
             alt={pick.title || ''}
             fill
-            sizes="(max-width: 1100px) 100vw, 320px"
+            sizes="(max-width: 768px) 70vw, (max-width: 1100px) 33vw, 320px"
             className={styles.editorPickImg}
           />
         ) : null}
