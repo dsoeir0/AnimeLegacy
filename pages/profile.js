@@ -79,7 +79,12 @@ function ProfilePage({ t }) {
   const avatar = profile?.avatarData || profile?.avatarUrl || user?.photoURL;
   const initials = useMemo(() => userInitials(displayName), [displayName]);
   const [activeTab, setActiveTab] = useState('Overview');
+  const [mountedTabs, setMountedTabs] = useState({ Overview: true });
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    setMountedTabs((prev) => (prev[activeTab] ? prev : { ...prev, [activeTab]: true }));
+  }, [activeTab]);
 
   const currentSeason = getSeasonFromDate();
   const currentYear = new Date().getFullYear();
@@ -227,6 +232,7 @@ function ProfilePage({ t }) {
     fetchAniListMediaByMalIds(ids)
       .then((map) => {
         if (!cancelled) setAniListMap(map || {});
+        return null;
       })
       .catch(() => {});
     return () => {
@@ -346,105 +352,115 @@ function ProfilePage({ t }) {
                   aria-labelledby={`profile-tab-${activeTab}`}
                   tabIndex={0}
                 >
-                  {activeTab === 'Overview' ? (
-                    <>
-                      <RecentEntriesTable
-                        entries={recentEntries}
-                        total={listEntries}
-                        onSeeAll={() => router.push('/my-list')}
-                      />
-                      <TopFavoritesCards
-                        favorites={favorites}
-                        aniListMap={aniListMap}
-                        onReorder={handleReorderFavorites}
-                      />
-                    </>
-                  ) : null}
-
-                  {activeTab === 'Stats' ? (
-                    <>
-                      <RatingDistribution
-                        histogram={ratingHistogram}
-                        rated={ratedCount}
-                        peak={peakRating}
-                      />
-                      <div className={styles.section}>
-                        <h3 className={styles.sectionTitle}>{t('profile.genreBreakdown')}</h3>
-                        <GenreBars bars={genreBars} />
-                      </div>
-                      <WatchHeatmap
-                        heatmap={activityHeatmap}
-                        title={t('profile.activityHeatmap')}
-                        meta={t('profile.heatmapMeta')}
-                      />
-                    </>
-                  ) : null}
-
-                  {activeTab === 'Favorites' ? (
-                    <>
-                      <div className={styles.section}>
-                        <div className={styles.distroHead}>
-                          <h3 className={styles.sectionTitle}>{t('profile.favoritesTitle')}</h3>
-                          <span className={styles.kicker}>
-                            {t('profile.favoritesCount', { n: favorites.length, limit: FAVORITE_LIMIT })}
-                          </span>
-                        </div>
-                        <FavoritesStrip
+                  <div hidden={activeTab !== 'Overview'}>
+                    {mountedTabs.Overview ? (
+                      <>
+                        <RecentEntriesTable
+                          entries={recentEntries}
+                          total={listEntries}
+                          onSeeAll={() => router.push('/my-list')}
+                        />
+                        <TopFavoritesCards
                           favorites={favorites}
                           aniListMap={aniListMap}
                           onReorder={handleReorderFavorites}
                         />
-                      </div>
-                      <div className={styles.section}>
-                        <div className={styles.distroHead}>
-                          <h3 className={styles.sectionTitle}>{t('profile.favoriteCharactersTitle')}</h3>
-                          <span className={styles.kicker}>
-                            {t('profile.favoritesCount', { n: favoriteCharacters.length, limit: FAVORITE_LIMIT })}
-                          </span>
-                        </div>
-                        <FavoriteCharactersStrip
-                          favorites={favoriteCharacters}
-                          onReorder={handleReorderCharacters}
-                        />
-                      </div>
-                      <div className={styles.section}>
-                        <div className={styles.distroHead}>
-                          <h3 className={styles.sectionTitle}>{t('profile.favoriteVoicesTitle')}</h3>
-                          <span className={styles.kicker}>
-                            {t('profile.favoritesCount', { n: favoriteVoices.length, limit: FAVORITE_LIMIT })}
-                          </span>
-                        </div>
-                        <FavoriteVoicesStrip
-                          favorites={favoriteVoices}
-                          onReorder={handleReorderVoices}
-                        />
-                      </div>
-                      <div className={styles.section}>
-                        <div className={styles.distroHead}>
-                          <h3 className={styles.sectionTitle}>{t('profile.favoriteStudiosTitle')}</h3>
-                          <span className={styles.kicker}>
-                            {t('profile.favoritesCount', { n: favoriteStudios.length, limit: FAVORITE_LIMIT })}
-                          </span>
-                        </div>
-                        <FavoriteStudiosStrip
-                          favorites={favoriteStudios}
-                          onReorder={handleReorderStudios}
-                        />
-                      </div>
-                    </>
-                  ) : null}
+                      </>
+                    ) : null}
+                  </div>
 
-                  {activeTab === 'Reviews' ? (
-                    <ReviewsPanel reviews={writtenReviews} joinYear={joinYear} />
-                  ) : null}
+                  <div hidden={activeTab !== 'Stats'}>
+                    {mountedTabs.Stats ? (
+                      <>
+                        <RatingDistribution
+                          histogram={ratingHistogram}
+                          rated={ratedCount}
+                          peak={peakRating}
+                        />
+                        <div className={styles.section}>
+                          <h3 className={styles.sectionTitle}>{t('profile.genreBreakdown')}</h3>
+                          <GenreBars bars={genreBars} />
+                        </div>
+                        <WatchHeatmap
+                          heatmap={activityHeatmap}
+                          title={t('profile.activityHeatmap')}
+                          meta={t('profile.heatmapMeta')}
+                        />
+                      </>
+                    ) : null}
+                  </div>
 
-                  {activeTab === 'Activity' ? (
-                    <ActivityTimeline
-                      groups={activityGroups}
-                      total={activityAll.length}
-                      animeItems={animeItems}
-                    />
-                  ) : null}
+                  <div hidden={activeTab !== 'Favorites'}>
+                    {mountedTabs.Favorites ? (
+                      <>
+                        <div className={styles.section}>
+                          <div className={styles.distroHead}>
+                            <h3 className={styles.sectionTitle}>{t('profile.favoritesTitle')}</h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', { n: favorites.length, limit: FAVORITE_LIMIT })}
+                            </span>
+                          </div>
+                          <FavoritesStrip
+                            favorites={favorites}
+                            aniListMap={aniListMap}
+                            onReorder={handleReorderFavorites}
+                          />
+                        </div>
+                        <div className={styles.section}>
+                          <div className={styles.distroHead}>
+                            <h3 className={styles.sectionTitle}>{t('profile.favoriteCharactersTitle')}</h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', { n: favoriteCharacters.length, limit: FAVORITE_LIMIT })}
+                            </span>
+                          </div>
+                          <FavoriteCharactersStrip
+                            favorites={favoriteCharacters}
+                            onReorder={handleReorderCharacters}
+                          />
+                        </div>
+                        <div className={styles.section}>
+                          <div className={styles.distroHead}>
+                            <h3 className={styles.sectionTitle}>{t('profile.favoriteVoicesTitle')}</h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', { n: favoriteVoices.length, limit: FAVORITE_LIMIT })}
+                            </span>
+                          </div>
+                          <FavoriteVoicesStrip
+                            favorites={favoriteVoices}
+                            onReorder={handleReorderVoices}
+                          />
+                        </div>
+                        <div className={styles.section}>
+                          <div className={styles.distroHead}>
+                            <h3 className={styles.sectionTitle}>{t('profile.favoriteStudiosTitle')}</h3>
+                            <span className={styles.kicker}>
+                              {t('profile.favoritesCount', { n: favoriteStudios.length, limit: FAVORITE_LIMIT })}
+                            </span>
+                          </div>
+                          <FavoriteStudiosStrip
+                            favorites={favoriteStudios}
+                            onReorder={handleReorderStudios}
+                          />
+                        </div>
+                      </>
+                    ) : null}
+                  </div>
+
+                  <div hidden={activeTab !== 'Reviews'}>
+                    {mountedTabs.Reviews ? (
+                      <ReviewsPanel reviews={writtenReviews} joinYear={joinYear} />
+                    ) : null}
+                  </div>
+
+                  <div hidden={activeTab !== 'Activity'}>
+                    {mountedTabs.Activity ? (
+                      <ActivityTimeline
+                        groups={activityGroups}
+                        total={activityAll.length}
+                        animeItems={animeItems}
+                      />
+                    ) : null}
+                  </div>
                 </div>
               </section>
             </div>
