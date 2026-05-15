@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, TrendingUp, Star } from 'lucide-react';
@@ -8,6 +8,7 @@ import styles from './PosterCard.module.css';
 
 function PosterCard({ anime, media, inList, onClick, width = 200, showMeta = true, href, sizes }) {
   const card = toCardShape(anime, media);
+  const [failed, setFailed] = useState(false);
   if (!card) return null;
   const content = (
     <div
@@ -17,18 +18,25 @@ function PosterCard({ anime, media, inList, onClick, width = 200, showMeta = tru
       role={onClick ? 'button' : undefined}
     >
       <div className={styles.poster}>
-        <Image
-          className={styles.posterImage}
-          src={card.poster}
-          alt={card.title}
-          fill
-          sizes={
-            sizes ||
-            (typeof width === 'number'
-              ? `${width}px`
-              : '(max-width: 768px) 33vw, (max-width: 1200px) 33vw, 320px')
-          }
-        />
+        {failed ? (
+          <div className={styles.fallback} aria-hidden="true">
+            <img src="/brand/iris-mark.svg" alt="" width={56} height={56} />
+          </div>
+        ) : (
+          <Image
+            className={styles.posterImage}
+            src={card.poster}
+            alt={card.title}
+            fill
+            sizes={
+              sizes ||
+              (typeof width === 'number'
+                ? `${width}px`
+                : '(max-width: 768px) 33vw, (max-width: 1200px) 33vw, 320px')
+            }
+            onError={() => setFailed(true)}
+          />
+        )}
         <div className={styles.gradient} />
         {card.rank && card.rank <= 100 ? (
           <div className={styles.rank}>
