@@ -1,14 +1,20 @@
 .track {
   position: fixed;
-  top: 0;
+  top: 64px;
   left: 0;
   right: 0;
   height: 2px;
   background: transparent;
-  z-index: 9999;
+  z-index: 19;
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--dur-2) var(--ease-standard);
+}
+
+@media (max-width: 768px) {
+  .track {
+    top: calc(56px + env(safe-area-inset-top, 0px));
+  }
 }
 
 .trackVisible {
