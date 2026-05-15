@@ -109,7 +109,7 @@ pnpm test:watch            # Same, in watch mode
 pnpm analyze               # Build with @next/bundle-analyzer — opens treemap
 pnpm seed:firestore        # Seed anime catalog (requires service-account JSON)
 pnpm gen-trans             # Auto-translate new en.json keys into pt/es/fr via MyMemory
-pnpm gen-icons             # Re-render PWA icons from public/brand/iris-mark.svg (192/512/180/maskable)
+pnpm gen-icons             # Re-render PWA icons + poster placeholder from public/brand/iris-mark.svg (192/512/180/maskable + 480×720 logo_no_text.png)
 ```
 
 ---
@@ -142,7 +142,7 @@ AnimeLegacy/
 ├── lib/
 │   ├── firebase/            # client.js + admin.js + authStateStore, userProfileStore, userListStore, notificationStateStore (lastReadAt + dismissedIds + seenEpisodes) — subscriber stores for listener consolidation + createSubscriberStore factory
 │   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight, includes score/popularity/favourites/year), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios, favoriteOrder (shared batch personalRank writer), categorySearch (4-section parallel fetch shared by HeaderSearch desktop + MobileSearch)
-│   ├── utils/               # anime, season, media, time, cardShape, synopsis, text (truncateText/firstSentence), listTransitions, profileActivity, profileStats, heatmap, rating, reorder, debounce, reviewsView, rateLimit, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay (userInitials + nameInitials), chunk, notifications (compute logic for airing/finished/newEpisode/sequel), voiceRoles (year + sortVoiceRolesByPopularity)
+│   ├── utils/               # anime, season, media, time, cardShape, synopsis, text (truncateText/firstSentence), listTransitions, profileActivity, profileStats, heatmap, rating, reorder, debounce, reviewsView, rateLimit, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay (userInitials + nameInitials), chunk, notifications (compute logic for airing/finished/newEpisode/sequel), voiceRoles (year + sortVoiceRolesByPopularity), pwaPlatform (UA → isIos/isAndroid/isMobile, pure)
 │   ├── constants/           # flags.js (SUPPORTED_LANGUAGES, flagcdn URLs)
 │   └── constants.js         # FAVORITE_LIMIT, MAX_AVATAR_SIZE_*, PASSWORD_RULES, isValidEmail
 ├── pages/
@@ -346,7 +346,7 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/authErrors.test.js` | Firebase Auth error-code → i18n key mapping. |
 | `tests/deleteAccount.test.js` | `/api/delete-account` gatekeeping — 405 / 503 fallback / 401 auth paths. |
 | `tests/sessionCache.test.js` | Generic LRU + TTL + inflight cache factory used by `HeaderSearch`. |
-| `tests/subscriberStore.test.js` | Factory behind Firestore listener consolidation — single underlying listener per key, fan-out to N subscribers, teardown on last leave. |
+| `tests/subscriberStore.test.js` | Factory behind Firestore listener consolidation — single underlying listener per key, fan-out to N subscribers, teardown on last leave, plus deep-equal fan-out skip (no re-render when snapshot is structurally identical). |
 | `tests/authStateStore.test.js` | Singleton `onAuthStateChanged` consolidation: one listener globally, fan-out to every `useAuth` consumer. |
 | `tests/anilistDedup.test.js` | Per-ID inflight dedup of the AniList batch fetcher — overlapping cold IDs across concurrent SSR calls only hit AniList once per ID. |
 | `tests/mymemoryDedup.test.js` | MyMemory translation dedup keyed by `(text, lang)` — concurrent identical translations share one request. |
@@ -375,6 +375,7 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/notifications.test.js` | `computeNotifications` + `baselineSeenEpisodes` — airing today/tomorrow, new-episode delta, finished bingeable, sequel announced, dismissedIds filtering, read marking, kind-priority sort. |
 | `tests/text.test.js` | `truncateText` (word-boundary ellipsis, source-line stripping, whitespace collapse) + `firstSentence` (`.`/`!`/`?` cut + 90-char fallback). |
 | `tests/voiceRoles.test.js` | `yearOfVoiceRole` (anime.year → aired.from fallback) + `sortVoiceRolesByPopularity` (favourites desc → popularity asc → year desc) — voice actor role ranking. |
+| `tests/pwaPlatform.test.js` | `detectPwaPlatform(ua)` — UA string → `{ isIos, isAndroid, isMobile }` covering iPhone, iPad, Android, Linux Firefox, macOS Safari, empty, null. |
 
 ### Adding tests
 
