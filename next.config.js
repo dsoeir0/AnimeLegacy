@@ -3,6 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
+    deviceSizes: [640, 828, 1080, 1920],
+    imageSizes: [48, 96, 200, 384],
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       { protocol: 'https', hostname: 'myanimelist.net' },
       { protocol: 'https', hostname: 'cdn.myanimelist.net' },
