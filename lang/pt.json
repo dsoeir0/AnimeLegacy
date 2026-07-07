@@ -918,7 +918,18 @@
     "mobileLikesCount": "{n} curtidas",
     "mobileFansCount": "{n} fãs",
     "mobileTopTitle": "Mais Curtidos",
-    "mobileResultsCount": "{n} resultados"
+    "mobileResultsCount": "{n} resultados",
+    "heroEyebrow": "EM DESTAQUE · PERSONAGEM DO MÊS",
+    "heroFrom": "de {title}",
+    "heroStatEpisodes": "EPISÓDIOS",
+    "heroStatRole": "PAPEL",
+    "heroStatRanking": "RANKING",
+    "heroRoleMain": "Principal",
+    "heroRoleSupporting": "Secundário",
+    "searchPlaceholder": "Pesquisar personagens, anime, ator de voz…",
+    "voiceLabel": "VOZ · JP",
+    "noResultsTitle": "Nenhum personagem corresponde",
+    "noResultsBody": "Tenta uma pesquisa diferente ou limpa o filtro."
   },
   "voices": {
     "metaTitle": "AnimeLegacy · Atores de voz",

@@ -1,0 +1,130 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--dur-2) var(--ease-out);
+}
+
+.card:hover .posterWrap {
+  border-color: var(--al-border-strong);
+}
+
+.posterWrap {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--al-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--al-ink-3);
+  transition: border-color var(--dur-2) var(--ease-standard);
+}
+
+.poster {
+  object-fit: cover;
+}
+
+.gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--al-ink-0) 80%, transparent) 100%);
+  pointer-events: none;
+}
+
+.roleBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.roleBadgeMain {
+  background: var(--al-primary-gradient);
+  color: var(--al-ink-0);
+}
+
+.roleBadgeSupporting {
+  background: color-mix(in srgb, var(--al-white) 12%, transparent);
+  color: var(--al-fg-1);
+  border: 1px solid color-mix(in srgb, var(--al-white) 18%, transparent);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 4px 4px;
+  min-width: 0;
+  min-height: 92px;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--al-fg-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anime {
+  font-size: 12px;
+  color: var(--al-fg-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.voiceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--al-border-subtle);
+  min-width: 0;
+}
+
+.voiceAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.voiceAvatarFallback {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--al-ink-3);
+  flex-shrink: 0;
+}
+
+.voiceMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.voiceLabel {
+  font-family: var(--font-display);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--al-fg-3);
+  text-transform: uppercase;
+}
+
+.voiceName {
+  font-size: 11px;
+  color: var(--al-fg-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

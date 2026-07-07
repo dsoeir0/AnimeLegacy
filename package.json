@@ -13,6 +13,7 @@
     "seed:firestore": "node scripts/seed-firestore.js",
     "gen-trans": "node scripts/generate-translations.cjs",
     "gen-icons": "node scripts/gen-pwa-icons.cjs",
+    "gen-char-enrichment": "node scripts/gen-character-enrichment.cjs",
     "test": "firebase emulators:exec --only firestore --project=demo-animelegacy \"vitest run\"",
     "test:watch": "firebase emulators:exec --only firestore --project=demo-animelegacy \"vitest\""
   },

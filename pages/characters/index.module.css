@@ -1,51 +1,9 @@
 .page {
-  padding: 40px 48px 80px;
+  padding: 0 48px 80px;
 }
 
 @media (max-width: 768px) {
   .page { display: none; }
-}
-
-.head {
-  margin-bottom: 32px;
-  padding-bottom: 28px;
-  border-bottom: 1px solid var(--al-border);
-}
-
-.eyebrow {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-weight: 600;
-  font-size: 11px;
-  color: var(--al-fg-2);
-  margin-bottom: 12px;
-}
-
-.heading {
-  margin: 0 0 8px;
-  font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 52px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.04;
-  color: var(--al-fg-1);
-}
-
-.highlight {
-  background: var(--al-primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: var(--al-fg-2);
-  line-height: 1.55;
-  margin: 0;
-  max-width: 560px;
 }
 
 .empty {
@@ -69,101 +27,56 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 18px;
 }
 
-.card {
+.skeletonCard {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  text-decoration: none;
-  color: inherit;
-  transition: transform var(--dur-2) var(--ease-standard);
+  gap: 8px;
 }
 
-.card:hover {
-  transform: translateY(-3px);
-}
-
-.posterWrap {
-  position: relative;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
+.skeletonPoster {
+  aspect-ratio: 2 / 3;
   border-radius: 14px;
-  border: 1px solid var(--al-border);
-  background: var(--al-ink-3);
-  transition: border-color var(--dur-2) var(--ease-standard);
+  background: linear-gradient(
+    90deg,
+    var(--al-ink-3) 0%,
+    var(--al-ink-4) 50%,
+    var(--al-ink-3) 100%
+  );
+  background-size: 800px 100%;
+  animation: al-shimmer 1.6s linear infinite;
 }
 
-.card:hover .posterWrap {
-  border-color: var(--al-border-strong);
+.skeletonLine {
+  height: 14px;
+  width: 70%;
+  border-radius: 4px;
+  margin-top: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--al-ink-3) 0%,
+    var(--al-ink-4) 50%,
+    var(--al-ink-3) 100%
+  );
+  background-size: 800px 100%;
+  animation: al-shimmer 1.6s linear infinite;
 }
 
-.poster {
-  object-fit: cover;
-}
-
-.posterGradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.75) 100%);
-  pointer-events: none;
-}
-
-.favBadge {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(6, 7, 9, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--al-border-strong);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.favNum {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--al-warm-ink);
-}
-
-.favLabel {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 9px;
-  color: var(--al-fg-3);
-  font-weight: 600;
-}
-
-.meta {
-  padding: 0 2px;
-}
-
-.name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--al-fg-1);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.3;
-}
-
-.kanji {
-  font-family: var(--font-display);
-  font-size: 12px;
-  color: var(--al-fg-3);
-  margin-top: 3px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.skeletonLineShort {
+  height: 10px;
+  width: 45%;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--al-ink-3) 0%,
+    var(--al-ink-4) 50%,
+    var(--al-ink-3) 100%
+  );
+  background-size: 800px 100%;
+  animation: al-shimmer 1.6s linear infinite;
 }
 
 .pagination {
@@ -191,13 +104,13 @@
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--al-white) 5%, transparent);
   color: var(--al-fg-1);
 }
 
 .pageBtnActive {
-  background: rgba(132, 217, 255, 0.12);
-  border-color: rgba(132, 217, 255, 0.3);
+  background: color-mix(in srgb, var(--al-primary-2) 12%, transparent);
+  border-color: color-mix(in srgb, var(--al-primary-2) 30%, transparent);
   color: var(--al-primary-ink);
 }
 

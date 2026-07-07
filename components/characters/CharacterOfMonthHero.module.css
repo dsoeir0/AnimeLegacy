@@ -1,0 +1,136 @@
+.hero {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 0;
+  min-height: 500px;
+  background: var(--al-ink-1);
+  text-decoration: none;
+  color: inherit;
+  margin: 0 0 32px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--al-border-subtle);
+}
+
+.posterCol {
+  position: relative;
+  min-height: 500px;
+  background: var(--al-ink-2);
+  overflow: hidden;
+}
+
+.posterImg {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.posterFade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 60%,
+    color-mix(in srgb, var(--al-ink-1) 35%, transparent) 78%,
+    color-mix(in srgb, var(--al-ink-1) 80%, transparent) 92%,
+    var(--al-ink-1) 100%
+  );
+  pointer-events: none;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px 48px 40px 24px;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--al-fg-3);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--al-fg-1);
+}
+
+.from {
+  font-size: 14px;
+  color: var(--al-fg-2);
+  margin: 0;
+}
+
+.quote {
+  margin: 8px 0 4px;
+  padding: 14px 18px;
+  border-left: 2px solid var(--al-warm);
+  background: color-mix(in srgb, var(--al-ink-3) 50%, transparent);
+  border-radius: 0 10px 10px 0;
+}
+
+.quoteText {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--al-fg-2);
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  margin-top: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--al-border-subtle);
+}
+
+.statCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.statLabel {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--al-fg-3);
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--al-fg-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statValueAccent {
+  color: var(--al-warm);
+}
+
+@media (max-width: 768px) {
+  .hero {
+    display: none;
+  }
+}

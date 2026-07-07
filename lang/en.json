@@ -918,7 +918,18 @@
     "mobileLikesCount": "{n} likes",
     "mobileFansCount": "{n} fans",
     "mobileTopTitle": "Most loved",
-    "mobileResultsCount": "{n} results"
+    "mobileResultsCount": "{n} results",
+    "heroEyebrow": "IN FOCUS · CHARACTER OF THE MONTH",
+    "heroFrom": "from {title}",
+    "heroStatEpisodes": "EPISODES",
+    "heroStatRole": "ROLE",
+    "heroStatRanking": "RANKING",
+    "heroRoleMain": "Main",
+    "heroRoleSupporting": "Supporting",
+    "searchPlaceholder": "Search characters, anime, voice actor…",
+    "voiceLabel": "VOICE · JP",
+    "noResultsTitle": "No characters match",
+    "noResultsBody": "Try a different search or clear the filter."
   },
   "voices": {
     "metaTitle": "AnimeLegacy · Voice actors",

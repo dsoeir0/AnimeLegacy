@@ -18,7 +18,7 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 - **Ratings & reviews** — rate 1–5 stars (half-star precision) and write freeform reviews. Split into two focused modals so rating is a 2-second action and review is a dedicated writing surface. Restricted to `watching` / `completed` / `on_hold` / `dropped` statuses.
 - **Favorites** — curate up to 10 favourites in each of four buckets (anime, characters, voice actors, studios), featured on your profile.
 - **MyAnimeList import** — paste your MAL username and pull your full list (every status, progress, score) plus favourite anime and favourite characters in one step. Skip-silent merge leaves existing entries intact, and the 10-per-category favourite cap is honoured.
-- **Character & voice actor pages** — biographies, appearances, and cross-linked cast.
+- **Character & voice actor pages** — biographies, appearances, and cross-linked cast. The desktop `/characters` index features a "Character of the month" hero card on top, deterministically rotated from the top-25 by Jikan favourites (`(year*12+month) % 25`) with quote, source-anime episode count, role and Jikan ranking.
 - **Studios index & detail** — every producer from Jikan, filtered down to actual animation studios only (Jikan lumps animators, financiers and licensors together; a client-side sweep classifies by role). Each studio has a dedicated detail page with a filmography timeline grouped by year, KPI strip, genre-mix breakdown, score histogram, upcoming releases, and related studios.
 - **Discover page** (`/search`) — dual-mode. With no query: editorial feature (top-rated primary + two under-the-radar secondary), 6 curated mood collections, an experimental **Vibe Finder** with pace/tone/length sliders that rank anime by Euclidean distance on a genre-derived coord space, hidden-gem cards (score ≥ 8 but less watched), and a clickable genre rail with real Jikan counts. With a query/genre/mood filter: standard search results grid with removable filter chips.
 - **Profile** — live stats (episodes watched, days spent, mean score), top genres, seasonal progress, and activity feed.
@@ -123,7 +123,7 @@ AnimeLegacy/
 │   ├── auth/                # AuthShell, AuthPage, EmailAuthForm, GoogleAuthButton, ProfileCompletionModal
 │   ├── calendar/            # CalendarCell — single (day × hour) slot entry; MobileCalendar
 │   ├── cards/               # PosterCard, DetailedCard, HorizontalRow
-│   ├── characters/          # MobileCharacters (index 3-col grid), MobileCharacterDetail (hero + KPIs + appearances + voices + bio)
+│   ├── characters/          # CharacterOfMonthHero (desktop /characters monthly featured card), MobileCharacters (index 3-col grid), MobileCharacterDetail (hero + KPIs + appearances + voices + bio)
 │   ├── collections/         # MobileCollections (shell with Coming Soon)
 │   ├── discover/            # EditorialFeature, MoodGrid, VibeFinder, HiddenGems, GenreRail, BecauseYouLiked, SurpriseMe, AiringThisWeek, FilterBanner
 │   ├── home/                # MobileHome (hero carousel + airing strip + highlights)
@@ -142,7 +142,7 @@ AnimeLegacy/
 ├── lib/
 │   ├── firebase/            # client.js + admin.js + authStateStore, userProfileStore, userListStore, notificationStateStore (lastReadAt + dismissedIds + seenEpisodes) — subscriber stores for listener consolidation + createSubscriberStore factory
 │   ├── services/            # _cache.js (TTL+inflight), jikan.js, anilist.js (per-ID inflight, includes score/popularity/favourites/year), mymemory.js (translation), userProfile, userAnime, animeCatalog, userList, favoriteCharacters/Voices/Studios, favoriteOrder (shared batch personalRank writer), categorySearch (4-section parallel fetch shared by HeaderSearch desktop + MobileSearch)
-│   ├── utils/               # anime, season, media, time, cardShape, synopsis, text (truncateText/firstSentence), listTransitions, profileActivity, profileStats, heatmap, rating, reorder, debounce, reviewsView, rateLimit, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay (userInitials + nameInitials), chunk, notifications (compute logic for airing/finished/newEpisode/sequel), voiceRoles (year + sortVoiceRolesByPopularity), pwaPlatform (UA → isIos/isAndroid/isMobile, pure)
+│   ├── utils/               # anime, season, media, time, cardShape, synopsis, text (truncateText/firstSentence), listTransitions, profileActivity, profileStats, heatmap, rating, reorder, debounce, reviewsView, rateLimit, authErrors, discoverPayload, discoverFilter, discoverRecs, vibeFinder, studio, studioAccent, studioStats, calendarSchedule, charLocalize, malImport, airingThisWeek, seasonHero, sessionCache, router, userDisplay (userInitials + nameInitials), chunk, notifications (compute logic for airing/finished/newEpisode/sequel + optimistic-state helpers consumed by useNotifications), voiceRoles (year + sortVoiceRolesByPopularity), pwaPlatform (UA → isIos/isAndroid/isMobile, pure), characterOfMonth (deterministic monthly pick + role tiebreaker)
 │   ├── constants/           # flags.js (SUPPORTED_LANGUAGES, flagcdn URLs)
 │   └── constants.js         # FAVORITE_LIMIT, MAX_AVATAR_SIZE_*, PASSWORD_RULES, isValidEmail
 ├── pages/
@@ -376,6 +376,8 @@ Both commands wrap the run with `firebase emulators:exec`, which starts a throwa
 | `tests/text.test.js` | `truncateText` (word-boundary ellipsis, source-line stripping, whitespace collapse) + `firstSentence` (`.`/`!`/`?` cut + 90-char fallback). |
 | `tests/voiceRoles.test.js` | `yearOfVoiceRole` (anime.year → aired.from fallback) + `sortVoiceRolesByPopularity` (favourites desc → popularity asc → year desc) — voice actor role ranking. |
 | `tests/pwaPlatform.test.js` | `detectPwaPlatform(ua)` — UA string → `{ isIos, isAndroid, isMobile }` covering iPhone, iPad, Android, Linux Firefox, macOS Safari, empty, null. |
+| `tests/characterOfMonth.test.js` | `pickCharacterOfMonth(pool, now)` deterministic per `(year*12+month) % pool.length` (empty pool, monthly rollover, full 30-month cycle, wrap-around for short pools) + `pickPrincipalRole` Main vs Supporting tiebreak. |
+| `tests/notificationStateStore.test.js` | Firestore integration tests for `markAllReadIn` / `dismissNotificationsIn` / `setSeenEpisodesIn` — timestamp + merge semantics, arrayUnion dedup, seenEpisodes merge without overwriting other anime entries. |
 
 ### Adding tests
 

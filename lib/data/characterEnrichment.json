@@ -1,0 +1,1052 @@
+{
+  "1": {
+    "mal_id": 1,
+    "name": "Spike Spiegel",
+    "name_kanji": "スパイク・スピーゲル",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/516853.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/516853.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/11/516853t.webp"
+      }
+    },
+    "favorites": 48993,
+    "role": "Main",
+    "animeTitle": "Cowboy Bebop",
+    "voiceActor": {
+      "name": "Yamadera, Kouichi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/73614.jpg"
+    }
+  },
+  "5": {
+    "mal_id": 5,
+    "name": "Ichigo Kurosaki",
+    "name_kanji": "黒崎 一護",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/512788.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/512788.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/3/512788t.webp"
+      }
+    },
+    "favorites": 36840,
+    "role": "Main",
+    "animeTitle": "Bleach",
+    "voiceActor": {
+      "name": "Morita, Masakazu",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/65561.jpg"
+    }
+  },
+  "11": {
+    "mal_id": 11,
+    "name": "Edward Elric",
+    "name_kanji": "エドワード・エルリック",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/72533.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/72533.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/72533t.webp"
+      }
+    },
+    "favorites": 91166,
+    "role": "Main",
+    "animeTitle": "Fullmetal Alchemist",
+    "voiceActor": {
+      "name": "Park, Romi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/54602.jpg"
+    }
+  },
+  "13": {
+    "mal_id": 13,
+    "name": "Sasuke Uchiha",
+    "name_kanji": "うちは サスケ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/131317.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/131317.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/131317t.webp"
+      }
+    },
+    "favorites": 30181,
+    "role": "Main",
+    "animeTitle": "Naruto",
+    "voiceActor": {
+      "name": "Sugiyama, Noriaki",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/73289.jpg"
+    }
+  },
+  "14": {
+    "mal_id": 14,
+    "name": "Itachi Uchiha",
+    "name_kanji": "うちは イタチ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/284122.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/284122.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/284122t.webp"
+      }
+    },
+    "favorites": 67593,
+    "role": "Main",
+    "animeTitle": "Naruto: Shippuuden - Sunny Side Battle",
+    "voiceActor": {
+      "name": "Ishikawa, Hideo",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/56721.jpg"
+    }
+  },
+  "17": {
+    "mal_id": 17,
+    "name": "Naruto Uzumaki",
+    "name_kanji": "うずまき ナルト",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/284121.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/284121.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/2/284121t.webp"
+      }
+    },
+    "favorites": 87554,
+    "role": "Main",
+    "animeTitle": "Naruto",
+    "voiceActor": {
+      "name": "Takeuchi, Junko",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/54677.jpg"
+    }
+  },
+  "27": {
+    "mal_id": 27,
+    "name": "Killua Zoldyck",
+    "name_kanji": "キルア・ゾルディック",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/327920.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/327920.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/2/327920t.webp"
+      }
+    },
+    "favorites": 101117,
+    "role": "Main",
+    "animeTitle": "Hunter x Hunter",
+    "voiceActor": {
+      "name": "Mitsuhashi, Kanako",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/68826.jpg"
+    }
+  },
+  "31": {
+    "mal_id": 31,
+    "name": "Hisoka Morow",
+    "name_kanji": "ヒソカ・モロウ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/174561.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/174561.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/3/174561t.webp"
+      }
+    },
+    "favorites": 35468,
+    "role": "Supporting",
+    "animeTitle": "Hunter x Hunter",
+    "voiceActor": {
+      "name": "Takahashi, Hiroki",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/89435.jpg"
+    }
+  },
+  "40": {
+    "mal_id": 40,
+    "name": "Luffy Monkey D.",
+    "name_kanji": "モンキー・D・ルフィ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/310307.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/310307.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/310307t.webp"
+      }
+    },
+    "favorites": 148756,
+    "role": "Main",
+    "animeTitle": "One Piece",
+    "voiceActor": {
+      "name": "Tanaka, Mayumi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/73373.jpg"
+    }
+  },
+  "62": {
+    "mal_id": 62,
+    "name": "Zoro Roronoa",
+    "name_kanji": "ロロノア・ゾロ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/100534.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/100534.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/3/100534t.webp"
+      }
+    },
+    "favorites": 115879,
+    "role": "Main",
+    "animeTitle": "One Piece",
+    "voiceActor": {
+      "name": "Nakai, Kazuya",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/62866.jpg"
+    }
+  },
+  "68": {
+    "mal_id": 68,
+    "name": "Roy Mustang",
+    "name_kanji": "ロイ・マスタング",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/510227.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/510227.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/11/510227t.webp"
+      }
+    },
+    "favorites": 39401,
+    "role": "Main",
+    "animeTitle": "Fullmetal Alchemist: Brotherhood Specials",
+    "voiceActor": {
+      "name": "Miki, Shinichiro",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/70845.jpg"
+    }
+  },
+  "71": {
+    "mal_id": 71,
+    "name": "L Lawliet",
+    "name_kanji": "エル ローライト",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/10/249647.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/10/249647.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/10/249647t.webp"
+      }
+    },
+    "favorites": 131169,
+    "role": "Main",
+    "animeTitle": "Death Note",
+    "voiceActor": {
+      "name": "Yamaguchi, Kappei",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/74474.jpg"
+    }
+  },
+  "80": {
+    "mal_id": 80,
+    "name": "Light Yagami",
+    "name_kanji": "夜神 月",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/6/63870.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/6/63870.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/6/63870t.webp"
+      }
+    },
+    "favorites": 99596,
+    "role": "Main",
+    "animeTitle": "Death Note",
+    "voiceActor": {
+      "name": "Miyano, Mamoru",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/66414.jpg"
+    }
+  },
+  "85": {
+    "mal_id": 85,
+    "name": "Kakashi Hatake",
+    "name_kanji": "はたけ カカシ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/284129.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/284129.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/7/284129t.webp"
+      }
+    },
+    "favorites": 49052,
+    "role": "Main",
+    "animeTitle": "Naruto",
+    "voiceActor": {
+      "name": "Inoue, Kazuhiko",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/68015.jpg"
+    }
+  },
+  "94": {
+    "mal_id": 94,
+    "name": "Asuka Langley Souryuu",
+    "name_kanji": "惣流・アスカ・ラングレー",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/12/79465.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/12/79465.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/12/79465t.webp"
+      }
+    },
+    "favorites": 30784,
+    "role": "Main",
+    "animeTitle": "Shinseiki Evangelion",
+    "voiceActor": {
+      "name": "Miyamura, Yuuko",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/79174.jpg"
+    }
+  },
+  "246": {
+    "mal_id": 246,
+    "name": "Gokuu Son",
+    "name_kanji": "孫 悟空",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/72546.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/72546.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/15/72546t.webp"
+      }
+    },
+    "favorites": 30479,
+    "role": "Main",
+    "animeTitle": "Dragon Ball",
+    "voiceActor": {
+      "name": "Nozawa, Masako",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/77340.jpg"
+    }
+  },
+  "305": {
+    "mal_id": 305,
+    "name": "Sanji",
+    "name_kanji": "サンジ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/5/136769.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/5/136769.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/5/136769t.webp"
+      }
+    },
+    "favorites": 33231,
+    "role": "Main",
+    "animeTitle": "One Piece",
+    "voiceActor": {
+      "name": "Hirata, Hiroaki",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/58150.jpg"
+    }
+  },
+  "417": {
+    "mal_id": 417,
+    "name": "Lelouch Lamperouge",
+    "name_kanji": "ルルーシュ・ランペルージ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/8/406163.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/8/406163.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/8/406163t.webp"
+      }
+    },
+    "favorites": 179339,
+    "role": "Main",
+    "animeTitle": "Code Geass: Hangyaku no Lelouch",
+    "voiceActor": {
+      "name": "Fukuyama, Jun",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/82978.jpg"
+    }
+  },
+  "422": {
+    "mal_id": 422,
+    "name": "Guts",
+    "name_kanji": "ガッツ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/13/284125.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/13/284125.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/13/284125t.webp"
+      }
+    },
+    "favorites": 86022,
+    "role": "Main",
+    "animeTitle": "Kenpuu Denki Berserk",
+    "voiceActor": {
+      "name": "Canna, Nobutoshi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/17561.jpg"
+    }
+  },
+  "434": {
+    "mal_id": 434,
+    "name": "Eikichi Onizuka",
+    "name_kanji": "鬼塚 英吉",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/8/241475.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/8/241475.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/8/241475t.webp"
+      }
+    },
+    "favorites": 33746,
+    "role": "Main",
+    "animeTitle": "Great Teacher Onizuka",
+    "voiceActor": {
+      "name": "Takagi, Wataru",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/66813.jpg"
+    }
+  },
+  "497": {
+    "mal_id": 497,
+    "name": "Saber",
+    "name_kanji": "セイバー",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/6/275276.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/6/275276.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/6/275276t.webp"
+      }
+    },
+    "favorites": 33417,
+    "role": "Main",
+    "animeTitle": "Fate/stay night",
+    "voiceActor": {
+      "name": "Kawasumi, Ayako",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/69419.jpg"
+    }
+  },
+  "672": {
+    "mal_id": 672,
+    "name": "Gintoki Sakata",
+    "name_kanji": "坂田 銀時",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/241479.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/241479.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/15/241479t.webp"
+      }
+    },
+    "favorites": 76526,
+    "role": "Main",
+    "animeTitle": "Gintama",
+    "voiceActor": {
+      "name": "Sugita, Tomokazu",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/81054.jpg"
+    }
+  },
+  "2075": {
+    "mal_id": 2075,
+    "name": "Kamina",
+    "name_kanji": "カミナ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/83946.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/83946.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/7/83946t.webp"
+      }
+    },
+    "favorites": 34734,
+    "role": "Main",
+    "animeTitle": "Tengen Toppa Gurren Lagann",
+    "voiceActor": {
+      "name": "Konishi, Katsuyuki",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/69727.jpg"
+    }
+  },
+  "6356": {
+    "mal_id": 6356,
+    "name": "Joseph Joestar",
+    "name_kanji": "ジョセフ・ジョースター",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/316615.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/316615.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/7/316615t.webp"
+      }
+    },
+    "favorites": 43986,
+    "role": "Main",
+    "animeTitle": "JoJo no Kimyou na Bouken: Adventure",
+    "voiceActor": {
+      "name": "Sugita, Tomokazu",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/81054.jpg"
+    }
+  },
+  "10138": {
+    "mal_id": 10138,
+    "name": "Thorfinn",
+    "name_kanji": "トルフィン",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/309871.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/309871.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/309871t.webp"
+      }
+    },
+    "favorites": 35379,
+    "role": "Main",
+    "animeTitle": "Vinland Saga",
+    "voiceActor": {
+      "name": "Uemura, Yuuto",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/87350.jpg"
+    }
+  },
+  "12064": {
+    "mal_id": 12064,
+    "name": "Taiga Aisaka",
+    "name_kanji": "逢坂 大河",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/514086.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/514086.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/11/514086t.webp"
+      }
+    },
+    "favorites": 31883,
+    "role": "Main",
+    "animeTitle": "Toradora!",
+    "voiceActor": {
+      "name": "Kugimiya, Rie",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/63374.jpg"
+    }
+  },
+  "13020": {
+    "mal_id": 13020,
+    "name": "Askeladd",
+    "name_kanji": "アシェラッド",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/14/401940.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/14/401940.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/14/401940t.webp"
+      }
+    },
+    "favorites": 30222,
+    "role": "Main",
+    "animeTitle": "Vinland Saga",
+    "voiceActor": {
+      "name": "Uchida, Naoya",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/83452.jpg"
+    }
+  },
+  "22036": {
+    "mal_id": 22036,
+    "name": "Koyomi Araragi",
+    "name_kanji": "阿良々木 暦",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/16/559456.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/16/559456.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/16/559456t.webp"
+      }
+    },
+    "favorites": 30516,
+    "role": "Main",
+    "animeTitle": "Bakemonogatari",
+    "voiceActor": {
+      "name": "Kamiya, Hiroshi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/66163.jpg"
+    }
+  },
+  "22037": {
+    "mal_id": 22037,
+    "name": "Hitagi Senjougahara",
+    "name_kanji": "戦場ヶ原 ひたぎ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/287902.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/287902.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/11/287902t.webp"
+      }
+    },
+    "favorites": 41289,
+    "role": "Main",
+    "animeTitle": "Bakemonogatari",
+    "voiceActor": {
+      "name": "Saitou, Chiwa",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/79603.jpg"
+    }
+  },
+  "23602": {
+    "mal_id": 23602,
+    "name": "Shinobu Oshino",
+    "name_kanji": "忍野 忍",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/16/234167.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/16/234167.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/16/234167t.webp"
+      }
+    },
+    "favorites": 33337,
+    "role": "Main",
+    "animeTitle": "Kizumonogatari I: Tekketsu-hen",
+    "voiceActor": {
+      "name": "Sakamoto, Maaya",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/65911.jpg"
+    }
+  },
+  "34470": {
+    "mal_id": 34470,
+    "name": "Kurisu Makise",
+    "name_kanji": "牧瀬 紅莉栖",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/12/492885.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/12/492885.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/12/492885t.webp"
+      }
+    },
+    "favorites": 68844,
+    "role": "Main",
+    "animeTitle": "Steins;Gate",
+    "voiceActor": {
+      "name": "Imai, Asami",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/68014.jpg"
+    }
+  },
+  "35252": {
+    "mal_id": 35252,
+    "name": "Rintarou Okabe",
+    "name_kanji": "岡部 倫太郎",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/6/122643.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/6/122643.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/6/122643t.webp"
+      }
+    },
+    "favorites": 99838,
+    "role": "Main",
+    "animeTitle": "Steins;Gate",
+    "voiceActor": {
+      "name": "Miyano, Mamoru",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/66414.jpg"
+    }
+  },
+  "36765": {
+    "mal_id": 36765,
+    "name": "Kazuto Kirigaya",
+    "name_kanji": "桐ヶ谷 和人",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/204821.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/204821.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/7/204821t.webp"
+      }
+    },
+    "favorites": 40773,
+    "role": "Main",
+    "animeTitle": "Sword Art Online",
+    "voiceActor": {
+      "name": "Matsuoka, Yoshitsugu",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/87038.jpg"
+    }
+  },
+  "40881": {
+    "mal_id": 40881,
+    "name": "Mikasa Ackerman",
+    "name_kanji": "ミカサ・アッカーマン",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/215563.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/215563.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/215563t.webp"
+      }
+    },
+    "favorites": 56895,
+    "role": "Main",
+    "animeTitle": "Shingeki no Kyojin",
+    "voiceActor": {
+      "name": "Ishikawa, Yui",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/69967.jpg"
+    }
+  },
+  "40882": {
+    "mal_id": 40882,
+    "name": "Eren Yeager",
+    "name_kanji": "エレン・イェーガー",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/10/216895.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/10/216895.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/10/216895t.webp"
+      }
+    },
+    "favorites": 74536,
+    "role": "Main",
+    "animeTitle": "Shingeki no Kyojin",
+    "voiceActor": {
+      "name": "Kaji, Yuuki",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/89058.jpg"
+    }
+  },
+  "45627": {
+    "mal_id": 45627,
+    "name": "Levi",
+    "name_kanji": "リヴァイ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/241413.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/241413.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/2/241413t.webp"
+      }
+    },
+    "favorites": 146167,
+    "role": "Main",
+    "animeTitle": "Shingeki no Kyojin: Kuinaki Sentaku",
+    "voiceActor": {
+      "name": "Kamiya, Hiroshi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/66163.jpg"
+    }
+  },
+  "67065": {
+    "mal_id": 67065,
+    "name": "Hachiman Hikigaya",
+    "name_kanji": "比企谷 八幡",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/4/203555.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/4/203555.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/4/203555t.webp"
+      }
+    },
+    "favorites": 53386,
+    "role": "Main",
+    "animeTitle": "Yahari Ore no Seishun Love Comedy wa Machigatteiru.",
+    "voiceActor": {
+      "name": "Eguchi, Takuya",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/67736.jpg"
+    }
+  },
+  "73935": {
+    "mal_id": 73935,
+    "name": "Saitama",
+    "name_kanji": "サイタマ",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/294388.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/11/294388.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/11/294388t.webp"
+      }
+    },
+    "favorites": 48070,
+    "role": "Main",
+    "animeTitle": "One Punch Man",
+    "voiceActor": {
+      "name": "Furukawa, Makoto",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/74503.jpg"
+    }
+  },
+  "84677": {
+    "mal_id": 84677,
+    "name": "Yato",
+    "name_kanji": "夜ト",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/328158.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/3/328158.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/3/328158t.webp"
+      }
+    },
+    "favorites": 39515,
+    "role": "Main",
+    "animeTitle": "Noragami",
+    "voiceActor": {
+      "name": "Kamiya, Hiroshi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/66163.jpg"
+    }
+  },
+  "87275": {
+    "mal_id": 87275,
+    "name": "Ken Kaneki",
+    "name_kanji": "金木 研",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/307255.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/307255.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/15/307255t.webp"
+      }
+    },
+    "favorites": 55103,
+    "role": "Main",
+    "animeTitle": "Tokyo Ghoul",
+    "voiceActor": {
+      "name": "Hanae, Natsuki",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/85088.jpg"
+    }
+  },
+  "109931": {
+    "mal_id": 109931,
+    "name": "Arataka Reigen",
+    "name_kanji": "霊幻 新隆",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/16/308364.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/16/308364.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/16/308364t.webp"
+      }
+    },
+    "favorites": 42011,
+    "role": "Main",
+    "animeTitle": "Mob Psycho 100",
+    "voiceActor": {
+      "name": "Sakurai, Takahiro",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/85504.jpg"
+    }
+  },
+  "117225": {
+    "mal_id": 117225,
+    "name": "Megumin",
+    "name_kanji": "めぐみん",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/14/349249.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/14/349249.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/14/349249t.webp"
+      }
+    },
+    "favorites": 42231,
+    "role": "Main",
+    "animeTitle": "Kono Subarashii Sekai ni Shukufuku wo!",
+    "voiceActor": {
+      "name": "Takahashi, Rie",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/86541.jpg"
+    }
+  },
+  "118739": {
+    "mal_id": 118739,
+    "name": "Mai Sakurajima",
+    "name_kanji": "桜島 麻衣",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/366639.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/2/366639.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/2/366639t.webp"
+      }
+    },
+    "favorites": 40263,
+    "role": "Main",
+    "animeTitle": "Seishun Buta Yarou wa Bunny Girl Senpai no Yume wo Minai",
+    "voiceActor": {
+      "name": "Seto, Asami",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/65839.jpg"
+    }
+  },
+  "118763": {
+    "mal_id": 118763,
+    "name": "Rem",
+    "name_kanji": "レム",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/311327.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/311327.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/311327t.webp"
+      }
+    },
+    "favorites": 47124,
+    "role": "Main",
+    "animeTitle": "Re:Zero kara Hajimeru Isekai Seikatsu - Memory Snow - Manner Movie",
+    "voiceActor": {
+      "name": "Minase, Inori",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/74704.jpg"
+    }
+  },
+  "125056": {
+    "mal_id": 125056,
+    "name": "Osamu Dazai",
+    "name_kanji": "太宰 治",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/5/307236.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/5/307236.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/5/307236t.webp"
+      }
+    },
+    "favorites": 36350,
+    "role": "Main",
+    "animeTitle": "Bungou Stray Dogs",
+    "voiceActor": {
+      "name": "Miyano, Mamoru",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/66414.jpg"
+    }
+  },
+  "128909": {
+    "mal_id": 128909,
+    "name": "Kiyotaka Ayanokouji",
+    "name_kanji": "綾小路 清隆",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/4/539058.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/4/539058.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/4/539058t.webp"
+      }
+    },
+    "favorites": 36550,
+    "role": "Main",
+    "animeTitle": "Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e PV",
+    "voiceActor": {
+      "name": "Chiba, Shouya",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/74244.jpg"
+    }
+  },
+  "141354": {
+    "mal_id": 141354,
+    "name": "Violet Evergarden",
+    "name_kanji": "ヴァイオレット・エヴァーガーデン",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/345616.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/9/345616.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/9/345616t.webp"
+      }
+    },
+    "favorites": 39409,
+    "role": "Main",
+    "animeTitle": "Violet Evergarden",
+    "voiceActor": {
+      "name": "Ishikawa, Yui",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/2/69967.jpg"
+    }
+  },
+  "155679": {
+    "mal_id": 155679,
+    "name": "Zero Two",
+    "name_kanji": "ゼロツー",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/14/559013.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/14/559013.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/14/559013t.webp"
+      }
+    },
+    "favorites": 37775,
+    "role": "Main",
+    "animeTitle": "Darling in the FranXX",
+    "voiceActor": {
+      "name": "Tomatsu, Haruka",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/76640.jpg"
+    }
+  },
+  "164471": {
+    "mal_id": 164471,
+    "name": "Satoru Gojou",
+    "name_kanji": "五条 悟",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/422168.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/15/422168.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/15/422168t.webp"
+      }
+    },
+    "favorites": 63953,
+    "role": "Main",
+    "animeTitle": "Jujutsu Kaisen Official PVs",
+    "voiceActor": {
+      "name": "Nakamura, Yuuichi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/1/86727.jpg"
+    }
+  },
+  "184947": {
+    "mal_id": 184947,
+    "name": "Frieren",
+    "name_kanji": "フリーレン",
+    "images": {
+      "jpg": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/525105.jpg"
+      },
+      "webp": {
+        "image_url": "https://cdn.myanimelist.net/images/characters/7/525105.webp",
+        "small_image_url": "https://cdn.myanimelist.net/images/characters/7/525105t.webp"
+      }
+    },
+    "favorites": 31929,
+    "role": "Main",
+    "animeTitle": "Sousou no Frieren",
+    "voiceActor": {
+      "name": "Tanezaki, Atsumi",
+      "image": "https://cdn.myanimelist.net/images/voiceactors/3/77190.jpg"
+    }
+  }
+}

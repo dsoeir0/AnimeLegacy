@@ -918,7 +918,18 @@
     "mobileLikesCount": "{n} likes",
     "mobileFansCount": "{n} fans",
     "mobileTopTitle": "Les plus aimés",
-    "mobileResultsCount": "{n} résultats"
+    "mobileResultsCount": "{n} résultats",
+    "heroEyebrow": "EN VEDETTE · PERSONNAGE DU MOIS",
+    "heroFrom": "de {title}",
+    "heroStatEpisodes": "ÉPISODES",
+    "heroStatRole": "RÔLE",
+    "heroStatRanking": "CLASSEMENT",
+    "heroRoleMain": "Principal",
+    "heroRoleSupporting": "Secondaire",
+    "searchPlaceholder": "Rechercher personnages, anime, voix…",
+    "voiceLabel": "VOIX · JP",
+    "noResultsTitle": "Aucun personnage trouvé",
+    "noResultsBody": "Essaie une autre recherche ou efface le filtre."
   },
   "voices": {
     "metaTitle": "AnimeLegacy · Doubleurs",
