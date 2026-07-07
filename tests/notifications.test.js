@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   baselineSeenEpisodes,
+  buildSeenPatchFromNotifications,
   computeNotifications,
+  filterUnconfirmedDismissed,
+  mergeOptimisticState,
+  shouldClearOptimisticReadAt,
 } from '../lib/utils/notifications';
 
 const aMonday = new Date('2026-05-04T10:00:00');
@@ -169,5 +173,125 @@ describe('baselineSeenEpisodes', () => {
       { 101: 10 },
     );
     expect(patch).toEqual({});
+  });
+});
+
+describe('mergeOptimisticState', () => {
+  const baseState = {
+    lastReadAt: 1_000,
+    dismissedIds: ['airingToday:101:2026-05-04'],
+    seenEpisodes: { 101: 12 },
+  };
+
+  it('returns the input state unchanged when there is nothing optimistic', () => {
+    expect(mergeOptimisticState(baseState, [], null)).toBe(baseState);
+    expect(mergeOptimisticState(baseState, undefined, undefined)).toBe(baseState);
+  });
+
+  it('overrides only lastReadAt when optimisticReadAt is set', () => {
+    const merged = mergeOptimisticState(baseState, [], 5_000);
+    expect(merged.lastReadAt).toBe(5_000);
+    expect(merged.dismissedIds).toEqual(baseState.dismissedIds);
+    expect(merged.seenEpisodes).toBe(baseState.seenEpisodes);
+  });
+
+  it('appends optimistic dismissed ids without dropping server ones', () => {
+    const merged = mergeOptimisticState(baseState, ['finished:202'], null);
+    expect(merged.dismissedIds).toEqual([
+      'airingToday:101:2026-05-04',
+      'finished:202',
+    ]);
+    expect(merged.lastReadAt).toBe(1_000);
+  });
+
+  it('combines both optimistic flags in one merge', () => {
+    const merged = mergeOptimisticState(baseState, ['sequel:303:404'], 7_000);
+    expect(merged.lastReadAt).toBe(7_000);
+    expect(merged.dismissedIds).toEqual([
+      'airingToday:101:2026-05-04',
+      'sequel:303:404',
+    ]);
+  });
+
+  it('handles missing server fields gracefully', () => {
+    const merged = mergeOptimisticState({}, ['x'], 9_000);
+    expect(merged.lastReadAt).toBe(9_000);
+    expect(merged.dismissedIds).toEqual(['x']);
+  });
+
+  it('treats optimisticReadAt of 0 as a real value', () => {
+    const merged = mergeOptimisticState(baseState, [], 0);
+    expect(merged.lastReadAt).toBe(0);
+  });
+});
+
+describe('shouldClearOptimisticReadAt', () => {
+  it('returns false when there is no optimistic read', () => {
+    expect(shouldClearOptimisticReadAt(1_000, null)).toBe(false);
+    expect(shouldClearOptimisticReadAt(1_000, undefined)).toBe(false);
+  });
+
+  it('returns false when the server has no lastReadAt yet', () => {
+    expect(shouldClearOptimisticReadAt(null, 5_000)).toBe(false);
+    expect(shouldClearOptimisticReadAt(undefined, 5_000)).toBe(false);
+  });
+
+  it('returns true when the server caught up to the optimistic value', () => {
+    expect(shouldClearOptimisticReadAt(5_000, 5_000)).toBe(true);
+  });
+
+  it('returns true within the 2s clock-skew tolerance', () => {
+    expect(shouldClearOptimisticReadAt(4_500, 5_000)).toBe(true);
+    expect(shouldClearOptimisticReadAt(3_001, 5_000)).toBe(true);
+  });
+
+  it('returns false when the server timestamp is older than the skew window', () => {
+    expect(shouldClearOptimisticReadAt(2_000, 5_000)).toBe(false);
+  });
+});
+
+describe('filterUnconfirmedDismissed', () => {
+  it('returns the input list when there is nothing optimistic', () => {
+    const empty = [];
+    expect(filterUnconfirmedDismissed(empty, ['a', 'b'])).toBe(empty);
+  });
+
+  it('removes ids that the server already confirmed', () => {
+    expect(
+      filterUnconfirmedDismissed(['a', 'b', 'c'], ['b']),
+    ).toEqual(['a', 'c']);
+  });
+
+  it('keeps every id when none have been confirmed yet', () => {
+    expect(filterUnconfirmedDismissed(['a', 'b'], [])).toEqual(['a', 'b']);
+    expect(filterUnconfirmedDismissed(['a', 'b'], null)).toEqual(['a', 'b']);
+  });
+});
+
+describe('buildSeenPatchFromNotifications', () => {
+  it('extracts {malId: episodes} only for newEpisode entries', () => {
+    const notifications = [
+      { id: 'newEpisode:101:12', kind: 'newEpisode', malId: 101, extra: { episodes: 12 } },
+      { id: 'airingToday:202:2026-05-04', kind: 'airingToday', malId: 202 },
+      { id: 'newEpisode:303:8', kind: 'newEpisode', malId: 303, extra: { episodes: 8 } },
+    ];
+    expect(buildSeenPatchFromNotifications(notifications)).toEqual({
+      101: 12,
+      303: 8,
+    });
+  });
+
+  it('returns an empty object for non-arrays and empty input', () => {
+    expect(buildSeenPatchFromNotifications(null)).toEqual({});
+    expect(buildSeenPatchFromNotifications([])).toEqual({});
+  });
+
+  it('skips newEpisode notifications missing the episode count', () => {
+    expect(
+      buildSeenPatchFromNotifications([
+        { kind: 'newEpisode', malId: 101 },
+        { kind: 'newEpisode', malId: 102, extra: {} },
+      ]),
+    ).toEqual({});
   });
 });

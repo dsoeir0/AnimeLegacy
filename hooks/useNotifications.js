@@ -9,7 +9,11 @@ import {
 } from '../lib/firebase/notificationStateStore';
 import {
   baselineSeenEpisodes,
+  buildSeenPatchFromNotifications,
   computeNotifications,
+  filterUnconfirmedDismissed,
+  mergeOptimisticState,
+  shouldClearOptimisticReadAt,
 } from '../lib/utils/notifications';
 
 const EMPTY_STATE = { lastReadAt: null, dismissedIds: [], seenEpisodes: {} };
@@ -68,16 +72,14 @@ export default function useNotifications(uid) {
   }, [uid]);
 
   useEffect(() => {
-    if (optimisticReadAt === null) return;
-    if (Number.isFinite(state.lastReadAt) && state.lastReadAt >= optimisticReadAt - 2000) {
+    if (shouldClearOptimisticReadAt(state.lastReadAt, optimisticReadAt)) {
       setOptimisticReadAt(null);
     }
   }, [state.lastReadAt, optimisticReadAt]);
 
   useEffect(() => {
     if (optimisticDismissed.length === 0) return;
-    const serverIds = new Set(state.dismissedIds || []);
-    const remaining = optimisticDismissed.filter((id) => !serverIds.has(id));
+    const remaining = filterUnconfirmedDismissed(optimisticDismissed, state.dismissedIds);
     if (remaining.length !== optimisticDismissed.length) {
       setOptimisticDismissed(remaining);
     }
@@ -110,16 +112,10 @@ export default function useNotifications(uid) {
     }
   }, [uid, listEntries, state.seenEpisodes]);
 
-  const effectiveState = useMemo(() => {
-    if (optimisticDismissed.length === 0 && optimisticReadAt === null) return state;
-    return {
-      ...state,
-      lastReadAt: optimisticReadAt !== null ? optimisticReadAt : state.lastReadAt,
-      dismissedIds: optimisticDismissed.length
-        ? [...(state.dismissedIds || []), ...optimisticDismissed]
-        : state.dismissedIds,
-    };
-  }, [state, optimisticDismissed, optimisticReadAt]);
+  const effectiveState = useMemo(
+    () => mergeOptimisticState(state, optimisticDismissed, optimisticReadAt),
+    [state, optimisticDismissed, optimisticReadAt],
+  );
 
   const notifications = useMemo(
     () =>
@@ -150,12 +146,7 @@ export default function useNotifications(uid) {
     if (!uid) return Promise.resolve();
     const current = peekNotificationState(uid)?.seenEpisodes || state.seenEpisodes || {};
     const ids = notifications.map((n) => n.id);
-    const seenPatch = {};
-    for (const n of notifications) {
-      if (n.kind === 'newEpisode' && n.extra?.episodes != null) {
-        seenPatch[String(n.malId)] = Number(n.extra.episodes);
-      }
-    }
+    const seenPatch = buildSeenPatchFromNotifications(notifications);
     setOptimisticDismissed((prev) => [...prev, ...ids]);
     const rollback = () => {
       setOptimisticDismissed((prev) => prev.filter((id) => !ids.includes(id)));
