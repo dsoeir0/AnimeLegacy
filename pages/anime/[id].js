@@ -173,7 +173,7 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
         <div className={styles.hero}>
           <Image
             src={backdropUrl}
-            alt=""
+            alt={normalized.title || ''}
             fill
             sizes="100vw"
             className={`${styles.heroImage} ${hasLandscapeBanner ? '' : styles.heroImageBlurred}`}

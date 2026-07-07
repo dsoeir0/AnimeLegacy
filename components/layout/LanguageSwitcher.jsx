@@ -52,7 +52,7 @@ function LanguageSwitcher({ t }) {
       >
         <Image
           src={flags[currentLang]}
-          alt=""
+          alt={t(`lang.${currentLang}`)}
           width={20}
           height={14}
           className={styles.flag}
@@ -75,7 +75,7 @@ function LanguageSwitcher({ t }) {
               >
                 <Image
                   src={flags[code]}
-                  alt=""
+                  alt={t(`lang.${code}`)}
                   width={20}
                   height={14}
                   className={styles.flag}

@@ -116,7 +116,7 @@ function MobileStudios({ items, postersByStudio, totals, t }) {
                           {url ? (
                             <Image
                               src={url}
-                              alt=""
+                              alt={p.title || ''}
                               fill
                               sizes="44px"
                               loading="lazy"

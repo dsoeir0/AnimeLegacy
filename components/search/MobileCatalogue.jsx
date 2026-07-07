@@ -150,7 +150,7 @@ function MobileCatalogue({
             {getAnimeImageUrl(featured) ? (
               <Image
                 src={getAnimeImageUrl(featured)}
-                alt=""
+                alt={featured.title || ''}
                 fill
                 sizes="120px"
               />
@@ -232,7 +232,7 @@ function MobileCatalogue({
                     {cover ? (
                       <Image
                         src={cover}
-                        alt=""
+                        alt={anime.title || ''}
                         fill
                         sizes="(max-width: 768px) 33vw, 140px"
                       />

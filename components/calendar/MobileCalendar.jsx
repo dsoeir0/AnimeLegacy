@@ -198,7 +198,7 @@ function EpisodeRow({ item, localTime, inList, tz, t }) {
       className={`${styles.row} ${inList ? styles.rowInList : ''}`}
     >
       <span className={styles.rowCover}>
-        {cover ? <Image src={cover} alt="" fill sizes="52px" /> : null}
+        {cover ? <Image src={cover} alt={item?.title || ''} fill sizes="52px" /> : null}
       </span>
       <span className={styles.rowBody}>
         <span className={styles.rowTitle}>{item?.title || '—'}</span>

@@ -33,7 +33,7 @@ function StatusRow({ entry, detail, t }) {
   return (
     <Link href={`/anime/${entry.id}`} className={styles.row}>
       <span className={styles.rowCover}>
-        {cover ? <Image src={cover} alt="" fill sizes="56px" /> : null}
+        {cover ? <Image src={cover} alt={entry?.title || ''} fill sizes="56px" /> : null}
       </span>
       <span className={styles.rowBody}>
         <span className={styles.rowStatus}>

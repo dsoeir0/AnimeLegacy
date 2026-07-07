@@ -20,7 +20,7 @@ function CalendarCell({ anime, broadcastTime, inList, localTime }) {
       <div className={styles.entryPoster}>
         <Image
           src={poster}
-          alt=""
+          alt={anime?.title || ''}
           fill
           sizes="44px"
           className={styles.entryImage}

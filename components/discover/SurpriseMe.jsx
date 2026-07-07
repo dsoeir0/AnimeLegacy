@@ -88,7 +88,7 @@ function SurpriseMe({ pool, t }) {
           <Image
             key={pick.mal_id}
             src={bannerUrl}
-            alt=""
+            alt={pick.title || ''}
             fill
             sizes="100vw"
             className={styles.surpriseBackdropImg}
@@ -144,7 +144,7 @@ function SurpriseMe({ pool, t }) {
                       {hPoster ? (
                         <Image
                           src={hPoster}
-                          alt=""
+                          alt={h.title || ''}
                           fill
                           sizes="36px"
                           className={styles.surpriseHistoryImg}

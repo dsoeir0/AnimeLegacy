@@ -23,7 +23,7 @@ function AnimeRow({ item, t }) {
   return (
     <Link href={`/anime/${item.mal_id}`} className={styles.row}>
       <span className={`${styles.rowCover} ${styles.rowCoverAnime}`}>
-        {cover ? <Image src={cover} alt="" fill sizes="48px" /> : null}
+        {cover ? <Image src={cover} alt={item.title || ''} fill sizes="48px" /> : null}
       </span>
       <span className={styles.rowBody}>
         <span className={styles.rowTitle}>{item.title || '—'}</span>
@@ -45,7 +45,7 @@ function CharacterRow({ item, t }) {
   return (
     <Link href={`/characters/${item.mal_id}`} className={styles.row}>
       <span className={`${styles.rowCover} ${styles.rowCoverPerson}`}>
-        {cover ? <Image src={cover} alt="" fill sizes="48px" /> : null}
+        {cover ? <Image src={cover} alt={item.name || ''} fill sizes="48px" /> : null}
       </span>
       <span className={styles.rowBody}>
         <span className={styles.rowTitle}>{item.name || t('status.unknown')}</span>
@@ -62,7 +62,7 @@ function VoiceRow({ item, t }) {
   return (
     <Link href={`/voices/${item.mal_id}`} className={styles.row}>
       <span className={`${styles.rowCover} ${styles.rowCoverPerson}`}>
-        {cover ? <Image src={cover} alt="" fill sizes="48px" /> : null}
+        {cover ? <Image src={cover} alt={item.name || ''} fill sizes="48px" /> : null}
       </span>
       <span className={styles.rowBody}>
         <span className={styles.rowTitle}>{item.name || t('status.unknown')}</span>

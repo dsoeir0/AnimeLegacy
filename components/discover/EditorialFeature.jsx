@@ -21,7 +21,7 @@ function EditorialFeature({ primary, secondary, t }) {
         {primaryBanner ? (
           <Image
             src={primaryBanner}
-            alt=""
+            alt={primary.title || ''}
             fill
             sizes="(max-width: 768px) 100vw, 1280px"
             quality={85}
@@ -70,7 +70,7 @@ function EditorialFeature({ primary, secondary, t }) {
               {banner ? (
                 <Image
                   src={banner}
-                  alt=""
+                  alt={a.title || ''}
                   fill
                   sizes="(max-width: 768px) 50vw, 1000px"
                   className={styles.editorialSecondaryImage}

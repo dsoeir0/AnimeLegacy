@@ -88,7 +88,7 @@ function AiringThisWeek({ schedulesByDay: ssrSchedules, t }) {
                 {url ? (
                   <Image
                     src={url}
-                    alt=""
+                    alt={anime.title || ''}
                     fill
                     sizes="170px"
                     className={styles.airingPosterImg}

@@ -170,7 +170,7 @@ function StudioDetailPage({ producer, works, related, t }) {
           {heroPoster ? (
             <Image
               src={heroPoster}
-              alt=""
+              alt={name || ''}
               fill
               sizes="100vw"
               quality={85}
@@ -342,7 +342,7 @@ function StudioDetailPage({ producer, works, related, t }) {
                             {getAnimeThumbUrl(a) ? (
                               <Image
                                 src={getAnimeThumbUrl(a)}
-                                alt=""
+                                alt={a.title || ''}
                                 fill
                                 sizes="110px"
                                 className={styles.timelinePosterImg}

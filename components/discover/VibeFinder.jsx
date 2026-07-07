@@ -98,7 +98,7 @@ function VibeFinder({ pool, t }) {
                     {url ? (
                       <Image
                         src={url}
-                        alt=""
+                        alt={anime.title || ''}
                         fill
                         sizes="64px"
                         className={styles.vibeMatchImg}

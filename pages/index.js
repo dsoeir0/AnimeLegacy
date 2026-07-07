@@ -46,7 +46,7 @@ function HeroCarousel({ slides, aniListMap, onOpenModal, getEntry, canEdit, t })
             aria-hidden={i !== idx}
           >
             {slideBanner ? (
-              <Image src={slideBanner} alt="" fill priority={i === 0} sizes="100vw" className={styles.heroImage} />
+              <Image src={slideBanner} alt={slide.title || ''} fill priority={i === 0} sizes="100vw" className={styles.heroImage} />
             ) : null}
             <div className={styles.heroGradient} />
           </div>

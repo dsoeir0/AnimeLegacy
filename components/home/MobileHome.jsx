@@ -40,7 +40,7 @@ function HeroSection({ slides, aniListMap, onOpenModal, getEntry, t }) {
         <Image
           key={slide.mal_id}
           src={banner}
-          alt=""
+          alt={slide.title || ''}
           fill
           priority
           sizes="100vw"
@@ -157,7 +157,7 @@ function AiringStrip({ items, aniListMap, t }) {
             >
               <div className={styles.portraitPoster}>
                 {cover ? (
-                  <Image src={cover} alt="" fill sizes="124px" className={styles.portraitImg} />
+                  <Image src={cover} alt={item.title || ''} fill sizes="124px" className={styles.portraitImg} />
                 ) : null}
                 {score !== null ? (
                   <span className={styles.portraitScore}>{formatFivePoint(score)}</span>
@@ -206,7 +206,7 @@ function HighlightsGrid({ items, aniListMap, t }) {
             <Link key={item.mal_id} href={`/anime/${item.mal_id}`} className={styles.gridCard}>
               <div className={styles.gridPoster}>
                 {cover ? (
-                  <Image src={cover} alt="" fill sizes="(max-width: 768px) 45vw, 200px" />
+                  <Image src={cover} alt={item.title || ''} fill sizes="(max-width: 768px) 45vw, 200px" />
                 ) : null}
                 {item.type ? (
                   <span className={styles.gridMeta}>

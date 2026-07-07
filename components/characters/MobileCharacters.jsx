@@ -40,7 +40,7 @@ function MobileCharacters({ items, totalIndexed, t }) {
             {posterFrom(featured) ? (
               <Image
                 src={posterFrom(featured)}
-                alt=""
+                alt={featured.name || ''}
                 fill
                 sizes="(max-width: 768px) 100vw, 600px"
                 priority

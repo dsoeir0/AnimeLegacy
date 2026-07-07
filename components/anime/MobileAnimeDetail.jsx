@@ -52,7 +52,7 @@ function MobileAnimeDetail({
     <div className={styles.mobileDetail}>
       <div className={styles.bannerWrap}>
         {banner ? (
-          <Image src={banner} alt="" fill priority sizes="100vw" className={styles.bannerImg} />
+          <Image src={banner} alt={normalized?.title || ''} fill priority sizes="100vw" className={styles.bannerImg} />
         ) : null}
         <div className={styles.bannerGradTop} />
         <div className={styles.bannerGradBottom} />

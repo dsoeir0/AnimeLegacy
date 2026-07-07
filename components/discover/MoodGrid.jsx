@@ -57,7 +57,7 @@ function MoodGrid({ postersByMood, t }) {
                 <div className={styles.moodBannerWrap}>
                   <Image
                     src={banner}
-                    alt=""
+                    alt={bannerAnime?.title || ''}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className={styles.moodBanner}
@@ -103,7 +103,7 @@ function MoodGrid({ postersByMood, t }) {
                             {url ? (
                               <Image
                                 src={url}
-                                alt=""
+                                alt={a.title || ''}
                                 fill
                                 sizes="28px"
                                 className={styles.moodAvatarImg}

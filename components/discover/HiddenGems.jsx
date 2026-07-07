@@ -33,7 +33,7 @@ function HiddenGems({ gems, t }) {
                 {url ? (
                   <Image
                     src={url}
-                    alt=""
+                    alt={a.title || ''}
                     fill
                     sizes="(max-width: 768px) 50vw, 1000px"
                     className={styles.gemBannerImg}

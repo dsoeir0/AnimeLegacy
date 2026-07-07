@@ -159,7 +159,7 @@ function MobileStudioDetail({
                 >
                   <span className={styles.workPoster}>
                     {cover ? (
-                      <Image src={cover} alt="" fill sizes="(max-width: 768px) 33vw, 140px" />
+                      <Image src={cover} alt={anime.title || ''} fill sizes="(max-width: 768px) 33vw, 140px" />
                     ) : null}
                     {score !== null ? (
                       <span className={styles.workScore}>{formatFivePoint(score)}</span>

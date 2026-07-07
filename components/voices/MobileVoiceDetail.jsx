@@ -145,7 +145,7 @@ function MobileVoiceDetail({
                   <span className={styles.roleYear}>{year ?? '—'}</span>
                   <span className={styles.roleAvatar}>
                     {charImg ? (
-                      <Image src={charImg} alt="" fill sizes="44px" />
+                      <Image src={charImg} alt={entry?.character?.name || ''} fill sizes="44px" />
                     ) : null}
                   </span>
                   <span className={styles.roleBody}>

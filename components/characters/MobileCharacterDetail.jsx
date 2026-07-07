@@ -55,7 +55,7 @@ function MobileCharacterDetail({
         {imageUrl ? (
           <Image
             src={imageUrl}
-            alt=""
+            alt={character?.name || ''}
             fill
             priority
             sizes="100vw"
@@ -163,7 +163,7 @@ function MobileCharacterDetail({
                 <>
                   <span className={styles.voiceAvatar}>
                     {portrait ? (
-                      <Image src={portrait} alt="" fill sizes="44px" />
+                      <Image src={portrait} alt={actor?.name || ''} fill sizes="44px" />
                     ) : (
                       <span>{(actor?.name || '?').slice(0, 1).toUpperCase()}</span>
                     )}
@@ -221,7 +221,7 @@ function MobileCharacterDetail({
               const inner = (
                 <>
                   <span className={styles.appearCover}>
-                    {cover ? <Image src={cover} alt="" fill sizes="48px" /> : null}
+                    {cover ? <Image src={cover} alt={entry?.anime?.title || ''} fill sizes="48px" /> : null}
                   </span>
                   <span className={styles.appearBody}>
                     <span className={styles.appearTitle}>

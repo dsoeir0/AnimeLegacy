@@ -117,7 +117,7 @@ function BecauseYouLiked({ pool, t }) {
             <div className={styles.becauseAnchorPoster}>
               <Image
                 src={anchor.image}
-                alt=""
+                alt={anchor.title || ''}
                 fill
                 sizes="48px"
                 className={styles.becauseAnchorImg}

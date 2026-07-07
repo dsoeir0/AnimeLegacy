@@ -77,7 +77,7 @@ const FeaturedRow = memo(function FeaturedRow({ anime, index, aniListMap, t }) {
     <Link href={`/anime/${anime.mal_id}`} className={styles.featuredRow}>
       <span className={styles.featuredRank}>{String(index).padStart(2, '0')}</span>
       <span className={styles.featuredPoster}>
-        {cover ? <Image src={cover} alt="" fill sizes="88px" /> : null}
+        {cover ? <Image src={cover} alt={anime.title || ''} fill sizes="88px" /> : null}
         {anime.type ? (
           <span className={styles.featuredPosterMeta}>
             {anime.type.toUpperCase()}
@@ -111,7 +111,7 @@ const GridCard = memo(function GridCard({ anime, aniListMap }) {
     <Link href={`/anime/${anime.mal_id}`} className={styles.gridCard}>
       <span className={styles.gridPoster}>
         {cover ? (
-          <Image src={cover} alt="" fill sizes="(max-width: 768px) 45vw, 200px" />
+          <Image src={cover} alt={anime.title || ''} fill sizes="(max-width: 768px) 45vw, 200px" />
         ) : null}
         {anime.type ? (
           <span className={styles.gridMeta}>
