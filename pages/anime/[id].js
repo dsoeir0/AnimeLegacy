@@ -147,6 +147,23 @@ function AnimeDetail({ animeResposta, charactersResposta, aniListMedia, t }) {
   const orderedChars = [...mains, ...supporting];
   const visibleChars = showAllCharacters ? orderedChars : orderedChars.slice(0, 6);
 
+  // Both Jikan and the AniList fallback failed: say so instead of crashing.
+  if (!normalized) {
+    return (
+      <Layout title={`${t('errors.notFound')} · ${t('anime.metaTitleSuffix')}`}>
+        <div className={styles.page}>
+          <div className={styles.empty}>
+            <h1>{t('errors.notFound')}</h1>
+            <p>{t('errors.notFoundBody')}</p>
+            <Link href="/seasons">
+              <Button variant="primary" size="md">{t('actions.browseSeasons')}</Button>
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout
       title={`${data.title || t('anime.unknownTitle')} · ${t('anime.metaTitleSuffix')}`}
@@ -612,6 +629,8 @@ export async function getServerSideProps(context) {
   if (isHentaiAnime(animeResposta?.data)) {
     return { notFound: true };
   }
+  // Upstream outage, not a missing page: keep crawlers from indexing it.
+  if (!animeResposta?.data && context.res) context.res.statusCode = 503;
   const aniListMap = await fetchAniListMediaByMalIds([Number(id)]);
   const aniListMedia = aniListMap[id] || null;
   return { props: { animeResposta, charactersResposta, aniListMedia } };

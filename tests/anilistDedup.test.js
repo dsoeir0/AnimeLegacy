@@ -72,3 +72,27 @@ describe('fetchAniListMediaByMalIds', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe('AniList rate limit handling', () => {
+  it('does not cache covers from a 429 and pauses every AniList caller', async () => {
+    fetchMock.mockReturnValueOnce(
+      Promise.resolve({ ok: false, status: 429, headers: new Headers({ 'retry-after': '30' }) }),
+    );
+    const { fetchAniListMediaByMalIds } = await import('../lib/services/anilist');
+    const { getAniListTopMovies } = await import('../lib/services/anilistFallback');
+    expect(await fetchAniListMediaByMalIds([1])).toEqual({});
+    // Paused: neither the cover fetch nor the fallback hits the network.
+    expect(await fetchAniListMediaByMalIds([1])).toEqual({});
+    expect((await getAniListTopMovies()).error).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries a failed cover on the next call instead of caching the miss', async () => {
+    fetchMock
+      .mockReturnValueOnce(Promise.resolve({ ok: false, status: 500 }))
+      .mockReturnValueOnce(respond([{ idMal: 1, coverImage: { large: 'c.jpg' } }]));
+    const { fetchAniListMediaByMalIds } = await import('../lib/services/anilist');
+    expect(await fetchAniListMediaByMalIds([1])).toEqual({});
+    expect((await fetchAniListMediaByMalIds([1]))[1].coverImage.large).toBe('c.jpg');
+  });
+});
