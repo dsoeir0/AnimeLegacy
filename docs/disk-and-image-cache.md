@@ -60,4 +60,4 @@ Two layers, already in place:
 
 ## VPS terminal note
 
-Both the Hetzner web console and the SSH terminal hard-wrap pasted lines at ~80 chars and auto-indent each line by 2 spaces. That breaks heredocs (an indented closing `EOF` never terminates) and splits long commands. When pasting commands to the server, keep every line under ~78 chars, avoid heredocs, and put long commands in a short-path wrapper script (as `imgclean` above) rather than inline in `ExecStart`.
+Some web consoles (e.g. the OVH KVM) and SSH terminals hard-wrap pasted lines at ~80 chars and auto-indent each line by 2 spaces. That breaks heredocs (an indented closing `EOF` never terminates) and splits long commands. When pasting commands to the server, keep every line under ~78 chars, avoid heredocs, and put long commands in a short-path wrapper script (as `imgclean` above) rather than inline in `ExecStart`.

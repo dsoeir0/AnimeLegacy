@@ -8,7 +8,7 @@ Account deletion is a GDPR Article 17 obligation. If someone emails you asking f
 
 ## Mode 1 — Automated (the goal)
 
-**Prerequisites in Vercel**: the 3 env vars below, set at `Production` / `Preview` / `Development` scopes.
+**Prerequisites on the VPS**: the 3 env vars below in `/home/duarte/apps/animelegacy/.env.local`, then `sudo systemctl restart animelegacy`.
 
 | Variable | Where to get it |
 |---|---|

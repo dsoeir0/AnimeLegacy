@@ -50,7 +50,7 @@ jobs:
         run: pnpm build
         env:
           # Dummy values so next build succeeds without real Firebase creds.
-          # Real values are set in Vercel environment variables for deploys.
+          # Real values live in .env.local on the VPS.
           NEXT_PUBLIC_FIREBASE_API_KEY: ci-placeholder
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ci.firebaseapp.com
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ci-project

@@ -14,7 +14,7 @@
 // doesn't catch real Admin-SDK regressions. Instead:
 //   - This file tests the logic that decides *whether* the cascade runs
 //   - docs/account-deletion.md documents a manual smoke test after you
-//     first set FIREBASE_ADMIN_* in Vercel
+//     first set FIREBASE_ADMIN_* in the VPS .env.local
 //
 // If we ever need to unit-test the cascade itself, extract it into a pure
 // function that takes a minimal `{ getUser, deleteDoc, listDocs, deleteAuthUser }`
