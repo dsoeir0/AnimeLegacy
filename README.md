@@ -45,7 +45,7 @@ Built with Next.js 14, Firebase, and the Jikan + AniList APIs. Dark-first, typog
 | Translations | [MyMemory](https://mymemory.translated.net/) (free tier, no key) — cached per `(text, lang)` in Firestore |
 | i18n | [`react-switch-lang`](https://github.com/MaximeMaillet/react-switch-lang) — en/pt/es/fr, dot-notation keys, flag CDN via [flagcdn.com](https://flagcdn.com) |
 | Error tracking | [Sentry](https://sentry.io) (via `@sentry/nextjs` + instrumentation files) — silent transactions (sample rate 0), unhandled exceptions only |
-| Deployment | Hetzner Cloud (CX23) + Caddy reverse proxy + systemd |
+| Deployment | OVHcloud VPS + Caddy reverse proxy + systemd |
 
 ---
 
@@ -448,7 +448,7 @@ Release notes are written by hand (group commits by area: Seasons / Discover / e
 
 ## Deployment
 
-AnimeLegacy runs on a single Hetzner Cloud VPS (CX23, Nuremberg) with Caddy as the reverse proxy and HTTPS provider, and systemd supervising the Next.js process.
+AnimeLegacy runs on a single OVHcloud VPS (VPS-1, Beauharnois) with Caddy as the reverse proxy and HTTPS provider, and systemd supervising the Next.js process. A fresh server is provisioned with [`scripts/vps-setup.sh`](scripts/vps-setup.sh).
 
 **Pipeline:**
 
@@ -465,9 +465,9 @@ AnimeLegacy runs on a single Hetzner Cloud VPS (CX23, Nuremberg) with Caddy as t
 | systemd unit | `/etc/systemd/system/animelegacy.service` (port 3000) |
 | Caddyfile | `/etc/caddy/Caddyfile` (HTTPS auto via Let's Encrypt) |
 | Env vars | `/home/duarte/apps/animelegacy/.env.local` (Firebase) |
-| Backups | Hetzner snapshots — 7 days, daily, automatic |
+| Backups | OVH automated backup — daily, included with the plan |
 
-**DNS:** managed at Cloudflare Registrar with two A records (`@` and `www`) pointing to the VPS IP. Cloudflare proxy is **off** (DNS only) so Caddy can issue/renew certs directly via Let's Encrypt HTTP-01 challenge.
+**DNS:** managed at Cloudflare Registrar with two A records (`@` and `www`) pointing to the VPS IP, proxied through Cloudflare. Caddy still issues/renews certs via the Let's Encrypt HTTP-01 challenge, which Cloudflare passes through on port 80.
 
 **Monitoring:**
 
