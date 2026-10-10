@@ -25,7 +25,8 @@
     "next": "^14.2.35",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-switch-lang": "^1.0.2"
+    "react-switch-lang": "^1.0.2",
+    "sharp": "0.33"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "3",
