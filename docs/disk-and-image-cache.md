@@ -58,6 +58,8 @@ Two layers, already in place:
 
 2. **Fewer variants** — `next.config.js` caps `deviceSizes` and `imageSizes` to 4 widths each and sets `minimumCacheTTL` to 31 days, so each cover produces fewer files and re-optimizes less often. Widening those arrays multiplies the file count — weigh that before changing them.
 
+3. **Cloudflare edge cache** — a Cache Rule on `/_next/image` (see README → Deployment) serves repeat requests for a cover from Cloudflare's edge, so the VPS optimizes each variant once per 31-day TTL instead of on every cold visitor. This doesn't shrink `.next/cache/images` (the origin still writes each variant once), but it removes most re-reads and keeps optimizer CPU flat during traffic spikes.
+
 ## VPS terminal note
 
 Some web consoles (e.g. the OVH KVM) and SSH terminals hard-wrap pasted lines at ~80 chars and auto-indent each line by 2 spaces. That breaks heredocs (an indented closing `EOF` never terminates) and splits long commands. When pasting commands to the server, keep every line under ~78 chars, avoid heredocs, and put long commands in a short-path wrapper script (as `imgclean` above) rather than inline in `ExecStart`.

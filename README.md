@@ -469,6 +469,8 @@ AnimeLegacy runs on a single OVHcloud VPS (VPS-1, Beauharnois) with Caddy as the
 
 **DNS:** managed at Cloudflare Registrar with two A records (`@` and `www`) pointing to the VPS IP, proxied through Cloudflare. Caddy still issues/renews certs via the Let's Encrypt HTTP-01 challenge, which Cloudflare passes through on port 80.
 
+**Edge cache for optimized images:** a Cloudflare Cache Rule (`Next image cache`, expression `starts_with(http.request.uri.path, "/_next/image")`, *Eligible for cache*, everything else default) caches `next/image` output at the edge. Cloudflare doesn't cache these by default because the URLs have no file extension. The edge TTL follows the origin's `Cache-Control: public, max-age=2678400` (31 days, from `minimumCacheTTL`), and the default cache key includes the query string, so every `url` × `w` × `q` variant is stored separately. Check it with `curl -sI "https://animelegacy.org/_next/image?url=…&w=640&q=75" | grep cf-cache-status`: the first request is `MISS` and the next one is `HIT`.
+
 **Monitoring:**
 
 - **Uptime** — [UptimeRobot](https://uptimerobot.com) free tier pings `https://www.animelegacy.org` every 5 minutes. Three consecutive failures → email alert. No external dashboard URL; logs visible in the UptimeRobot console.
